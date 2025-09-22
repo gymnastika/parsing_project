@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GYMNASTIKA - Панель управления</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Instant loader display to prevent white screen -->
+    <style>
+        #loadingScreen {
+            display: flex !important;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 10000;
+            background: linear-gradient(135deg, #7C3AED 0%, #8B5CF6 100%);
+            align-items: center;
+            justify-content: center;
+        }
+        #animationWindow {
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        #animationWindow svg {
+            width: 100%;
+            height: 100%;
+        }
+        #animationWindow svg {
+            background: transparent !important;
+        }
+        .loading-logo-subtitle {
+            text-decoration: none !important;
+            border-bottom: none !important;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Lottie Animation CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.9.6/lottie.min.js"></script>
+    
+    <!-- Adaptive Loader -->
+    <script src="lib/adaptive-loader.js"></script>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <h1 class="loading-logo-text">GYMNASTIKA</h1>
+                <p class="loading-logo-subtitle">RG CLUB UAE</p>
+            </div>
+            <div class="loading-spinner">
+                <div id="animationWindow"></div>
+            </div>
+            <div class="loading-text">Загрузка системы...</div>
+        </div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container hidden">
+        <div class="auth-card">
+            <div class="logo-container">
+                <h1 class="auth-logo-text">GYMNASTIKA</h1>
+                <p class="auth-logo-subtitle">RG CLUB UAE</p>
+            </div>
+            
+            <!-- Auth Toggle Buttons -->
+            <div class="auth-toggle">
+                <button type="button" id="loginToggle" class="auth-toggle-btn active">Вход</button>
+                <button type="button" id="registerToggle" class="auth-toggle-btn">Регистрация</button>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form login-form">
+                <div class="inputGroup">
+                    <input type="text" id="username" name="username" required>
+                    <label for="username">Пользователь</label>
+                </div>
+                <div class="inputGroup">
+                    <input type="password" id="password" name="password" required>
+                    <label for="password">Пароль</label>
+                </div>
+                <button type="submit" class="login-btn">
+                    Войти
+                    <span></span><span></span><span></span><span></span>
+                </button>
+                <div id="loginError" class="error-message"></div>
+            </form>
+            
+            
+            <!-- Registration Form -->
+            <form id="registerForm" class="auth-form register-form hidden">
+                <div class="form-row">
+                    <div class="inputGroup">
+                        <input type="text" id="firstName" name="firstName" required>
+                        <label for="firstName">Имя</label>
+                    </div>
+                    <div class="inputGroup">
+                        <input type="text" id="lastName" name="lastName" required>
+                        <label for="lastName">Фамилия</label>
+                    </div>
+                </div>
+                <div class="inputGroup">
+                    <input type="text" id="registerUsername" name="username" required 
+                           pattern="[a-zA-Z0-9_]{3,20}" 
+                           title="3-20 символов: буквы, цифры, подчеркивание">
+                    <label for="registerUsername">Username</label>
+                </div>
+                <div class="inputGroup">
+                    <input type="email" id="registerEmail" name="email" required>
+                    <label for="registerEmail">Email</label>
+                </div>
+                <div class="form-row">
+                    <div class="inputGroup">
+                        <input type="password" id="registerPassword" name="password" required minlength="6">
+                        <label for="registerPassword">Пароль</label>
+                    </div>
+                    <div class="inputGroup">
+                        <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6">
+                        <label for="confirmPassword">Подтвердить пароль</label>
+                    </div>
+                </div>
+                <div class="form-group glitch-input-wrapper">
+                    <div class="input-container">
+                        <input type="text" id="secretCode" name="secretCode" class="holo-input" required 
+                               placeholder="СЕКРЕТНЫЙ КОД" 
+                               style="text-transform: uppercase;" 
+                               oninput="this.value = this.value.toUpperCase()">
+                        
+
+                        <div class="input-corners">
+                            <div class="corner corner-tl"></div>
+                            <div class="corner corner-tr"></div>
+                            <div class="corner corner-bl"></div>
+                            <div class="corner corner-br"></div>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="register-btn">
+                    Зарегистрироваться
+                    <span></span><span></span><span></span><span></span>
+                </button>
+                <div id="registerError" class="error-message"></div>
+            </form>
+            
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboard" class="dashboard hidden">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="sidebar-logo-text">GYMNASTIKA</h1>
+                <p class="sidebar-logo-subtitle">RG CLUB UAE</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="#parsing" class="nav-link active" data-section="parsing">
+                            <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20">
+                                <path d="M23.707,22.293l-5.969-5.969a10.016,10.016,0,1,0-1.414,1.414l5.969,5.969a1,1,0,0,0,1.414-1.414ZM10,18a8,8,0,1,1,8-8A8.009,8.009,0,0,1,10,18Z"/>
+                            </svg>
+                            <span>Парсинг данных</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#database" class="nav-link" data-section="database">
+                            <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20">
+                                <path d="M7,0H4A4,4,0,0,0,0,4V7a4,4,0,0,0,4,4H7a4,4,0,0,0,4-4V4A4,4,0,0,0,7,0ZM9,7A2,2,0,0,1,7,9H4A2,2,0,0,1,2,7V4A2,2,0,0,1,4,2H7A2,2,0,0,1,9,4Z"/>
+                                <path d="M20,0H17a4,4,0,0,0-4,4V7a4,4,0,0,0,4,4h3a4,4,0,0,0,4-4V4A4,4,0,0,0,20,0Zm2,7a2,2,0,0,1-2,2H17a2,2,0,0,1-2-2V4a2,2,0,0,1,2-2h3a2,2,0,0,1,2,2Z"/>
+                                <path d="M7,13H4a4,4,0,0,0-4,4v3a4,4,0,0,0,4,4H7a4,4,0,0,0,4-4V17A4,4,0,0,0,7,13Zm2,7a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V17a2,2,0,0,1,2-2H7a2,2,0,0,1,2,2Z"/>
+                                <path d="M20,13H17a4,4,0,0,0-4,4v3a4,4,0,0,0,4,4h3a4,4,0,0,0,4-4V17A4,4,0,0,0,20,13Zm2,7a2,2,0,0,1-2,2H17a2,2,0,0,1-2-2V17a2,2,0,0,1,2-2h3a2,2,0,0,1,2,2Z"/>
+                            </svg>
+                            <span>База данных</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#email" class="nav-link" data-section="email">
+                            <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20">
+                                <path d="M19,1H5A5.006,5.006,0,0,0,0,6V18a5.006,5.006,0,0,0,5,5H19a5.006,5.006,0,0,0,5-5V6A5.006,5.006,0,0,0,19,1ZM5,3H19a3,3,0,0,1,2.78,1.887l-7.658,7.659a3.007,3.007,0,0,1-4.244,0L2.22,4.887A3,3,0,0,1,5,3ZM19,21H5a3,3,0,0,1-3-3V7.5L8.464,13.96a5.007,5.007,0,0,0,7.072,0L22,7.5V18A3,3,0,0,1,19,21Z"/>
+                            </svg>
+                            <span>Рассылка email</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#settings" class="nav-link" data-section="settings">
+                            <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20">
+                                <path d="M15,24H9V20.487a9,9,0,0,1-2.849-1.646L3.107,20.6l-3-5.2L3.15,13.645a9.1,9.1,0,0,1,0-3.29L.107,8.6l3-5.2L6.151,5.159A9,9,0,0,1,9,3.513V0h6V3.513a9,9,0,0,1,2.849,1.646L20.893,3.4l3,5.2L20.85,10.355a9.1,9.1,0,0,1,0,3.29L23.893,15.4l-3,5.2-3.044-1.758A9,9,0,0,1,15,20.487Zm-4-2h2V18.973l.751-.194A6.984,6.984,0,0,0,16.994,16.9l.543-.553,2.623,1.515,1-1.732-2.62-1.513.206-.746a7.048,7.048,0,0,0,0-3.75l-.206-.746,2.62-1.513-1-1.732L17.537,7.649,16.994,7.1a6.984,6.984,0,0,0-3.243-1.875L13,5.027V2H11V5.027l-.751.194A6.984,6.984,0,0,0,7.006,7.1l-.543.553L3.84,6.134l-1,1.732L5.46,9.379l-.206.746a7.048,7.048,0,0,0,0,3.75l.206.746L2.84,16.134l1,1.732,2.623-1.515.543.553a6.984,6.984,0,0,0,3.243,1.875l.751.194Zm1-6a4,4,0,1,1,4-4A4,4,0,0,1,12,16Zm0-6a2,2,0,1,0,2,2A2,2,0,0,0,12,10Z"/>
+                            </svg>
+                            <span>Настройки</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <h1 id="pageTitle">Парсинг данных</h1>
+                <div class="user-info">
+                    <div class="db-status" id="dbStatus">
+                        <span class="status-icon">🔌</span>
+                        <span class="status-text">База данных</span>
+                    </div>
+                    <div class="apify-status" id="apifyStatus">
+                        <span class="status-icon">🎭</span>
+                        <span class="status-text">Apify</span>
+                    </div>
+                    <span id="currentUsername" class="current-username">Администратор</span>
+                    <button id="logoutBtn" class="logout-btn">Выйти</button>
+                </div>
+            </header>
+            
+            <div class="content-area">
+                <!-- Parsing Section -->
+                <div id="parsing-content" class="section-content active">
+                    <div class="section-card">
+                        <h2>Парсинг данных</h2>
+                        <p>Модуль для парсинга и обработки данных художественной гимнастики</p>
+                        
+                        <!-- Parsing Tabs -->
+                        <div class="parsing-tabs">
+                            <button class="tab-button active" data-tab="ai-search">
+                                <svg class="tab-icon" viewBox="0 0 24 24" width="20" height="20">
+                                    <path d="m16 6a1 1 0 0 1 0 2h-8a1 1 0 0 1 0-2zm7.707 17.707a1 1 0 0 1 -1.414 0l-2.407-2.407a4.457 4.457 0 0 1 -2.386.7 4.5 4.5 0 1 1 4.5-4.5 4.457 4.457 0 0 1 -.7 2.386l2.407 2.407a1 1 0 0 1 0 1.414zm-6.207-3.707a2.5 2.5 0 1 0 -2.5-2.5 2.5 2.5 0 0 0 2.5 2.5zm-4.5 2h-6a3 3 0 0 1 -3-3v-14a3 3 0 0 1 3-3h12a1 1 0 0 1 1 1v8a1 1 0 0 0 2 0v-8a3 3 0 0 0 -3-3h-12a5.006 5.006 0 0 0 -5 5v14a5.006 5.006 0 0 0 5 5h6a1 1 0 0 0 0-2z"/>
+                                </svg>
+                                AI поиск
+                            </button>
+                            <button class="tab-button" data-tab="url-parsing">
+                                <svg class="tab-icon" viewBox="0 0 24 24" width="20" height="20">
+                                    <path d="M12,0A12,12,0,1,0,24,12,12.013,12.013,0,0,0,12,0ZM22,12a9.938,9.938,0,0,1-1.662,5.508l-1.192-1.193A.5.5,0,0,1,19,15.962V15a3,3,0,0,0-3-3H13a1,1,0,0,1-1-1v-.5a.5.5,0,0,1,.5-.5A2.5,2.5,0,0,0,15,7.5v-1a.5.5,0,0,1,.5-.5h1.379a2.516,2.516,0,0,0,1.767-.732l.377-.377A9.969,9.969,0,0,1,22,12Zm-19.951.963,3.158,3.158A2.978,2.978,0,0,0,7.329,17H10a1,1,0,0,1,1,1v3.949A10.016,10.016,0,0,1,2.049,12.963ZM13,21.949V18a3,3,0,0,0-3-3H7.329a1,1,0,0,1-.708-.293L2.163,10.249A9.978,9.978,0,0,1,17.456,3.63l-.224.224A.507.507,0,0,1,16.879,4H15.5A2.5,2.5,0,0,0,13,6.5v1a.5.5,0,0,1-.5.5A2.5,2.5,0,0,0,10,10.5V11a3,3,0,0,0,3,3h3a1,1,0,0,1,1,1v.962a2.516,2.516,0,0,0,.732,1.767l1.337,1.337A9.971,9.971,0,0,1,13,21.949Z"/>
+                                </svg>
+                                По URL
+                            </button>
+                        </div>
+
+                        <!-- AI Search Tab Content -->
+                        <div id="ai-search-content" class="tab-content active">
+                            <form id="parsingForm" class="parsing-form">
+                                <div class="form-group">
+                                    <input type="text" id="taskName" name="task-name" placeholder="Введите название задачи" required>
+                                    <label for="taskName">Название задачи</label>
+                                </div>
+                                <div class="form-group">
+                                    <textarea id="searchQuery" name="search-query" placeholder="Опишите что нужно найти" rows="3" required></textarea>
+                                    <label for="searchQuery">Поисковый запрос</label>
+                                </div>
+                                <button type="submit" class="submit-btn">
+                                    Начать парсинг
+                                </button>
+                            </form>
+                            
+                            <!-- Stylish Progress Bar -->
+                            <div class="stylish-progress-bar" id="stylishProgressBar">
+                                <div class="progress-bar">
+                                    <input type="radio" class="progress-bar-input" name="progress" id="progress_0" />
+                                    <div class="progress-bar-view" data-stage="query-generation">
+                                        <div class="progress-stage-button">
+                                            <span class="progress-stage-icon">🤖</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <input type="radio" class="progress-bar-input" name="progress" id="progress_1" />
+                                    <div class="progress-bar-view" data-stage="apify-search">
+                                        <div class="progress-stage-button">
+                                            <span class="progress-stage-icon">🔍</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <input type="radio" class="progress-bar-input" name="progress" id="progress_2" />
+                                    <div class="progress-bar-view" data-stage="validation">
+                                        <div class="progress-stage-button">
+                                            <span class="progress-stage-icon">✅</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <input type="radio" class="progress-bar-input" name="progress" id="progress_3" />
+                                    <div class="progress-bar-view" data-stage="web-scraping">
+                                        <div class="progress-stage-button">
+                                            <span class="progress-stage-icon">🌐</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <input type="radio" class="progress-bar-input" name="progress" id="progress_4" />
+                                    <div class="progress-bar-view" data-stage="complete">
+                                        <div class="progress-stage-button">
+                                            <span class="progress-stage-icon">📊</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="progress-text" id="progressText">
+                                    Нажмите "Начать парсинг" для запуска процесса
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- URL Parsing Tab Content -->
+                        <div id="url-parsing-content" class="tab-content">
+                            <form class="parsing-form">
+                                <div class="form-group">
+                                    <input type="text" id="url-task-name" name="task-name" placeholder="Введите название задачи" required>
+                                    <label for="url-task-name">Название задачи</label>
+                                </div>
+                                <div class="form-group">
+                                    <input type="url" id="url-website" name="website-url" placeholder="https://example.com" required>
+                                    <label for="url-website">URL сайта</label>
+                                </div>
+                                <button type="submit" class="submit-btn">
+                                    Начать парсинг
+                                </button>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Database Section -->
+                <div id="database-content" class="section-content">
+                    <div class="section-card">
+                        <h2>База данных</h2>
+                        <p>Результаты парсинга и управление данными</p>
+                        
+                        <!-- Database Tabs with Controls -->
+                        <div class="database-tabs-header">
+                            <div class="parsing-tabs">
+                                <button class="tab-button database-tab active" data-tab="task-history">
+                                    <svg class="tab-icon" viewBox="0 0 24 24" width="20" height="20">
+                                        <path d="M18.713,12H14a2,2,0,0,1-2-2V5.274a3,3,0,0,0-1.166-2.383,2.871,2.871,0,0,0-2.481-.534,10.969,10.969,0,0,0,.553,21.414A11,11,0,0,0,21.64,15.657a2.876,2.876,0,0,0-.533-2.485A3.055,3.055,0,0,0,18.713,12Zm.988,3.168A8.969,8.969,0,1,1,8.842,4.3a.871.871,0,0,1,.764.172,1.016,1.016,0,0,1,.4.806V10a4,4,0,0,0,4,4h4.712a1.041,1.041,0,0,1,.816.4A.884.884,0,0,1,19.7,15.168Z"/>
+                                        <path d="M23.651,7.446A10.073,10.073,0,0,0,16.582.372A2.1,2.1,0,0,0,16.038.3a2,2,0,0,0-2.019,2V7a3,3,0,0,0,3,3h4.719A2.008,2.008,0,0,0,23.651,7.446ZM21.153,8H17.015a1,1,0,0,1-1-1l-.008-4.693a.048.048,0,0,1,.025-.009l.026,0A8.072,8.072,0,0,1,21.734,8Z"/>
+                                    </svg>
+                                    История задач
+                                </button>
+                                <button class="tab-button database-tab" data-tab="contacts">
+                                    <svg class="tab-icon" viewBox="0 0 24 24" width="20" height="20">
+                                        <path d="m7.5 13a4.5 4.5 0 1 1 4.5-4.5 4.505 4.505 0 0 1 -4.5 4.5zm0-7a2.5 2.5 0 1 0 2.5 2.5 2.5 2.5 0 0 0 -2.5-2.5zm7.5 14a5.006 5.006 0 0 0 -5-5h-5a5.006 5.006 0 0 0 -5 5v4h2v-4a3 3 0 0 1 3-3h5a3 3 0 0 1 3 3v4h2zm2.5-11a4.5 4.5 0 1 1 4.5-4.5 4.505 4.505 0 0 1 -4.5 4.5zm0-7a2.5 2.5 0 1 0 2.5 2.5 2.5 2.5 0 0 0 -2.5-2.5zm6.5 14a5.006 5.006 0 0 0 -5-5h-4v2h4a3 3 0 0 1 3 3v4h2z"/>
+                                    </svg>
+                                    Контакты
+                                </button>
+                            </div>
+                            <div class="database-controls" id="taskHistoryControls">
+                                <button id="exportBtn" class="export-btn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                                    </svg>
+                                    Экспорт
+                                </button>
+                                <div class="search-box">
+                                    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M23.707,22.293l-5.969-5.969a10.016,10.016,0,1,0-1.414,1.414l5.969,5.969a1,1,0,0,0,1.414-1.414ZM10,18a8,8,0,1,1,8-8A8.009,8.009,0,0,1,10,18Z"/>
+                                    </svg>
+                                    <input type="text" id="searchInput" placeholder="Поиск по базе данных...">
+                                </div>
+                            </div>
+                            <div class="database-controls hidden" id="contactsControls">
+                                <button id="addContactBtn" class="add-contact-btn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+                                    </svg>
+                                    Добавить контакт
+                                </button>
+                                <button id="exportContactsBtn" class="export-btn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                                    </svg>
+                                    Экспорт контактов
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Task History Tab Content -->
+                        <div id="task-history-content" class="tab-content active">
+                            
+                            <div class="database-content">
+                                <!-- Loading State -->
+                                <div id="databaseLoading" class="database-loading hidden">
+                                    <div class="loading-spinner-small"></div>
+                                    <p>Загрузка данных...</p>
+                                </div>
+                                
+                                <!-- Empty State -->
+                                <div id="databaseEmpty" class="database-empty">
+                                    <div class="empty-icon">
+                                        <svg viewBox="0 0 24 24" width="64" height="64" fill="#9CA3AF">
+                                            <path d="M7,0H4A4,4,0,0,0,0,4V7a4,4,0,0,0,4,4H7a4,4,0,0,0,4-4V4A4,4,0,0,0,7,0ZM9,7A2,2,0,0,1,7,9H4A2,2,0,0,1,2,7V4A2,2,0,0,1,4,2H7A2,2,0,0,1,9,4Z"/>
+                                            <path d="M20,0H17a4,4,0,0,0-4,4V7a4,4,0,0,0,4,4h3a4,4,0,0,0,4-4V4A4,4,0,0,0,20,0Zm2,7a2,2,0,0,1-2,2H17a2,2,0,0,1-2-2V4a2,2,0,0,1,2-2h3a2,2,0,0,1,2,2Z"/>
+                                            <path d="M7,13H4a4,4,0,0,0-4,4v3a4,4,0,0,0,4,4H7a4,4,0,0,0,4-4V17A4,4,0,0,0,7,13Zm2,7a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V17a2,2,0,0,1,2-2H7a2,2,0,0,1,2,2Z"/>
+                                            <path d="M20,13H17a4,4,0,0,0-4,4v3a4,4,0,0,0,4,4h3a4,4,0,0,0,4-4V17A4,4,0,0,0,20,13Zm2,7a2,2,0,0,1-2,2H17a2,2,0,0,1-2-2V17a2,2,0,0,1,2-2h3a2,2,0,0,1,2,2Z"/>
+                                        </svg>
+                                    </div>
+                                    <h3>База данных пуста</h3>
+                                    <p>Выполните парсинг для добавления данных в базу</p>
+                                </div>
+                                
+                                <!-- Data Table -->
+                                <div id="databaseTable" class="database-table-container hidden">
+                                    <div class="table-wrapper">
+                                        <table class="data-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Название</th>
+                                                    <th>Адрес</th>
+
+                                                    <th>Веб-сайт</th>
+                                                    <th>Часы работы</th>
+                                                    <th>Дата парсинга</th>
+                                                    <th>Действия</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="databaseTableBody">
+                                                <!-- Dynamic content will be inserted here -->
+                                            </tbody>
+                                        </table>
+                                        
+                                        <!-- Pagination -->
+                                        <div class="pagination" id="tablePagination">
+                                            <div class="pagination-info">
+                                                <span id="paginationInfo">Показано 0 из 0 записей</span>
+                                            </div>
+                                            <div class="pagination-controls">
+                                            <button id="prevPageBtn" class="pagination-btn" disabled>
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M15.41,7.41L14,6L8,12L14,18L15.41,16.59L10.83,12L15.41,7.41Z"/>
+                                                </svg>
+                                            </button>
+                                            <div id="pageNumbers" class="page-numbers">
+                                                <!-- Page numbers will be inserted here -->
+                                            </div>
+                                            <button id="nextPageBtn" class="pagination-btn" disabled>
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M8.59,16.59L10,18L16,12L10,6L8.59,7.41L13.17,12L8.59,16.59Z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contacts Tab Content -->
+                        <div id="contacts-content" class="tab-content">
+
+                            <!-- Contact Form -->
+                            <div id="contactForm" class="contact-form-container hidden">
+                                <div class="contact-form">
+                                    <h3>Добавить новый контакт</h3>
+                                    <form id="addContactForm" class="parsing-form">
+                                        <div class="form-group">
+                                            <input type="text" id="orgName" name="orgName" placeholder="Введите название организации" required>
+                                            <label for="orgName">Название организации</label>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="email" id="contactEmail" name="contactEmail" placeholder="contact@example.com" required>
+                                            <label for="contactEmail">Email</label>
+                                        </div>
+                                        <div class="form-group">
+                                            <textarea id="contactDescription" name="contactDescription" placeholder="Краткое описание организации" rows="3"></textarea>
+                                            <label for="contactDescription">Описание</label>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="url" id="contactWebsite" name="contactWebsite" placeholder="https://example.com">
+                                            <label for="contactWebsite">Ссылка на сайт</label>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="text" id="contactCountry" name="contactCountry" placeholder="ОАЭ" required>
+                                            <label for="contactCountry">Страна</label>
+                                        </div>
+                                        <div class="form-actions">
+                                            <button type="submit" class="submit-btn">Сохранить контакт</button>
+                                            <button type="button" id="cancelContactBtn" class="cancel-btn">Отмена</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Contacts List -->
+                            <div class="contacts-content">
+                                <!-- Loading State -->
+                                <div id="contactsLoading" class="contacts-loading hidden">
+                                    <div class="loading-spinner-small"></div>
+                                    <p>Загрузка контактов...</p>
+                                </div>
+                                
+                                <!-- Empty State -->
+                                <div id="contactsEmpty" class="contacts-empty">
+                                    <div class="empty-icon">
+                                        <svg viewBox="0 0 24 24" width="64" height="64" fill="#9CA3AF">
+                                            <path d="M12,2C13.1,2 14,2.9 14,4C14,5.1 13.1,6 12,6C10.9,6 10,5.1 10,4C10,2.9 10.9,2 12,2M21,9V7L15,1H5C3.89,1 3,1.89 3,3V21A2,2 0 0,0 5,23H19A2,2 0 0,0 21,21V12H19V19H5V3H13V9H21Z"/>
+                                        </svg>
+                                    </div>
+                                    <h3>Нет контактов</h3>
+                                    <p>Добавьте первый контакт или импортируйте из результатов парсинга</p>
+                                </div>
+                                
+                                <!-- Contacts Table -->
+                                <div id="contactsTable" class="contacts-table-container hidden">
+                                    <div class="table-wrapper">
+                                        <table class="data-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Название организации</th>
+                                                    <th>Email</th>
+                                                    <th>Описание</th>
+                                                    <th>Веб-сайт</th>
+                                                    <th>Страна</th>
+                                                    <th>Дата добавления</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="contactsTableBody">
+                                                <!-- Dynamic content will be inserted here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Section -->
+                <div id="email-content" class="section-content">
+                    <div class="section-card">
+                        <h2>Email рассылка</h2>
+                        <p>Система рассылки уведомлений и новостей</p>
+
+                        <!-- Simple Google Connection -->
+                        <div class="simple-google-connection">
+                            <div class="connection-header">
+                                <div class="connection-title">
+                                    <svg viewBox="0 0 24 24" width="32" height="32" fill="#4285f4">
+                                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                                    </svg>
+                                    <h3>Подключение Google аккаунта</h3>
+                                </div>
+                                <div class="connection-status" id="googleConnectionStatus">
+                                    <span id="googleStatusText">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="#ef4444">
+                                            <circle cx="12" cy="12" r="10" fill="currentColor"/>
+                                        </svg>
+                                        Не подключено
+                                    </span>
+                                    <button id="disconnectGoogleBtn" class="disconnect-btn-header" style="display: none;">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" transform="rotate(45 12 12)"/>
+                                        </svg>
+                                        Отключить
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="connection-content">
+                                <!-- Not Connected State -->
+                                <div id="notConnectedState" class="connection-state active">
+                                    <p>Подключите Google аккаунт для отправки email рассылок</p>
+                                    
+                                    <button id="connectGoogleBtn" class="simple-google-btn">
+                                        <svg viewBox="0 0 24 24" width="18" height="18">
+                                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                                        </svg>
+                                        Войти через Google
+                                    </button>
+                                </div>
+
+                                <!-- Features Section Outside -->
+                                <div class="features-section">
+                                    <h3 class="features-title">Возможности email рассылки:</h3>
+                                    <div class="features-grid">
+                                        <ul>
+                                            <li>
+                                                <svg viewBox="0 0 24 24" width="20" height="20" fill="#4285f4">
+                                                    <path d="M12,16a4,4,0,1,1,4-4A4,4,0,0,1,12,16Zm0-6a2,2,0,1,0,2,2A2,2,0,0,0,12,10Zm6,13A6,6,0,0,0,6,23a1,1,0,0,0,2,0,4,4,0,0,1,8,0,1,1,0,0,0,2,0ZM18,8a4,4,0,1,1,4-4A4,4,0,0,1,18,8Zm0-6a2,2,0,1,0,2,2A2,2,0,0,0,18,2Zm6,13a6.006,6.006,0,0,0-6-6,1,1,0,0,0,0,2,4,4,0,0,1,4,4,1,1,0,0,0,2,0ZM6,8a4,4,0,1,1,4-4A4,4,0,0,1,6,8ZM6,2A2,2,0,1,0,8,4,2,2,0,0,0,6,2ZM2,15a4,4,0,0,1,4-4A1,1,0,0,0,6,9a6.006,6.006,0,0,0-6,6,1,1,0,0,0,2,0Z"/>
+                                                </svg>
+                                                Массовые рассылки для всех контактов
+                                            </li>
+                                            <li>
+                                                <svg viewBox="0 0 24 24" width="20" height="20" fill="#34A853">
+                                                    <g id="_01_align_center" data-name="01 align center"><path d="M21,1H3A3,3,0,0,0,0,4V23H24V4A3,3,0,0,0,21,1ZM3,3H21a1,1,0,0,1,1,1v.667l-7.878,7.879a3.007,3.007,0,0,1-4.244,0L2,4.667V4A1,1,0,0,1,3,3ZM2,21V7.5L8.464,13.96a5.007,5.007,0,0,0,7.072,0L22,7.5V21Z"/></g>
+                                                </svg>
+                                                Шаблоны писем для быстрой отправки
+                                            </li>
+                                            <li>
+                                                <svg viewBox="0 0 24 24" width="20" height="20" fill="#FBBC05">
+                                                    <path d="M22.5,3.976H19.414a1,1,0,0,0-.707,1.707l1.086,1.086h0l-3.586,3.585a1.024,1.024,0,0,1-1.415,0l-.17-.171a3.071,3.071,0,0,0-4.243,0l-5.1,5.1A1,1,0,1,0,6.7,16.7l5.1-5.1a1.023,1.023,0,0,1,1.415,0l.17.171a3.073,3.073,0,0,0,4.243,0l3.586-3.586h0l1.086,1.086A1,1,0,0,0,24,8.562V5.476A1.5,1.5,0,0,0,22.5,3.976Z"/><path d="M23,21.976H5a3,3,0,0,1-3-3V1A1,1,0,0,0,0,1V18.976a5.006,5.006,0,0,0,5,5H23a1,1,0,0,0,0-2Z"/>
+                                                </svg>
+                                                Статистика доставки и открытий
+                                            </li>
+                                            <li>
+                                                <svg viewBox="0 0 24 24" width="20" height="20" fill="#EA4335">
+                                                    <path d="M23,16a1,1,0,0,0-1,1v2a3,3,0,0,1-3,3H17a1,1,0,0,0,0,2h2a5.006,5.006,0,0,0,5-5V17A1,1,0,0,0,23,16Z"/><path d="M1,8A1,1,0,0,0,2,7V5A3,3,0,0,1,5,2H7A1,1,0,0,0,7,0H5A5.006,5.006,0,0,0,0,5V7A1,1,0,0,0,1,8Z"/><path d="M7,22H5a3,3,0,0,1-3-3V17a1,1,0,0,0-2,0v2a5.006,5.006,0,0,0,5,5H7a1,1,0,0,0,0-2Z"/><path d="M19,0H17a1,1,0,0,0,0,2h2a3,3,0,0,1,3,3V7a1,1,0,0,0,2,0V5A5.006,5.006,0,0,0,19,0Z"/><path d="M12,11A4,4,0,1,0,8,7,4,4,0,0,0,12,11Zm0-6a2,2,0,1,1-2,2A2,2,0,0,1,12,5Z"/><path d="M18,20a1,1,0,0,0,1-1,6.006,6.006,0,0,0-6-6H11a6.006,6.006,0,0,0-6,6,1,1,0,0,0,2,0,4,4,0,0,1,4-4h2a4,4,0,0,1,4,4A1,1,0,0,0,18,20Z"/>
+                                                </svg>
+                                                Персонализация сообщений с ИИ
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <!-- Connected State -->
+                                <div id="connectedState" class="connection-state">
+                                    <!-- Email Campaign Wizard -->
+                                    <div class="email-wizard">
+                                        <!-- Progress Indicator Card -->
+                                        <div class="section-card">
+                                            <div class="progress-steps">
+                                                <div class="progress-step active" data-step="1">
+                                                    <div class="step-number">1</div>
+                                                    <div class="step-label">Создание письма</div>
+                                                </div>
+                                                <div class="progress-connector"></div>
+                                                <div class="progress-step" data-step="2">
+                                                    <div class="step-number">2</div>
+                                                    <div class="step-label">Настройка рассылки</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 1: Compose Email -->
+                                        <div id="emailStep1" class="wizard-step active">
+                                            <form id="emailComposeForm" class="email-compose-form">
+                                                <!-- Subject Field -->
+                                                <div class="form-group">
+                                                    <label for="emailSubject">Заголовок письма</label>
+                                                    <input 
+                                                        type="text" 
+                                                        id="emailSubject" 
+                                                        name="subject" 
+                                                        placeholder="Введите заголовок письма..."
+                                                        required
+                                                        class="form-input"
+                                                    >
+                                                </div>
+
+                                                <!-- Body Field -->
+                                                <div class="form-group">
+                                                    <label for="emailBody">Текст письма</label>
+                                                    <textarea 
+                                                        id="emailBody" 
+                                                        name="body" 
+                                                        rows="12"
+                                                        placeholder="Введите текст вашего письма..."
+                                                        required
+                                                        class="form-textarea"
+                                                    ></textarea>
+                                                </div>
+
+                                                <!-- File Attachments -->
+                                                <div class="form-group">
+                                                    <div class="file-upload-area">
+                                                        <input 
+                                                            type="file" 
+                                                            id="emailAttachments" 
+                                                            name="attachments" 
+                                                            multiple 
+                                                            accept="*/*"
+                                                            style="display: none;"
+                                                        >
+                                                        <div class="file-drop-zone">
+                                                            <svg viewBox="0 0 24 24" width="32" height="32" class="upload-icon" fill="none" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                                            </svg>
+                                                            <p class="upload-text">Нажмите для выбора файлов или перетащите их сюда</p>
+                                                            <small class="upload-hint">Поддерживаются любые типы файлов</small>
+                                                        </div>
+                                                        <div id="attachmentsList" class="attachments-list"></div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Navigation Buttons -->
+                                                <div class="wizard-navigation">
+                                                    <button type="button" id="nextToStep2" class="wizard-btn-primary" disabled>
+                                                        Далее
+                                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                                            <path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+
+                                        <!-- Step 2: Campaign Settings (Hidden Initially) -->
+                                        <div id="emailStep2" class="wizard-step">
+
+                                            <!-- Email Recipients Tabs -->
+                                            <div class="email-tabs">
+                                                <button class="email-tab-button active" data-tab="database-contacts">
+                                                    <svg class="tab-icon" viewBox="0 0 24 24" width="20" height="20">
+                                                        <path d="M12,3C7.58,3 4,4.79 4,7C4,9.21 7.58,11 12,11C16.42,11 20,9.21 20,7C20,4.79 16.42,3 12,3M4,9V12C4,14.21 7.58,16 12,16C16.42,16 20,14.21 20,12V9C20,11.21 16.42,13 12,13C7.58,13 4,11.21 4,9M4,14V17C4,19.21 7.58,21 12,21C16.42,21 20,19.21 20,17V14C20,16.21 16.42,18 12,18C7.58,18 4,16.21 4,14Z"/>
+                                                    </svg>
+                                                    База данных
+                                                </button>
+                                                <button class="email-tab-button" data-tab="custom-contacts">
+                                                    <svg class="tab-icon" viewBox="0 0 24 24" width="20" height="20">
+                                                        <path d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12M8.8,14L9.8,13V4H14.2V13L15.2,14H8.8Z"/>
+                                                    </svg>
+                                                    Собственная база
+                                                </button>
+                                            </div>
+
+                                            <!-- Database Contacts Tab Content -->
+                                            <div id="database-contacts-content" class="email-tab-content active">
+                                                <div class="email-database-content">
+                                                    <!-- Loading State -->
+                                                    <div id="emailContactsLoading" class="loading-state">
+                                                        <div class="loading-spinner"></div>
+                                                        <p>Загрузка контактов...</p>
+                                                    </div>
+
+                                                    <!-- Empty State -->
+                                                    <div id="emailContactsEmpty" class="empty-state hidden">
+                                                        <div class="empty-icon">
+                                                            <svg viewBox="0 0 24 24" width="48" height="48" fill="#ccc">
+                                                                <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+                                                            </svg>
+                                                        </div>
+                                                        <h3>Контакты не найдены</h3>
+                                                        <p>Сначала добавьте контакты через раздел "База данных"</p>
+                                                    </div>
+
+                                                    <!-- Contacts Selection -->
+                                                    <div id="emailContactsSelection" class="email-contacts-selection hidden">
+                                                        <div class="selection-header">
+                                                            <div class="selection-controls">
+                                                                <label class="checkbox-label">
+                                                                    <input type="checkbox" id="selectAllEmailContacts" class="select-all-checkbox">
+                                                                    Выбрать все
+                                                                </label>
+                                                                <span id="selectedContactsCount" class="selected-count">0 выбрано</span>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Contacts Table -->
+                                                        <div id="emailContactsTable" class="email-contacts-table-container">
+                                                            <div class="table-wrapper">
+                                                                <table class="email-data-table">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th class="checkbox-column">
+                                                                            </th>
+                                                                            <th>Название организации</th>
+                                                                            <th>Email</th>
+                                                                            <th>Описание</th>
+                                                                            <th>Веб-сайт</th>
+                                                                            <th>Страна</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody id="emailContactsTableBody">
+                                                                        <!-- Dynamic content will be inserted here -->
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Custom Contacts Tab Content -->
+                                            <div id="custom-contacts-content" class="email-tab-content">
+                                                <div class="placeholder-content">
+                                                    <div class="placeholder-icon">
+                                                        <svg viewBox="0 0 24 24" width="64" height="64" fill="#ccc">
+                                                            <path d="M19,13H5V11H19V13Z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <h4>Скоро будет доступно</h4>
+                                                    <p>Возможность загрузки собственной базы email адресов</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="wizard-navigation">
+                                                <button type="button" id="backToStep1" class="wizard-btn-secondary">
+                                                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                                        <path d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z"/>
+                                                    </svg>
+                                                    Назад
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Section -->
+                <div id="settings-content" class="section-content">
+                    <div class="section-card">
+                        <h2>Настройки системы</h2>
+                        <p>Конфигурация платформы и пользовательские настройки</p>
+                        
+                        <!-- Telegram Bot Integration -->
+                        <div class="settings-section">
+                            <div class="settings-header">
+                                <div class="settings-icon">
+                                    <svg viewBox="0 0 24 24" width="24" height="24" fill="#0088CC">
+                                        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                                    </svg>
+                                </div>
+                                <div class="settings-title">
+                                    <h3>Интеграция с Telegram</h3>
+                                    <p>Подключение бота для отправки уведомлений</p>
+                                </div>
+                                <div class="connection-status" id="telegramStatus">
+                                    <span id="telegramStatusText" style="color: rgb(239, 68, 68);">
+                                        <svg viewBox="0 0 24 24" width="16" height="16">
+                                            <circle cx="12" cy="12" r="10" fill="currentColor"></circle>
+                                        </svg>
+                                        Не подключен
+                                    </span>
+                                    <button id="disconnectTelegramBtn" class="disconnect-btn-header" style="display: none;">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" transform="rotate(45 12 12)"></path>
+                                        </svg>
+                                        Отключить
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="settings-form">
+                                <!-- Connection Setup Form (shown when not connected) -->
+                                <div id="telegramSetupForm" class="telegram-setup-form">
+                                    <div class="toggle-container">
+                                        <!-- Dynamic Test Connection Button moved here -->
+                                        <div class="test-connection-wrapper" id="testConnectionWrapper" style="display: none;">
+                                            <button type="button" id="dynamicTestConnection" class="test-connection-btn" data-status="default">
+                                                <span class="test-text">Тест подключения</span>
+                                            </button>
+                                        </div>
+                                        <span class="toggle-label">Показать</span>
+                                        <div class="toggle-switch" id="toggleTokenVisibility">
+                                            <div class="toggle-slider"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <!-- Hidden decoy field to prevent autofill -->
+                                        <input type="password" style="position:absolute;top:-9999px;left:-9999px;" autocomplete="new-password" tabindex="-1">
+                                        <input 
+                                            type="password" 
+                                            id="telegramBotToken" 
+                                            name="telegram-bot-api-token"
+                                            placeholder="1234567890:ABCdefGhIjKlmNoPQRstuvWXYZ"
+                                            class="chat-input"
+                                            autocomplete="new-password"
+                                            autocorrect="off"
+                                            autocapitalize="off"
+                                            spellcheck="false"
+                                            data-form="telegram-token"
+                                            readonly
+                                        >
+                                        <label for="telegramBotToken">API Token бота</label>
+                                        <!-- Inline test button - shows when token is entered -->
+                                        <div class="inline-test-wrapper" id="inlineTestWrapper" style="display: none;">
+                                            <button type="button" id="testTelegramConnection" class="inline-test-btn">
+                                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                                </svg>
+                                                Тестировать
+                                            </button>
+                                        </div>
+                                        <!-- Static Help Text - Always visible inside form-group -->
+                                        <div class="form-help">
+                                            <span>Получите токен у <a href="https://t.me/BotFather" target="_blank">@BotFather</a></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <input 
+                                            type="text" 
+                                            id="telegramChatId" 
+                                            placeholder="-1001234567890 или @channel_name"
+                                            class="chat-input"
+                                        >
+                                        <label for="telegramChatId">Chat ID</label>
+                                        <div class="form-help">
+                                            <span>Ваш Telegram ID для получения уведомлений</span>
+                                            <br><small>Как получить Chat ID: отправьте /start боту <a href="https://t.me/userinfobot" target="_blank" style="color: #0066cc;">@userinfobot</a></small>
+                                        </div>
+                                    </div>
+
+                                    <div class="settings-actions">
+                                        <button type="button" id="saveTelegramSettings" class="save-btn">
+                                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                                <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+                                            </svg>
+                                            Сохранить настройки
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Notification Settings (shown when connected) -->
+                                <div id="telegramNotificationSettings" class="telegram-notification-settings" style="display: none;">
+                                    <div class="notification-header">
+                                        <div class="notification-header-content">
+                                            <h4>Настройки уведомлений</h4>
+                                            <p>Выберите типы уведомлений, которые будут отправляться в Telegram</p>
+                                        </div>
+                                        <button type="button" id="testNotificationBtn" class="inline-test-btn">
+                                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                                            </svg>
+                                            Тест уведомлений
+                                        </button>
+                                    </div>
+
+                                    <div class="notification-options">
+                                        <div class="notification-item">
+                                            <div class="notification-info">
+                                                <div class="notification-title">Уведомления парсинга</div>
+                                                <div class="notification-desc">Получать уведомления о завершении парсинга данных</div>
+                                            </div>
+                                            <div class="toggle-switch notification-toggle" id="parseNotificationToggle">
+                                                <div class="toggle-slider"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="settings-actions">
+                                        <button type="button" id="saveNotificationSettings" class="save-btn">
+                                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                                <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+                                            </svg>
+                                            Сохранить уведомления
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Parsing Completion Modal -->
+    <div id="parsingCompletionModal" class="modal-overlay">
+        <div class="completion-modal">
+            <div class="completion-icon">
+                ✅
+            </div>
+            <h3>Парсинг завершен</h3>
+            <p>Данные успешно обработаны и сохранены в базу данных</p>
+            <div class="completion-actions">
+                <button id="goToDatabaseBtn" class="primary-btn">Перейти в базу данных</button>
+                <button id="closeCompletionModalBtn" class="secondary-btn">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Database Integration -->
+    <script src="config/env.js"></script>
+    <script src="config/supabase.js"></script>
+    <script src="lib/supabase-client.js"></script>
+    <script src="lib/auth-client.js"></script>
+    <script src="lib/db-utils.js"></script>
+    <script src="lib/openai-client.js"></script>
+    <script src="lib/apify-client.js"></script>
+    <script src="lib/pipeline-orchestrator.js"></script>
+    <script src="lib/google-oauth-hybrid.js"></script>
+    
+    <!-- Main Application -->
+    <script src="script.js"></script>
+    
+    <!-- Lottie Animation Loader -->
+    <script>
+        var select = function(s) {
+            return document.querySelector(s);
+        },
+        animationWindow = select('#animationWindow');
+        
+        if (animationWindow && typeof lottie !== 'undefined') {
+            var anim = lottie.loadAnimation({
+                container: animationWindow, 
+                renderer: 'svg',
+                loop: true,
+                autoplay: true,
+                path: 'https://assets.codepen.io/35984/space+knot.json'
+            });
+            
+            anim.setSpeed(1.5);
+        }
+    </script>
+</body>
+</html>

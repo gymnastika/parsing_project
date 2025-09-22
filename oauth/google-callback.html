@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google OAuth Callback - GYMNASTIKA</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .callback-container {
+            text-align: center;
+            padding: 3rem;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+        }
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 2rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .status-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .error {
+            color: #ff6b6b;
+        }
+        .success {
+            color: #51cf66;
+        }
+        h2 {
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+        }
+        p {
+            opacity: 0.9;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+        .progress-steps {
+            text-align: left;
+            margin: 1.5rem 0;
+        }
+        .step {
+            padding: 0.25rem 0;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+        .step.active {
+            opacity: 1;
+            font-weight: 600;
+        }
+        .step.complete {
+            opacity: 1;
+            color: #51cf66;
+        }
+    </style>
+</head>
+<body>
+    <div class="callback-container">
+        <div class="spinner" id="spinner"></div>
+        <div class="status-icon" id="statusIcon" style="display: none;"></div>
+        
+        <h2 id="title">Обработка Google авторизации...</h2>
+        <p id="message">Подождите, обрабатываем ваши данные</p>
+        
+        <div class="progress-steps" id="progressSteps">
+            <div class="step" id="step1">• Получение токенов от Google</div>
+            <div class="step" id="step2">• Проверка авторизации</div>
+            <div class="step" id="step3">• Сохранение интеграции</div>
+            <div class="step" id="step4">• Перенаправление обратно</div>
+        </div>
+    </div>
+
+    <!-- Load required dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../config/env.js"></script>
+    <script src="../config/supabase.js"></script>
+    <script src="../lib/supabase-client.js"></script>
+    <script src="../lib/google-oauth-hybrid.js"></script>
+
+    <script>
+        console.log('🔄 Google OAuth Callback page loaded at:', new Date().toISOString());
+        console.log('🌐 Full URL:', window.location.href);
+        
+        // UI update function
+        function updateUI(stepId, title, message, isError = false) {
+            const spinner = document.getElementById('spinner');
+            const statusIcon = document.getElementById('statusIcon');
+            const titleElement = document.getElementById('title');
+            const messageElement = document.getElementById('message');
+            
+            if (stepId) {
+                // Mark current step as active, previous as complete
+                const steps = document.querySelectorAll('.step');
+                steps.forEach((step, index) => {
+                    step.classList.remove('active');
+                    if (step.id === stepId) {
+                        step.classList.add('active');
+                        // Mark previous steps as complete
+                        steps.forEach((prevStep, prevIndex) => {
+                            if (prevIndex < index) {
+                                prevStep.classList.add('complete');
+                                prevStep.classList.remove('active');
+                            }
+                        });
+                    }
+                });
+            }
+            
+            if (isError) {
+                spinner.style.display = 'none';
+                statusIcon.style.display = 'block';
+                statusIcon.textContent = '❌';
+                statusIcon.className = 'status-icon error';
+                titleElement.textContent = title;
+                titleElement.style.color = '#ff6b6b';
+            } else if (title && title.includes('успешно')) {
+                spinner.style.display = 'none';
+                statusIcon.style.display = 'block';
+                statusIcon.textContent = '✅';
+                statusIcon.className = 'status-icon success';
+                titleElement.textContent = title;
+                titleElement.style.color = '#51cf66';
+            }
+            
+            if (title) titleElement.textContent = title;
+            if (message) messageElement.textContent = message;
+            
+            console.log(`📺 UI Updated: ${title || 'Step update'}`);
+        }
+        
+        async function processGoogleCallback() {
+            try {
+                updateUI('step1', 'Получение токенов от Google...', 'Извлекаем данные авторизации');
+                
+                // Initialize Supabase Database Client first
+                console.log('🔧 Initializing Supabase Database Client...');
+                const dbClient = new SupabaseDatabaseClient();
+                await dbClient.initialize();
+                console.log('✅ Supabase Database Client initialized');
+                
+                // Initialize Google OAuth Hybrid client
+                const oauthClient = new GoogleOAuthHybrid();
+                await oauthClient.initialize();
+                
+                updateUI('step2', 'Проверка авторизации...', 'Валидируем полученные данные');
+                
+                // Process the callback and extract tokens
+                const result = await oauthClient.handleCallback();
+                
+                updateUI('step3', 'Сохранение интеграции...', 'Связываем Google аккаунт с вашим профилем');
+                
+                if (result.success) {
+                    updateUI('step4', 'Интеграция завершена!', 
+                             `Google аккаунт ${result.tokens.connected_email} успешно подключен`, false);
+                    
+                    // Mark all steps as complete
+                    document.querySelectorAll('.step').forEach(step => {
+                        step.classList.add('complete');
+                        step.classList.remove('active');
+                    });
+                    
+                    // Redirect back to the application after a short delay
+                    setTimeout(() => {
+                        console.log('🔄 Redirecting back to application...');
+                        window.location.href = result.returnUrl || '/index.html';
+                    }, 2000);
+                } else {
+                    throw new Error('OAuth callback processing failed');
+                }
+                
+            } catch (error) {
+                console.error('❌ Error in Google OAuth callback processing:', error);
+                
+                updateUI(null, 'Ошибка авторизации', 
+                        error.message || 'Произошла ошибка при подключении Google аккаунта', true);
+                
+                // Try to redirect back after showing error
+                setTimeout(() => {
+                    try {
+                        const storedState = localStorage.getItem('google_oauth_state');
+                        const returnUrl = storedState ? 
+                            JSON.parse(storedState).returnUrl : '/index.html';
+                        
+                        console.log('🔄 Redirecting to:', returnUrl);
+                        window.location.href = returnUrl;
+                    } catch (redirectError) {
+                        console.error('❌ Error redirecting:', redirectError);
+                        window.location.href = '/index.html';
+                    }
+                }, 3000);
+            }
+        }
+        
+        // Start processing when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Small delay to let UI render
+            setTimeout(processGoogleCallback, 500);
+        });
+        
+        // Handle any unhandled promise rejections
+        window.addEventListener('unhandledrejection', event => {
+            console.error('❌ Unhandled promise rejection:', event.reason);
+            updateUI(null, 'Системная ошибка', 
+                    'Произошла непредвиденная ошибка. Пожалуйста, попробуйте снова.', true);
+        });
+    </script>
+</body>
+</html>

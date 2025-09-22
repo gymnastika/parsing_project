@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google OAuth Callback - GYMNASTIKA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #7C3AED 0%, #8B5CF6 100%);
+            color: white;
+        }
+        .callback-container {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="callback-container">
+        <div class="spinner"></div>
+        <h2>Подключение Google аккаунта...</h2>
+        <p>Пожалуйста, подождите</p>
+    </div>
+
+    <script>
+        console.log('🔄 Google OAuth Callback page loaded at:', new Date().toISOString());
+        console.log('🌐 Full URL:', window.location.href);
+        console.log('🔗 Origin:', window.location.origin);
+        
+        // Функция для обновления UI с прогрессом
+        function updateUI(message, isError = false) {
+            const container = document.querySelector('.callback-container');
+            const spinner = container.querySelector('.spinner');
+            const title = container.querySelector('h2');
+            const text = container.querySelector('p');
+            
+            if (isError) {
+                spinner.style.display = 'none';
+                title.textContent = 'Ошибка';
+                title.style.color = '#ff6b6b';
+                text.textContent = message;
+            } else {
+                title.textContent = 'Обработка...';
+                text.textContent = message;
+            }
+            
+            console.log(`📺 UI Updated: ${message}`);
+        }
+        
+        async function processCallback() {
+            updateUI('Извлечение параметров из URL...');
+            
+            // Извлекаем параметры из URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const state = urlParams.get('state');
+            const error = urlParams.get('error');
+            const error_description = urlParams.get('error_description');
+            
+            console.log('📝 Raw URL parameters:');
+            console.log('  - code:', code ? `${code.substring(0, 20)}...` : 'MISSING');
+            console.log('  - state:', state ? `${state.substring(0, 20)}...` : 'MISSING');
+            console.log('  - error:', error || 'none');
+            console.log('  - error_description:', error_description || 'none');
+            
+            // Проверяем состояние окна
+            console.log('🪟 Window state analysis:');
+            console.log('  - window.opener exists:', !!window.opener);
+            console.log('  - window.opener.closed:', window.opener ? window.opener.closed : 'N/A');
+            console.log('  - window.parent !== window:', window.parent !== window);
+            console.log('  - window.top !== window:', window.top !== window);
+            
+            // Если есть ошибка OAuth, обрабатываем её
+            if (error) {
+                updateUI(`Ошибка OAuth: ${error_description || error}`, true);
+                
+                const errorData = {
+                    type: 'google_oauth_callback',
+                    error: error,
+                    error_description: error_description,
+                    timestamp: new Date().toISOString()
+                };
+                
+                console.log('❌ OAuth error detected, sending error data:', errorData);
+                
+                if (window.opener && !window.opener.closed) {
+                    console.log('📤 Sending error to parent via opener');
+                    window.opener.postMessage(errorData, window.location.origin);
+                    setTimeout(() => window.close(), 3000);
+                } else {
+                    console.log('🔒 No opener available for error, closing window');
+                    setTimeout(() => window.close(), 3000);
+                }
+                return;
+            }
+            
+            // Проверяем наличие кода авторизации
+            if (!code) {
+                updateUI('Код авторизации не найден', true);
+                console.error('❌ No authorization code found in URL');
+                setTimeout(() => window.close(), 3000);
+                return;
+            }
+            
+            if (!state) {
+                updateUI('Параметр state отсутствует', true);
+                console.error('❌ No state parameter found in URL');
+                setTimeout(() => window.close(), 3000);
+                return;
+            }
+
+            updateUI('Подготовка данных для отправки...');
+
+            // Данные для отправки
+            const callbackData = {
+                type: 'google_oauth_callback',
+                code: code,
+                state: state,
+                error: null,
+                error_description: null,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('📦 Prepared callback data:', {
+                type: callbackData.type,
+                code: code ? 'present' : 'missing',
+                state: state ? 'present' : 'missing',
+                timestamp: callbackData.timestamp
+            });
+
+            updateUI('Отправка данных родительскому окну...');
+
+            // Проверяем различные способы коммуникации с родительским окном
+            let messageSent = false;
+            let sendAttempts = [];
+            
+            // Способ 1: через window.opener (popup)
+            if (window.opener && !window.opener.closed) {
+                console.log('📤 Attempting to send callback data to parent window via opener');
+                updateUI('Связь с родительским окном через opener...');
+                
+                try {
+                    // Попробуем несколько раз отправить сообщение
+                    for (let i = 0; i < 3; i++) {
+                        console.log(`📤 Send attempt ${i + 1}/3 via opener`);
+                        window.opener.postMessage(callbackData, window.location.origin);
+                        await new Promise(resolve => setTimeout(resolve, 100)); // Ждем 100ms между попытками
+                    }
+                    
+                    messageSent = true;
+                    sendAttempts.push('opener: success');
+                    console.log('✅ Message sent successfully via opener');
+                    updateUI('Данные отправлены успешно! Закрытие окна...');
+                    
+                    // Ждем дольше перед закрытием чтобы дать время на обработку
+                    setTimeout(() => {
+                        console.log('🔒 Closing popup window after successful send');
+                        window.close();
+                    }, 2000);
+                    
+                } catch (err) {
+                    console.warn('⚠️ Failed to send message via opener:', err);
+                    sendAttempts.push(`opener: failed - ${err.message}`);
+                }
+            } else {
+                console.log('❌ window.opener not available or closed');
+                sendAttempts.push('opener: not available');
+            }
+            
+            // Способ 2: через window.parent (iframe)
+            if (!messageSent && window.parent !== window) {
+                console.log('📤 Attempting to send callback data to parent frame');
+                updateUI('Связь с родительским окном через parent...');
+                
+                try {
+                    window.parent.postMessage(callbackData, window.location.origin);
+                    messageSent = true;
+                    sendAttempts.push('parent: success');
+                    console.log('✅ Message sent successfully via parent');
+                    updateUI('Данные отправлены через parent!');
+                } catch (err) {
+                    console.warn('⚠️ Failed to send message via parent:', err);
+                    sendAttempts.push(`parent: failed - ${err.message}`);
+                }
+            } else if (window.parent === window) {
+                sendAttempts.push('parent: same as window');
+            }
+            
+            // Способ 3: через window.top
+            if (!messageSent && window.top !== window) {
+                console.log('📤 Attempting to send callback data to top window');
+                updateUI('Связь с родительским окном через top...');
+                
+                try {
+                    window.top.postMessage(callbackData, window.location.origin);
+                    messageSent = true;
+                    sendAttempts.push('top: success');
+                    console.log('✅ Message sent successfully via top');
+                    updateUI('Данные отправлены через top!');
+                } catch (err) {
+                    console.warn('⚠️ Failed to send message via top:', err);
+                    sendAttempts.push(`top: failed - ${err.message}`);
+                }
+            } else if (window.top === window) {
+                sendAttempts.push('top: same as window');
+            }
+            
+            console.log('📊 Send attempts summary:', sendAttempts);
+            
+            // Способ 4: Если ничего не сработало, пробуем localStorage
+            if (!messageSent) {
+                console.log('🏪 No direct messaging worked, trying localStorage backup');
+                updateUI('Сохранение данных в localStorage...');
+                
+                try {
+                    const backupData = {
+                        ...callbackData,
+                        backup: true,
+                        savedAt: Date.now()
+                    };
+                    
+                    localStorage.setItem('google_oauth_callback_backup', JSON.stringify(backupData));
+                    console.log('✅ Callback data saved to localStorage as backup');
+                    sendAttempts.push('localStorage: saved');
+                    updateUI('Данные сохранены как резервная копия');
+                } catch (err) {
+                    console.error('❌ Failed to save to localStorage:', err);
+                    sendAttempts.push(`localStorage: failed - ${err.message}`);
+                }
+            }
+            
+            // Финальный статус
+            if (!messageSent) {
+                updateUI('Не удалось связаться с родительским окном', true);
+                console.error('❌ Failed to send message through any method:', sendAttempts);
+                
+                // Ждем дольше перед закрытием в случае неудачи
+                setTimeout(() => {
+                    console.log('🔒 Closing window after failed attempts');
+                    window.close();
+                }, 5000);
+            }
+        }
+        
+        // Вызываем async функцию с обработкой ошибок
+        processCallback().catch(err => {
+            console.error('❌ Error in OAuth callback:', err);
+            updateUI('Произошла ошибка при обработке callback', true);
+            
+            // Отправляем ошибку в родительское окно
+            const errorData = {
+                type: 'google_oauth_callback',
+                error: 'callback_error',
+                error_description: err.message,
+                timestamp: new Date().toISOString(),
+                stack: err.stack
+            };
+            
+            console.log('📤 Sending error data:', errorData);
+            
+            if (window.opener && !window.opener.closed) {
+                try {
+                    window.opener.postMessage(errorData, window.location.origin);
+                    console.log('✅ Error data sent via opener');
+                } catch (sendErr) {
+                    console.error('❌ Failed to send error via opener:', sendErr);
+                }
+                setTimeout(() => window.close(), 3000);
+            } else if (window.parent !== window) {
+                try {
+                    window.parent.postMessage(errorData, window.location.origin);
+                    console.log('✅ Error data sent via parent');
+                } catch (sendErr) {
+                    console.error('❌ Failed to send error via parent:', sendErr);
+                }
+            } else {
+                console.log('🔄 Redirecting to main page with error');
+                // Перенаправляем на главную с ошибкой
+                window.location.href = `/?error=oauth_callback_error&message=${encodeURIComponent(err.message)}`;
+            }
+        });
+    </script>
+</body>
+</html>
