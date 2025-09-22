@@ -1,3 +1,5 @@
+После ЛЮБОГО изменения файлов ОБЯЗАТЕЛЬНО выполни: git add -A && git commit -m 'Auto-commit' && git push
+
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
