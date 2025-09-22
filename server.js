@@ -17,6 +17,9 @@ const {
 const ParsingTasksService = require('./lib/parsing-tasks-service');
 const BackgroundWorker = require('./lib/background-worker');
 
+// Import Railway Volume manager
+const { ensureDirectories } = require('./lib/volume-manager');
+
 const app = express();
 const PORT = 3001;
 
@@ -29,6 +32,10 @@ const backgroundWorker = new BackgroundWorker({
     maxConcurrentTasks: 2,     // Process max 2 tasks simultaneously 
     maxRetries: 3              // Retry failed tasks up to 3 times
 });
+
+// Initialize Railway Volume storage
+console.log('🔧 Initializing Railway Volume storage...');
+ensureDirectories();
 
 // Start background worker
 console.log('🔄 Starting background worker...');
