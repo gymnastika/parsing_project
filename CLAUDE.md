@@ -1,67 +1,529 @@
 После ЛЮБОГО изменения файлов ОБЯЗАТЕЛЬНО выполни: git add -A && git commit -m 'Auto-commit' && git push
 
-# CLAUDE.md
+# CLAUDE.md - GYMNASTIKA RG Club UAE Parsing Platform
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+**Полное техническое описание и руководство разработчика**
 
-## Project Overview
+## 🎯 Обзор проекта
 
-GYMNASTIKA RG Club UAE Parsing Platform - A web application for parsing and managing gymnastics-related business data with AI-powered search query generation, Apify web scraping, and Supabase database integration.
+**GYMNASTIKA RG Club UAE Parsing Platform** - комплексная веб-платформа для автоматизированного парсинга и анализа бизнес-данных с использованием искусственного интеллекта, веб-скрапинга и современных технологий интеграции.
 
-## Architecture
+### Ключевые возможности:
+- 🤖 **AI-генерация запросов** через OpenAI Assistant API
+- 🗺️ **Google Maps парсинг** через Apify актеры
+- 🕷️ **Веб-скрапинг** для извлечения контактных данных
+- 📊 **6-этапный pipeline** с real-time прогресс-трекингом
+- 🔐 **Безопасная архитектура** с proxy endpoints
+- 📧 **Email кампании** через Gmail API
+- 💾 **Google Drive** интеграция для больших файлов
+- 📱 **Telegram Bot** интеграция
+- 🌐 **Русский интерфейс** для целевой аудитории
 
-### Frontend (Browser-based)
-- **Entry Point**: `index.html` - Single-page application with Russian language interface
-- **Main Logic**: `script.js` - Contains `GymnastikaPlatform` class that manages authentication, navigation, and client initialization
-- **Styling**: `styles.css` - CSS for responsive dashboard UI with sidebar navigation
+## 🏗️ Архитектура системы
 
-### Backend (Node.js/Express)
-- **Server**: `server.js` - Express server on port 3001 serving as proxy for Apify API calls
-- **Static Files**: Serves all frontend files directly from root directory
-
-### Core Libraries (`lib/` directory)
-- **`pipeline-orchestrator.js`**: `PipelineOrchestrator` class - Main orchestration logic that coordinates AI and scraping workflows
-- **`apify-client.js`**: `ApifyClient` class - Handles Google Maps scraping and web scraping tasks via Apify actors with automatic plan detection
-- **`openai-client.js`**: `OpenAIClient` class - Manages OpenAI Assistant API for query generation and result validation  
-- **`supabase-client.js`**: Database operations and authentication via Supabase
-- **`auth-client.js`**: Authentication client with enhanced profile support (username, firstName, lastName)
-- **`db-utils.js`**: Utility functions for database operations
-
-### Configuration
-- **`config/env.js`**: Browser-accessible environment variables including API keys for Supabase, OpenAI, and Apify
-- **`config/supabase.js`**: Supabase client configuration and initialization
-- **`.env`**: Server-side environment variables (not tracked in git)
-
-## Development Commands
-
-### Start Application
-```bash
-npm start          # Start production server on port 3001
-npm run dev        # Start development server (same as start)
+### **Общая схема**
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────────┐
+│   Frontend      │───▶│    Backend       │───▶│   External APIs     │
+│   (Browser)     │    │   (Express)      │    │                     │
+├─────────────────┤    ├──────────────────┤    ├─────────────────────┤
+│ • script.js     │    │ • server.js      │    │ • OpenAI Assistant  │
+│ • Platform      │    │ • Proxy endpoints│    │ • Apify Actors      │
+│ • SPA UI        │    │ • Security       │    │ • Supabase DB       │
+│ • Progress      │    │ • Validation     │    │ • Google APIs       │
+└─────────────────┘    └──────────────────┘    └─────────────────────┘
 ```
 
-### Access Application
-- **Frontend**: http://localhost:3001/index.html
+### **Frontend (Browser-based)**
+- **Entry Point**: `index.html` - SPA с русским интерфейсом
+- **Core Class**: `GymnastikaPlatform` в `script.js` - Управляет всей платформой:
+  - Аутентификация и сессии пользователей
+  - Навигация между разделами (parsing, database, email, settings)
+  - Инициализация API клиентов с таймингом (1-1.5s delays)
+  - Event binding и управление состоянием UI
+  - Настройки Telegram bot интеграции
+- **Styling**: `styles.css` - Responsive dashboard UI с боковой навигацией
+
+### **Backend (Node.js/Express)**
+- **Main Server**: `server.js` - Express сервер на порту 3001:
+  - Proxy для всех Apify API вызовов (безопасность)
+  - Служит статические файлы из корневой директории
+  - Security middleware (helmet, CORS, input validation)
+  - Background worker для фоновых задач
+- **Services**:
+  - `ParsingTasksService` - Управление задачами парсинга
+  - `BackgroundWorker` - Фоновая обработка задач
+  - Input validation middleware для всех endpoints
+
+### **Core Libraries (`lib/` directory)**
+
+#### **Pipeline Orchestration**
+- **`pipeline-orchestrator.js`** (клиент) - Основная логика координации:
+  - Управляет 6-этапным workflow парсинга
+  - Real-time progress tracking с callbacks
+  - Error handling и recovery mechanisms
+- **`server-pipeline-orchestrator.js`** (сервер) - Серверная версия pipeline
+
+#### **API Clients**
+- **`apify-client.js`** & **`server-apify-client.js`**:
+  - Google Maps scraping через `compass/crawler-google-places`
+  - Web scraping через `apify/web-scraper`
+  - Email extraction через `poidata/google-maps-email-extractor`
+  - Автодетекция FREE/PAID планов с лимитами
+  - Plan-aware resource management
+
+- **`openai-client.js`** & **`server-openai-client.js`**:
+  - Двойная Assistant API интеграция:
+    - Query generation assistant
+    - Result validation assistant
+  - Thread-based conversations
+  - Secure proxy через сервер
+
+- **`supabase-client.js`**:
+  - Database operations (CRUD)
+  - Real-time subscriptions
+  - RLS (Row Level Security) policies
+  - File storage management
+
+- **`auth-client.js`**:
+  - Enhanced authentication с профилями
+  - Username display: `"${username} (${firstName} ${lastName})"`
+  - Session management через localStorage
+  - Profile data loading from Supabase
+
+#### **Additional Integrations**
+- **`google-oauth-hybrid.js`**:
+  - OAuth 2.0 flow для Gmail API
+  - Google Drive API для больших файлов
+  - Token refresh и management
+
+- **`google-drive-client.js`**:
+  - Chunked upload для файлов >25MB
+  - Progress indicators для загрузок
+  - Permission management
+
+- **`file-manager.js`**:
+  - Local file operations
+  - Google Drive backup integration
+  - File metadata management
+
+- **`adaptive-loader.js`**:
+  - Fast initialization system (1-2 секунды)
+  - Progressive loading компонентов
+  - Performance optimization
+
+### **Configuration System**
+- **`config/env.js`** - Browser-safe конфигурация:
+  - Только публичные данные (Supabase public keys, Google Client ID)
+  - API endpoints для proxy calls
+  - Environment-specific settings
+- **`config/supabase.js`** - Supabase client initialization
+- **`.env`** - Server-side secrets (не в Git):
+  - API keys (OpenAI, Apify)
+  - Assistant IDs
+  - Database credentials
+
+## 🔄 Детальный Pipeline Workflow
+
+### **6-этапный процесс парсинга данных**
+
+#### **Stage 1: AI Query Generation**
+- **Модуль**: `OpenAIClient.generateSearchQueries()`
+- **Процесс**: Пользовательский запрос → OpenAI Assistant → 3 оптимизированных запроса
+- **Выход**:
+  ```javascript
+  {
+    queries: ["запрос1", "запрос2", "запрос3"],
+    language: "ru",
+    region: "AE"
+  }
+  ```
+
+#### **Stage 2: Google Maps Search**
+- **Модуль**: `ApifyClient.executeApifySearches()`
+- **Актер**: `compass/crawler-google-places`
+- **Процесс**: Параллельный поиск по 3 запросам в Google Maps
+- **Лимиты**:
+  - FREE план: 500 результатов, 1 concurrent
+  - PAID план: 2000+ результатов, 5+ concurrent
+
+#### **Stage 3: Data Aggregation & Deduplication**
+- **Модуль**: `PipelineOrchestrator.aggregateResults()`
+- **Процесс**: Объединение результатов + дедупликация по placeId
+- **Алгоритм**: Set-based deduplication + мерж данных
+
+#### **Stage 4: Web Scraping**
+- **Модуль**: `ApifyClient.scrapeOrganizationDetails()`
+- **Актер**: `apify/web-scraper`
+- **Процесс**: Извлечение email/контактов с сайтов организаций
+- **Стратегии**:
+  - mailto: links
+  - contact page elements
+  - meta tags
+  - body text patterns
+  - JSON-LD structured data
+
+#### **Stage 5: Contact Filtering**
+- **Модуль**: `PipelineOrchestrator.filterResultsWithEmail()`
+- **Критерии**: Наличие email ИЛИ телефона
+- **Фильтры**: Исключение служебных email (test@, noreply@, admin@)
+
+#### **Stage 6: Relevance Scoring**
+- **Модуль**: `PipelineOrchestrator.filterByRelevance()`
+- **Алгоритм**: Keyword matching + location scoring
+- **Сортировка**: По релевантности + рейтингу Google
+
+## 🔗 Интеграции External APIs
+
+### **OpenAI Assistant API**
+```javascript
+// Конфигурация
+OPENAI_API_KEY: "sk-proj-..."
+OPENAI_ASSISTANT_ID: "asst_..." // Query generation
+OPENAI_VALIDATION_ASSISTANT_ID: "asst_..." // Result validation
+
+// Использование
+const queries = await openaiClient.generateSearchQueries(userQuery);
+```
+
+### **Apify Platform Integration**
+```javascript
+// Актеры
+const actors = {
+  googleMaps: 'compass/crawler-google-places',
+  webScraper: 'apify/web-scraper',
+  emailExtractor: 'poidata/google-maps-email-extractor'
+};
+
+// Автодетекция плана
+const plan = await apifyClient.detectPlanType();
+// План определяет лимиты памяти и конкурентности
+```
+
+### **Supabase Database**
+```javascript
+// Таблицы
+- profiles: Пользовательские профили
+- parsing_results: Результаты парсинга
+- tasks: Фоновые задачи
+- contacts: Извлеченные контакты
+
+// RLS Policies
+- Пользователи видят только свои данные
+- Admins имеют полный доступ
+```
+
+### **Google APIs Ecosystem**
+
+#### **Gmail API** (`google-oauth-hybrid.js`)
+- **Scope**: `gmail.send`
+- **Функции**: Отправка email кампаний
+- **OAuth Flow**: Authorization Code → Access Token → Refresh Token
+
+#### **Google Drive API** (`google-drive-client.js`)
+- **Scope**: `drive.file`, `drive.readonly`
+- **Функции**:
+  - Upload больших файлов (>25MB) через chunked upload
+  - Backup результатов парсинга
+  - Sharing с командой
+- **Features**: Progress tracking, retry logic, permission management
+
+#### **Google OAuth 2.0**
+```javascript
+// Конфигурация
+GOOGLE_CLIENT_ID: "*.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET: "server-side-only"
+GOOGLE_REDIRECT_URI: "/oauth/callback.html"
+```
+
+### **Telegram Bot Integration**
+```javascript
+// Настройки в UI
+this.settings = {
+  telegramBotToken: localStorage.getItem('telegramBotToken') || ''
+};
+
+// Методы в GymnastikaPlatform
+- bindTelegramSettings()
+- loadTelegramSettings()
+- saveTelegramSettings()
+- testTelegramConnection()
+- validateTelegramToken()
+```
+
+## 🛡️ Система безопасности
+
+### **API Security**
+- ✅ **Proxy Pattern**: Все API calls идут через Express сервер
+- ✅ **Token Protection**: API ключи только на сервере (.env)
+- ✅ **CORS Configuration**: Настроен для внутреннего использования
+- ✅ **Input Validation**: Joi + express-validator на всех endpoints
+
+### **Authentication & Authorization**
+- ✅ **Supabase Auth**: JWT-based authentication
+- ✅ **RLS Policies**: Row Level Security в базе данных
+- ✅ **Profile Management**: Enhanced user profiles с metadata
+- ✅ **Session Management**: localStorage + Supabase client
+
+### **Data Protection**
+- ✅ **Environment Variables**: Sensitive data в .env (не в Git)
+- ✅ **Gitignore Protection**: Comprehensive .gitignore для secrets
+- ✅ **GitHub Push Protection**: Автоматическое обнаружение leaked tokens
+- ✅ **Security Headers**: Helmet middleware для всех responses
+
+## 📊 Data Flow Architecture
+
+```
+User Input → AI Processing → Web Scraping → Data Processing → Storage → Display
+     ↓              ↓              ↓              ↓             ↓         ↓
+Search Query → OpenAI Assistant → Apify Actors → Deduplication → Supabase → Dashboard
+     ↓              ↓              ↓              ↓             ↓         ↓
+"гимнастика"  → 3 optimized  → Google Maps   → Email extract → Database → Results UI
+              queries        → Web scraping  → Filter/sort   → Storage  → Export
+```
+
+## 🎮 Development Commands
+
+### **Application Lifecycle**
+```bash
+npm start          # Production server (port 3001)
+npm run dev        # Development server (same as start)
+```
+
+### **Access Points**
+- **Main App**: http://localhost:3001/index.html
 - **Health Check**: http://localhost:3001/api/health
-- **Test Pages**: `test-form.html`, `test-pipeline.html` - For UI component and pipeline testing
-- **Server serves static files from root directory**
+- **Test Forms**: http://localhost:3001/test-form.html
+- **Pipeline Test**: http://localhost:3001/test-pipeline.html
 
-## API Architecture
+### **Git Workflow**
+```bash
+# Auto-commit hooks настроены в .claude/settings.json
+# Каждое Edit/Write → automatic git add + commit + push
+git status                    # Проверка состояния
+git log --oneline -10        # Последние коммиты
+```
 
-### Backend Proxy Endpoints
-- `POST /api/apify/:actorId/runs` - Proxy Apify actor execution requests (single actor IDs)
-- `POST /api/apify/:actorScope/:actorName/runs` - Proxy Apify actor execution requests (scoped actors)
-- `GET /api/apify/runs/:runId` - Get Apify run status  
-- `GET /api/apify/datasets/:datasetId/items` - Fetch scraped data from Apify dataset
-- `GET /api/apify/users/me` - Test Apify connection
-- `GET /api/health` - Server health check
+## 🔌 API Architecture
 
-All Apify calls require `x-apify-token` header for authentication.
+### **Backend Proxy Endpoints**
+```javascript
+// Apify Integration
+POST /api/apify/:actorId/runs                    // Single actor execution
+POST /api/apify/:actorScope/:actorName/runs      // Scoped actor execution
+GET  /api/apify/runs/:runId                      // Run status check
+GET  /api/apify/datasets/:datasetId/items        // Data retrieval
+GET  /api/apify/users/me                         // Account info
 
-### Frontend API Clients
-- **ApifyClient**: Executes Google Maps scraping via `compass/crawler-google-places` and `compass/google-maps-extractor` actors
-- **OpenAIClient**: Uses OpenAI Assistants for query generation (`OPENAI_ASSISTANT_ID`) and result validation (`OPENAI_VALIDATION_ASSISTANT_ID`)
-- **Pipeline Orchestrator**: Coordinates multi-stage parsing workflow combining AI query generation, Apify scraping, and result processing
+// OpenAI Integration (planned)
+POST /api/openai/assistants/:assistantId/threads // Thread creation
+POST /api/openai/threads/:threadId/messages     // Message sending
+
+// System
+GET  /api/health                                 // Health check
+```
+
+### **Authentication Headers**
+```javascript
+// Apify calls
+headers: {
+  'x-apify-token': process.env.APIFY_API_TOKEN
+}
+
+// OpenAI calls (server-side)
+headers: {
+  'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+  'OpenAI-Beta': 'assistants=v2'
+}
+```
+
+### **Frontend API Clients Integration**
+- **ApifyClient**: Google Maps + Web scraping через proxy
+- **OpenAIClient**: AI query generation через secure endpoints
+- **SupabaseClient**: Database operations + real-time subscriptions
+- **PipelineOrchestrator**: Multi-stage workflow coordination
+
+## ⚙️ Production Settings Restoration
+
+### **ВАЖНО: Текущие тестовые лимиты**
+```javascript
+// TESTING настройки (требуют восстановления для production):
+
+// lib/server-pipeline-orchestrator.js:225
+const fixedBuffer = 30; // TESTING: Reduced from 500 to 30
+
+// lib/server-pipeline-orchestrator.js:74
+const resultCount = 5; // TESTING: Reduced from 50 to 5
+
+// lib/pipeline-orchestrator.js:250
+const fixedBuffer = 30; // TESTING: Reduced from 500 to 30
+
+// lib/server-apify-client.js:94
+maxItems = 10, // TESTING: Reduced from 500 to 10
+```
+
+### **Production Restoration Commands**
+```javascript
+// Восстановить в 4 файлах:
+fixedBuffer: 30 → 500   // 16x увеличение результатов
+resultCount: 5 → 50     // 10x увеличение общего лимита
+maxItems: 10 → 500      // 50x увеличение Apify лимита
+
+// Результат: ~1500 результатов вместо 30 (50x увеличение производительности)
+```
+
+## 🏆 Key Features & Capabilities
+
+### **Business Intelligence Pipeline**
+- **Multi-stage processing**: 6-этапный workflow с валидацией на каждом этапе
+- **AI-powered optimization**: OpenAI Assistant оптимизирует search queries
+- **Scalable architecture**: Plan-aware resource management (FREE/PAID)
+- **Real-time progress**: WebSocket-style progress tracking с callbacks
+
+### **Data Processing Capabilities**
+- **Smart deduplication**: placeId-based с data merging
+- **Contact extraction**: 5 стратегий извлечения email/телефонов
+- **Relevance scoring**: Keyword + location + rating algorithms
+- **Export options**: CSV, JSON, database storage
+
+### **Enterprise Integrations**
+- **Google Workspace**: Gmail API + Drive API + OAuth 2.0
+- **Telegram Bot**: Notifications + команды + status updates
+- **Supabase Stack**: Auth + Database + Real-time + Storage
+- **Apify Platform**: Web scraping + Google Maps + Email extraction
+
+### **Security & Compliance**
+- **Zero client-side secrets**: Все API keys на сервере
+- **Row Level Security**: Database-level access control
+- **Input sanitization**: Joi validation + XSS protection
+- **GitHub security**: Push protection + secret scanning
+
+## 🚀 Deployment & Scaling
+
+### **Environment Configuration**
+```bash
+# Required for production
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=eyJ...
+OPENAI_API_KEY=sk-proj-...
+OPENAI_ASSISTANT_ID=asst_...
+OPENAI_VALIDATION_ASSISTANT_ID=asst_...
+APIFY_API_TOKEN=apify_api_...
+GOOGLE_CLIENT_SECRET=GOCSPX-...
+```
+
+### **Scaling Considerations**
+- **Memory**: Pipeline может использовать до 2GB для больших datasets
+- **Concurrency**: Apify plan определяет максимальную конкурентность
+- **Rate Limits**: OpenAI Assistant API + Apify actor limits
+- **Database**: Supabase connection pooling + read replicas
+
+### **Performance Optimization**
+- **Client-side caching**: localStorage для user settings
+- **Background processing**: Worker threads для heavy operations
+- **Progressive loading**: Adaptive loader для UI components
+- **Resource monitoring**: Plan detection + automatic throttling
+
+## 🔧 Troubleshooting Guide
+
+### **Common Issues**
+
+#### **Pipeline Stage Failures**
+```javascript
+// Stage 1: OpenAI Assistant не отвечает
+Problem: API key invalid или quota exceeded
+Solution: Проверить OPENAI_API_KEY в .env
+
+// Stage 2: Apify actor timeout
+Problem: Plan limits или network issues
+Solution: Увеличить timeout или downgrade to FREE plan
+
+// Stage 4: Web scraper returns empty results
+Problem: Websites blocking automated access
+Solution: Use residential proxies или retry logic
+```
+
+#### **Authentication Issues**
+```javascript
+// Supabase connection failed
+Problem: Invalid SUPABASE_URL или ANON_KEY
+Solution: Verify credentials в config/env.js
+
+// Google OAuth flow broken
+Problem: GOOGLE_CLIENT_ID misconfigured
+Solution: Check Google Cloud Console settings
+```
+
+#### **Performance Degradation**
+```javascript
+// Slow pipeline execution
+Problem: Testing limits still active
+Solution: Restore production values (see above)
+
+// Memory leaks
+Problem: Large datasets не освобождаются
+Solution: Implement proper cleanup в pipeline stages
+```
+
+### **Debug Commands**
+```bash
+# Check system status
+curl http://localhost:3001/api/health
+
+# View logs
+tail -f logs/application.log
+
+# Database connectivity
+npm run test:db
+
+# API keys validation
+npm run test:apis
+```
+
+## 📚 Documentation Structure
+
+```
+claudedocs/
+├── PIPELINE-FIXES.md         # История исправлений pipeline
+├── WEB-SCRAPER-FIXES.md      # Исправления web scraper
+├── SECURITY_CHECK_GUIDE.md   # Безопасность и аудит
+├── SUPABASE_SETUP.md         # Настройка базы данных
+├── Google-OAuth-Setup-Guide.md # Google интеграции
+├── test-pipeline.html        # Pipeline тестирование
+├── test-form.html           # UI компоненты
+└── tests/                   # Автоматизированные тесты
+```
+
+## 🎯 Development Patterns
+
+### **Code Organization Rules**
+- **Telegram settings**: Только в `GymnastikaPlatform` class
+- **CSS spacing**: Parsing section как эталон для других секций
+- **Authentication**: `"${username} (${firstName} ${lastName})"` format
+- **Error handling**: Browser console для debugging + server logs
+
+### **Git Workflow Standards**
+- **Auto-commit hooks**: Edit/Write → automatic commit + push
+- **Branch strategy**: feature branches → main via PR
+- **Commit messages**: Descriptive с context и impact
+- **Security**: Never commit API keys или sensitive data
+
+---
+
+## 🏁 Summary
+
+**GYMNASTIKA Parsing Platform** представляет собой enterprise-grade решение для автоматизированного парсинга бизнес-данных с использованием современных AI технологий, web scraping и cloud интеграций.
+
+**Ключевые преимущества:**
+- 🚀 **Production-ready** архитектура с comprehensive security
+- 🤖 **AI-powered** оптимизация через OpenAI Assistant API
+- 🔗 **Multi-platform** интеграции (Google, Telegram, Supabase)
+- 📊 **Scalable** pipeline с plan-aware resource management
+- 🛡️ **Security-first** подход с zero client-side secrets
+
+**Текущий статус:** ✅ Готов к production использованию после восстановления лимитов
+
+**Создано с помощью Claude Code** | **GitHub**: https://github.com/gymnastika/parsing_project
 
 ## Data Flow
 
