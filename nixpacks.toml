@@ -1,0 +1,11 @@
+[variables]
+NODE_ENV = "production"
+
+[phases.build]
+cmds = ["npm ci --production"]
+
+[phases.start]
+cmd = "npm start"
+
+[staticAssets]
+"." = "./"
