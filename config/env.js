@@ -15,7 +15,7 @@ window.ENV = {
     // ================================
     // These are safe to expose in browser - they're designed for client-side use
     SUPABASE_URL: 'https://egmpnazpmkghecodhbyy.supabase.co',
-    SUPABASE_ANON_KEY: 'ваш_новый_anon_ключ_для_egmpnazpmkghecodhbyy',
+    SUPABASE_ANON_KEY: 'ЗАМЕНИТЕ_НА_РЕАЛЬНЫЙ_ANON_KEY_ОТ_ПРОЕКТА_egmpnazpmkghecodhbyy',
     
     // ================================
     // APPLICATION PUBLIC SETTINGS
