@@ -416,9 +416,24 @@ app.post('/api/telegram/bot/sendMessage', async (req, res) => {
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-    res.json({ 
-        status: 'ok', 
+    res.json({
+        status: 'ok',
         message: 'GYMNASTIKA Parsing API Server',
+        timestamp: new Date().toISOString()
+    });
+});
+
+// TEMPORARY: Environment variables check for Railway debugging
+app.get('/api/debug/env', (req, res) => {
+    res.json({
+        status: 'env-check',
+        environment: process.env.NODE_ENV || 'undefined',
+        hasSupabaseUrl: !!process.env.SUPABASE_URL,
+        hasSupabaseAnonKey: !!process.env.SUPABASE_ANON_KEY,
+        hasSupabaseServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+        hasOpenAIKey: !!process.env.OPENAI_API_KEY,
+        hasApifyToken: !!process.env.APIFY_API_TOKEN,
+        supabaseUrlValue: process.env.SUPABASE_URL ? `${process.env.SUPABASE_URL.substring(0, 20)}...` : 'NOT_SET',
         timestamp: new Date().toISOString()
     });
 });
