@@ -1,0 +1,14 @@
+# Railway ignore patterns
+node_modules/
+.git/
+.env
+.env.*
+*.log
+logs/
+temp/
+cache/
+.DS_Store
+.vscode/
+.idea/
+claudedocs/
+BACKUP/
