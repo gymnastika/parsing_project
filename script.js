@@ -341,7 +341,6 @@ class GymnastikaPlatform {
     // Clear registration form fields
     clearRegistrationForm() {
         try {
-            document.getElementById('registerEmail').value = '';
             document.getElementById('registerPassword').value = '';
             document.getElementById('confirmPassword').value = '';
             document.getElementById('registerUsername').value = '';
