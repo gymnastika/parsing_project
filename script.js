@@ -338,6 +338,40 @@ class GymnastikaPlatform {
         }
     }
 
+    // Clear registration form fields
+    clearRegistrationForm() {
+        try {
+            document.getElementById('registerEmail').value = '';
+            document.getElementById('registerPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            document.getElementById('registerUsername').value = '';
+            document.getElementById('firstName').value = '';
+            document.getElementById('lastName').value = '';
+            document.getElementById('secretCode').value = '';
+            console.log('✅ Registration form cleared');
+        } catch (error) {
+            console.error('❌ Error clearing registration form:', error);
+        }
+    }
+
+    // Switch to login form
+    switchToLoginForm() {
+        try {
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+
+            // Update toggle button states
+            const loginToggle = document.getElementById('loginToggle');
+            const registerToggle = document.getElementById('registerToggle');
+            if (loginToggle) loginToggle.classList.add('active');
+            if (registerToggle) registerToggle.classList.remove('active');
+
+            console.log('✅ Switched to login form');
+        } catch (error) {
+            console.error('❌ Error switching to login form:', error);
+        }
+    }
+
     // Logout user
     async logout() {
         try {
