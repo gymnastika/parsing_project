@@ -318,11 +318,17 @@ class GymnastikaPlatform {
             console.log('✅ Registration successful');
             if (result.needsConfirmation) {
                 this.showSuccess('Регистрация успешна! Проверьте email для подтверждения.');
+                // Clear form and redirect to login after email confirmation
+                setTimeout(() => {
+                    this.clearRegistrationForm();
+                    this.switchToLoginForm();
+                }, 1500);
             } else {
                 this.showSuccess('Регистрация и вход выполнены успешно!');
-                // Auto-login on successful registration
+                // Clear form and redirect to login after successful registration
                 setTimeout(() => {
-                    location.reload();
+                    this.clearRegistrationForm();
+                    this.switchToLoginForm();
                 }, 1500);
             }
             
