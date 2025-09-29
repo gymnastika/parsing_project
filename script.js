@@ -207,11 +207,18 @@ class GymnastikaPlatform {
                 e.preventDefault();
                 const email = document.getElementById('registerEmail').value;
                 const password = document.getElementById('registerPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
                 const username = document.getElementById('registerUsername').value;
                 const firstName = document.getElementById('firstName').value;
                 const lastName = document.getElementById('lastName').value;
                 const secretCode = document.getElementById('secretCode').value;
-                
+
+                // 🔒 SECURITY: Validate password confirmation
+                if (password !== confirmPassword) {
+                    this.showError('Пароли не совпадают. Пожалуйста, проверьте введенные данные.');
+                    return;
+                }
+
                 await this.register(email, password, username, firstName, lastName, secretCode);
             });
         }
