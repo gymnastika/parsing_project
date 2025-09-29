@@ -2,7 +2,10 @@
 NODE_ENV = "production"
 
 [phases.build]
-cmds = ["npm ci --production"]
+cmds = ["npm ci --omit=dev"]
 
 [phases.start]
 cmd = "npm start"
+
+[static]
+dir = "/"
