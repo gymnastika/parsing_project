@@ -189,6 +189,85 @@
   - Assistant IDs
   - Database credentials
 
+## 🛡️ Input Validation & Security Middleware System
+
+### **`middleware/inputValidation.js`** (530 строк) - Комплексная система безопасности
+
+#### **Security Features**
+- **🔒 XSS Protection**: Полная санитизация всех входящих данных
+- **💉 SQL Injection Prevention**: Joi validation schemas с pattern matching
+- **🚫 NoSQL Injection Prevention**: express-mongo-sanitize integration
+- **⏱️ Rate Limiting**: Двухуровневая система (general + strict)
+- **📝 Input Sanitization**: Рекурсивная очистка объектов и массивов
+- **📋 Schema Validation**: Joi-based validation для всех endpoints
+
+#### **Rate Limiting Configuration**
+```javascript
+SECURITY_CONFIG = {
+    RATE_LIMIT_WINDOW: 15 * 60 * 1000,        // 15 minutes
+    RATE_LIMIT_MAX: 100,                       // general endpoints
+    RATE_LIMIT_STRICT_MAX: 10,                 // sensitive endpoints
+    MAX_STRING_LENGTH: 10000,
+    MAX_QUERY_LENGTH: 2000
+}
+```
+
+#### **Core Functions & Classes**
+- **`sanitizeInput(req, res, next)`**: Middleware для санитизации всех входящих данных
+- **`sanitizeObject(obj)`**: Рекурсивная санитизация объектов/массивов
+- **`sanitizeString(str)`**: XSS защита для строк с очисткой HTML тегов
+- **`validateSchema(schema)`**: Joi-based validation middleware generator
+- **`handleValidationErrors(req, res, next)`**: Express-validator error handler
+
+#### **Security Patterns & Validation Rules**
+```javascript
+SAFE_ID_PATTERN: /^[a-zA-Z0-9_-]+$/
+SAFE_ACTOR_ID_PATTERN: /^[a-zA-Z0-9_~\/.-]+$/
+THREAD_ID_PATTERN: /^thread_[a-zA-Z0-9]+$/
+RUN_ID_PATTERN: /^run_[a-zA-Z0-9]+$/
+ASSISTANT_ID_PATTERN: /^asst_[a-zA-Z0-9]+$/
+```
+
+#### **Endpoint-Specific Validation**
+- **`validateApifyRun`**: Google Maps scraper validation (searchStringsArray, locationQuery, maxCrawledPlacesPerSearch)
+- **`validateWebScraperRun`**: Web scraper validation (startUrls, pageFunction, proxyConfiguration)
+- **`validateOpenAIThread`**: OpenAI Assistant validation (threadId, content, assistant_type)
+- **`validateQueryParams`**: Query parameters validation (status, limit)
+
+#### **Security Middleware Stacks**
+- **`baseSecurityMiddleware`**: mongoSanitize + sanitizeInput + generalRateLimit
+- **`sensitiveSecurityMiddleware`**: baseSecurityMiddleware + strictRateLimit
+
+#### **Integration in server.js**
+```javascript
+const {
+    validateApifyRun,
+    validateWebScraperRun,
+    validateOpenAIThread,
+    validateQueryParams
+} = require('./middleware/inputValidation');
+```
+
+### **OAuth Callback Infrastructure**
+
+#### **`oauth/callback.html`** (306 строк) - Базовый OAuth callback
+- **UI Components**: Spinner, progress container, error states
+- **Multi-method messaging**: window.opener, window.parent, window.top
+- **Fallback система**: localStorage backup если postMessage не работает
+- **Error handling**: OAuth errors, network failures, timeout handling
+- **Auto-close логика**: 2-5 секунд в зависимости от результата
+
+#### **`oauth/google-callback.html`** (230 строк) - Google OAuth с прогресс UI
+- **Progressive UI**: 4-step progress indicator с visual feedback
+- **Advanced styling**: Glass morphism UI с backdrop-filter
+- **Client integration**: Загружает Supabase, GoogleOAuthHybrid clients
+- **Step tracking**:
+  1. Получение токенов от Google
+  2. Проверка авторизации
+  3. Сохранение интеграции
+  4. Перенаправление обратно
+- **Error recovery**: Automatic redirect с сохранением состояния
+
 ## 🔄 Детальный Pipeline Workflow
 
 ### **6-этапный процесс парсинга данных**
