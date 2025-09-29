@@ -62,14 +62,36 @@
 
 ### **Backend (Node.js/Express)**
 - **Main Server**: `server.js` - Express сервер на порту 3001:
-  - Proxy для всех Apify API вызовов (безопасность)
-  - Служит статические файлы из корневой директории
-  - Security middleware (helmet, CORS, input validation)
-  - Background worker для фоновых задач
-- **Services**:
-  - `ParsingTasksService` - Управление задачами парсинга
-  - `BackgroundWorker` - Фоновая обработка задач
-  - Input validation middleware для всех endpoints
+  - **Proxy Architecture**: Все Apify/OpenAI API вызовы через secure proxy
+  - **Static File Serving**: Статические файлы из корневой директории
+  - **Railway Volume Integration**: Автоинициализация persistent storage при старте
+  - **Background Worker**: Автозапуск worker для фоновых задач
+  - **Security Stack**: Helmet + CORS + Input Validation + Rate Limiting
+  - **Environment-based Configuration**: Security headers, CSP, HSTS
+
+- **Core Backend Services**:
+  - **`ParsingTasksService`** (341 строка): Database CRUD для parsing_tasks
+    - Task lifecycle management (pending → running → completed/failed)
+    - Progress tracking с real-time updates
+    - Retry логика и cleanup старых задач
+  - **`BackgroundWorker`** (330 строк): Polling-based task processor
+    - Concurrent task execution (max 2 simultaneous)
+    - Health monitoring и force cancellation
+    - Exponential backoff для retry логики
+
+- **Infrastructure Services**:
+  - **`Volume Manager`** (173 строки): Railway persistent storage management
+    - Directory structure management (logs, exports, temp, cache)
+    - Automated cleanup и disk usage monitoring
+  - **`Database Utils`** (66 строк): Connection utilities и health checks
+  - **`Path Configuration`** (119 строк): Централизованное управление файловыми путями
+
+- **Security & Middleware**:
+  - **Input Validation Middleware** (530 строк): Комплексная security система
+    - XSS/SQL/NoSQL injection prevention
+    - Rate limiting (general + strict tiers)
+    - Joi schema validation для всех endpoints
+  - **OAuth Infrastructure**: 2 callback endpoints для Google integration
 
 ### **Core Libraries (`lib/` directory)**
 
