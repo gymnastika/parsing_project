@@ -218,10 +218,10 @@ class GymnastikaPlatform {
                     return;
                 }
 
-                // Generate email from username for Supabase compatibility
-                const email = `${username}@gmail.com`;
+                // Generate phone from username for Supabase compatibility
+                const phone = this.generatePhoneFromUsername(username);
 
-                await this.register(email, password, username, firstName, lastName, secretCode);
+                await this.register(phone, password, username, firstName, lastName, secretCode);
             });
         }
 
@@ -294,8 +294,21 @@ class GymnastikaPlatform {
         }
     }
 
-    // Register user
-    async register(email, password, username, firstName, lastName, secretCode) {
+    // Generate deterministic phone number from username
+    generatePhoneFromUsername(username) {
+        // Create hash from username
+        const hash = username.toLowerCase().split('').reduce((acc, char) =>
+            acc + char.charCodeAt(0), 0);
+
+        // Generate 7-digit number from hash
+        const phoneNum = String(Math.abs(hash)).padStart(7, '0').slice(0, 7);
+
+        // Return in international format (Russia +7900 prefix)
+        return `+7900${phoneNum}`;
+    }
+
+    // Register user with phone
+    async register(phone, password, username, firstName, lastName, secretCode) {
         try {
             if (!window.gymnastikaAuth) {
                 throw new Error('Auth client not available');
@@ -307,9 +320,9 @@ class GymnastikaPlatform {
                 await window.gymnastikaAuth.initialize();
             }
 
-            // Use the auth client's register method
+            // Use the auth client's register method with phone
             const result = await window.gymnastikaAuth.register({
-                email,
+                phone,
                 password,
                 username,
                 firstName,
