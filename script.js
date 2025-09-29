@@ -5296,4 +5296,4 @@ window.closeResults = () => {
     if (platform) {
         platform.closeResults();
     }
-};
+};// Force cache refresh - Mon Sep 29 22:05:49 +05 2025
