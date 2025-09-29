@@ -219,7 +219,7 @@ class GymnastikaPlatform {
                 }
 
                 // Generate email from username for Supabase compatibility
-                const email = `${username}@gymnastika.internal`;
+                const email = `${username}@example.com`;
 
                 await this.register(email, password, username, firstName, lastName, secretCode);
             });
