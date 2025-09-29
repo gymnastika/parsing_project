@@ -14,8 +14,8 @@ window.ENV = {
     // SUPABASE PUBLIC CONFIGURATION
     // ================================
     // These are safe to expose in browser - they're designed for client-side use
-    SUPABASE_URL: 'https://revgeksfcwydibviowrl.supabase.co',
-    SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJldmdla3NmY3d5ZGlidmlvd3JsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcyMzI5ODYsImV4cCI6MjA3MjgwODk4Nn0.JBPBJiJdaK2scY-b_JtOqZ-5AL5feEdCIpWq1QYZqNI',
+    SUPABASE_URL: 'https://egmpnazpmkghecodhbyy.supabase.co',
+    SUPABASE_ANON_KEY: 'ваш_новый_anon_ключ_для_egmpnazpmkghecodhbyy',
     
     // ================================
     // APPLICATION PUBLIC SETTINGS
