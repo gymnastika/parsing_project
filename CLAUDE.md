@@ -128,6 +128,56 @@
   - Progressive loading компонентов
   - Performance optimization
 
+#### **Railway Volume & Persistent Storage Infrastructure**
+- **`lib/volume-manager.js`** (173 строки):
+  - **Функции**: `ensureDirectories()`, `getVolumeDirectory()`, `cleanupTempFiles()`, `getVolumeStats()`
+  - **VOLUME_CONFIG**: 4 основных директории (logs, exports, temp, cache)
+  - **Автоматическая инициализация**: Создание структуры каталогов при старте
+  - **Permission validation**: Проверка прав доступа к Railway Volume
+  - **Cleanup система**: Автоудаление временных файлов старше 24 часов
+  - **Статистика использования**: File count и размеры для каждой директории
+  - **Error handling**: Graceful fallback если Volume недоступен
+
+- **`config/paths.js`** (119 строк):
+  - **Централизованные пути**: VOLUME_PATH, LOGS_PATH, EXPORTS_PATH, TEMP_PATH, CACHE_PATH
+  - **APPLICATION_PATHS**: Детальные пути для логов, экспортов, временных файлов, кэша
+  - **PATH_HELPERS**: Utility функции для timestamp экспортов, временных файлов, кэша
+  - **Helper функции**:
+    - `getTimestampedExportPath(filename, format)` - экспорт с timestamp
+    - `getTempPath(filename, subdir)` - временные файлы по категориям
+    - `getCachePath(key, type)` - кэш файлы по типам
+    - `getLogPath(type)` - логи по типам (server, error, pipeline)
+  - **Volume validation**: `isVolumeConfigured()`, `getVolumeInfo()`
+  - **Интеграция в server.js**: Автоинициализация при запуске сервера
+
+#### **Background Processing Infrastructure**
+- **`lib/background-worker.js`** (330 строк):
+  - **Основной класс**: `BackgroundWorker` с polling архитектурой
+  - **Конфигурация**: pollInterval (5s), maxConcurrentTasks (2), maxRetries (3)
+  - **Методы жизненного цикла**: `start()`, `stop()`, `scheduleNextPoll()`
+  - **Task management**: `pollForTasks()`, `startTaskProcessing()`, `processTask()`
+  - **Retry логика**: `handleTaskFailure()` с exponential backoff
+  - **Monitoring**: `getStatus()`, `getRunningTasksDetails()`, `healthCheck()`
+  - **Force cancellation**: `cancelTask()` для экстренной остановки
+  - **Concurrency control**: Map-based tracking запущенных задач
+  - **State management**: isRunning, runningTasks, pollTimer
+
+- **`lib/parsing-tasks-service.js`** (341 строка):
+  - **Database service**: Полный CRUD для parsing_tasks таблицы
+  - **Core методы**: `createTask()`, `getTask()`, `getUserTasks()`, `updateTask()`
+  - **Status management**: `markAsRunning()`, `markAsCompleted()`, `markAsFailed()`
+  - **Progress tracking**: `updateProgress(stage, current, total, message)`
+  - **Task filtering**: `getPendingTasks()`, `getRunningTasks()`, `getActiveTasks()`
+  - **Data persistence**: `saveOpenAIData()`, `saveApifyRuns()`, `saveResults()`
+  - **Maintenance**: `cleanupOldTasks()` для автоочистки завершенных задач
+  - **Service Role Key**: Использует SUPABASE_SERVICE_ROLE_KEY для server-side операций
+
+- **`lib/db-utils.js`** (66 строк):
+  - **Базовые database utilities**: DatabaseUtils класс
+  - **Connection management**: `setClient()`, `ensureReady()`, `healthCheck()`
+  - **Global instance**: `window.dbUtils` для browser использования
+  - **Auto-initialization**: Связывается с `window.gymnastikaDB` при доступности
+
 ### **Configuration System**
 - **`config/env.js`** - Browser-safe конфигурация:
   - Только публичные данные (Supabase public keys, Google Client ID)
