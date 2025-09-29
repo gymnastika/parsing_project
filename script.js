@@ -205,7 +205,6 @@ class GymnastikaPlatform {
         if (registerForm) {
             registerForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const email = document.getElementById('registerEmail').value;
                 const password = document.getElementById('registerPassword').value;
                 const confirmPassword = document.getElementById('confirmPassword').value;
                 const username = document.getElementById('registerUsername').value;
@@ -218,6 +217,9 @@ class GymnastikaPlatform {
                     this.showError('Пароли не совпадают. Пожалуйста, проверьте введенные данные.');
                     return;
                 }
+
+                // Generate email from username for Supabase compatibility
+                const email = `${username}@gymnastika.internal`;
 
                 await this.register(email, password, username, firstName, lastName, secretCode);
             });
