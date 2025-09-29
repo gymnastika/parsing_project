@@ -568,16 +568,63 @@ maxItems: 10 → 500      // 50x увеличение Apify лимита
 ## 🚀 Deployment & Scaling
 
 ### **Environment Configuration**
+
+#### **Complete Environment Variables** (`.env.example` - 98 строк)
+
+**Supabase Configuration**:
 ```bash
-# Required for production
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=eyJ...
-OPENAI_API_KEY=sk-proj-...
-OPENAI_ASSISTANT_ID=asst_...
-OPENAI_VALIDATION_ASSISTANT_ID=asst_...
-APIFY_API_TOKEN=apify_api_...
-GOOGLE_CLIENT_SECRET=GOCSPX-...
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_ANON_KEY=your-anon-key-here
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here    # For server-side operations
+SUPABASE_ACCESS_TOKEN=your-access-token-here
 ```
+
+**OpenAI Configuration**:
+```bash
+OPENAI_API_KEY=sk-proj-your-api-key-here
+OPENAI_ASSISTANT_ID=asst_your-assistant-id-here
+OPENAI_VALIDATION_ASSISTANT_ID=asst_your-validation-assistant-id-here
+```
+
+**Apify Configuration**:
+```bash
+APIFY_API_TOKEN=apify_api_your-token-here
+APIFY_GOOGLE_MAPS_ACTOR=compass/crawler-google-places
+APIFY_DIRECT_ACTOR_ID=nwua9Gu5YrADL7ZDj
+APIFY_USE_DIRECT_FALLBACK=true
+```
+
+**Railway Volume Configuration**:
+```bash
+VOLUME_PATH=/app/data                    # Railway Volume persistent storage
+```
+
+**Application Configuration**:
+```bash
+REGISTRATION_SECRET_CODE=GYMN-2025-SECURE
+DB_SCHEMA=public
+NODE_ENV=development                     # development|staging|production
+APP_NAME=GYMNASTIKA Management Platform
+DEBUG=true
+AUTO_TEST_DB=true
+```
+
+**CORS & Security Configuration**:
+```bash
+CORS_ORIGIN=http://localhost:3001        # Development
+# CORS_ORIGIN=https://your-domain.com    # Production
+CORS_CREDENTIALS=true
+ALLOWED_ORIGINS=http://localhost:3001,http://127.0.0.1:3001
+ENABLE_SECURITY_HEADERS=true
+CSP_ENABLED=true
+HSTS_ENABLED=true
+```
+
+**Production Deployment Notes**:
+- Update `NODE_ENV=production` для боевой среды
+- Настроить `CORS_ORIGIN` и `ALLOWED_ORIGINS` для своих доменов
+- Включить все security headers в production
+- Использовать HTTPS обязательно в production
 
 ### **Scaling Considerations**
 - **Memory**: Pipeline может использовать до 2GB для больших datasets
