@@ -3937,18 +3937,18 @@ class GymnastikaPlatform {
         }
 
         try {
-            // Hide submit button and show stylish progress bar
+            // Hide submit button and show modern progress bar
             const submitBtn = document.querySelector('.submit-btn');
-            const progressBar = document.getElementById('stylishProgressBar');
-            const progressText = document.getElementById('progressText');
+            const progressBar = document.getElementById('modernProgressBar');
+            const progressDesc = document.getElementById('progressDescription');
 
             if (submitBtn) submitBtn.style.display = 'none';
             if (progressBar) progressBar.classList.add('active');
-            if (progressText) progressText.classList.add('active');
+            if (progressDesc) progressDesc.classList.add('active');
 
             // Set up progress callback
             this.pipelineOrchestrator.onProgressUpdate = (progress) => {
-                this.updateStylishProgress(progress);
+                this.updateModernProgress(progress);
             };
 
             // Start pipeline with proper parameters
