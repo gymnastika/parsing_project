@@ -2252,21 +2252,30 @@ class GymnastikaPlatform {
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const taskName = document.getElementById('taskName').value.trim();
             const searchQuery = document.getElementById('searchQuery').value.trim();
-            
+
             if (!taskName) {
                 this.showError('Введите название задачи');
                 return;
             }
-            
+
             if (!searchQuery) {
                 this.showError('Введите поисковый запрос');
                 return;
             }
 
-            await this.startParsing({ taskName, searchQuery });
+            // Проверка обязательного выбора категории
+            const categoryId = document.getElementById('categorySelect')?.value ||
+                             document.getElementById('urlCategorySelect')?.value;
+
+            if (!categoryId) {
+                this.showError('Выберите категорию перед началом парсинга');
+                return;
+            }
+
+            await this.startParsing({ taskName, searchQuery, categoryId });
         });
     }
 
