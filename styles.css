@@ -314,7 +314,7 @@ body {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 1rem;
     align-items: stretch;
     position: relative;
 }
@@ -333,9 +333,11 @@ body {
 }
 
 .category-selector-group select {
-    flex: 1;
+    flex: 0 1 auto;
     min-width: 200px;
-    max-width: calc(100% - 140px);
+    width: calc(100% - 150px);
+    position: relative;
+    z-index: 1;
     /* All other styles inherited from .form-group select */
 }
 
