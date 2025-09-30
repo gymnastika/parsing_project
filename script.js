@@ -2631,6 +2631,55 @@ class GymnastikaPlatform {
         }
     }
 
+    // Load categories into parsing form selects
+    async loadCategoriesIntoSelects() {
+        console.log('🔄 Loading categories into parsing form selects...');
+
+        const aiSelect = document.getElementById('categorySelect');
+        const urlSelect = document.getElementById('urlCategorySelect');
+
+        if (!aiSelect || !urlSelect) {
+            console.log('❌ Category select elements not found');
+            return;
+        }
+
+        if (!this.currentUser) {
+            console.log('❌ No current user for loading categories');
+            return;
+        }
+
+        try {
+            const { data: categories, error } = await this.supabase
+                .from('categories')
+                .select('*')
+                .eq('user_id', this.currentUser.id)
+                .order('name', { ascending: true });
+
+            if (error) throw error;
+
+            // Build options HTML
+            let optionsHTML = '<option value="">Выберите категорию (опционально)</option>';
+            if (categories && categories.length > 0) {
+                optionsHTML += categories.map(cat =>
+                    `<option value="${cat.id}">${this.escapeHtml(cat.name)}</option>`
+                ).join('');
+            }
+
+            // Update both selects
+            aiSelect.innerHTML = optionsHTML;
+            urlSelect.innerHTML = optionsHTML;
+
+            console.log(`✅ Loaded ${categories ? categories.length : 0} categories into selects`);
+
+        } catch (error) {
+            console.error('❌ Error loading categories into selects:', error);
+            // Keep default option on error
+            const defaultHTML = '<option value="">Выберите категорию (опционально)</option>';
+            aiSelect.innerHTML = defaultHTML;
+            urlSelect.innerHTML = defaultHTML;
+        }
+    }
+
     // Create new category
     async createCategory(name) {
         console.log('➕ Creating category:', name);
