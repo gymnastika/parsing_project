@@ -1031,6 +1031,42 @@
         </div>
     </div>
 
+    <!-- Categories Management Modal -->
+    <div id="categoriesModal" class="modal-overlay">
+        <div class="categories-modal">
+            <div class="modal-header">
+                <h3>Управление категориями</h3>
+                <button class="modal-close-btn" id="closeCategoriesModal">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Add New Category Form -->
+                <div class="add-category-section">
+                    <h4>Добавить категорию</h4>
+                    <div class="category-form">
+                        <input type="text" id="newCategoryName" class="category-input" placeholder="Введите название категории" maxlength="50">
+                        <button id="addCategoryBtn" class="primary-btn">Создать</button>
+                    </div>
+                </div>
+
+                <!-- Existing Categories List -->
+                <div class="categories-list-section">
+                    <h4>Существующие категории</h4>
+                    <div id="categoriesList" class="categories-list">
+                        <!-- Categories will be loaded here -->
+                        <div class="categories-loading">
+                            <div class="loading-spinner-small"></div>
+                            <p>Загрузка категорий...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 
     <!-- Database Integration -->
