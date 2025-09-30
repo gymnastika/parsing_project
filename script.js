@@ -595,6 +595,8 @@ class GymnastikaPlatform {
             setTimeout(() => {
                 this.switchTab('ai-search');
             }, 100);
+            // Load categories into parsing form selects
+            await this.loadCategoriesIntoSelects();
         } else if (sectionName === 'database') {
             console.log('🔄 Auto-activating task history tab for database section');
             // Small delay to ensure UI is ready
