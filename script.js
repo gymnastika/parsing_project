@@ -4115,6 +4115,7 @@ class GymnastikaPlatform {
         // Reset progress text
         if (progressText) {
             progressText.textContent = 'Нажмите "Начать парсинг" для запуска процесса';
+            progressText.classList.remove('active');
         }
 
         console.log('🔄 Parsing UI reset complete');
