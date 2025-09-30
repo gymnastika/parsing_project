@@ -331,22 +331,25 @@ body {
     display: flex;
     align-items: center;
     gap: 0.25rem;
-    padding: 10px 16px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    color: white;
+    padding: 0.8rem 1rem;
+    background: var(--bg-white);
+    border: 2px solid rgba(124, 58, 237, 0.2);
+    border-radius: 12px;
+    color: var(--text-dark);
     font-size: 0.85rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;
-    backdrop-filter: blur(10px);
 }
 
 .add-category-inline-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.4);
+    background: var(--primary-purple);
+    color: white;
+    border-color: var(--primary-purple);
+    box-shadow:
+        0 0 0 3px rgba(124, 58, 237, 0.15),
+        0 4px 20px rgba(124, 58, 237, 0.1);
     transform: translateY(-1px);
 }
 
