@@ -318,21 +318,12 @@ class GymnastikaPlatform {
             });
 
             console.log('✅ Registration successful');
-            if (result.needsConfirmation) {
-                this.showSuccess('Регистрация успешна! Проверьте email для подтверждения.');
-                // Clear form and redirect to login after email confirmation
-                setTimeout(() => {
-                    this.clearRegistrationForm();
-                    this.switchToLoginForm();
-                }, 1500);
-            } else {
-                this.showSuccess('Регистрация выполнена успешно!');
-                // Clear form and redirect to login after successful registration
-                setTimeout(() => {
-                    this.clearRegistrationForm();
-                    this.switchToLoginForm();
-                }, 1500);
-            }
+            this.showSuccess('Регистрация выполнена успешно!');
+            // Clear form and redirect to login after successful registration
+            setTimeout(() => {
+                this.clearRegistrationForm();
+                this.switchToLoginForm();
+            }, 1500);
             
         } catch (error) {
             console.error('❌ Registration error:', error);
