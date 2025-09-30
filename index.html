@@ -53,17 +53,16 @@
         function togglePasswordVisibility(fieldId) {
             const input = document.getElementById(fieldId);
             const button = input.nextElementSibling.nextElementSibling; // Get the button after the label
-            const eyeOpenPaths = button.querySelectorAll('.eye-open');
             const eyeClosedLine = button.querySelector('.eye-closed');
 
             if (input.type === 'password') {
+                // Show password - display strike-through line over eye
                 input.type = 'text';
-                eyeOpenPaths.forEach(path => path.style.display = 'none');
                 eyeClosedLine.style.display = 'block';
                 button.setAttribute('aria-label', 'Скрыть пароль');
             } else {
+                // Hide password - remove strike-through line
                 input.type = 'password';
-                eyeOpenPaths.forEach(path => path.style.display = 'block');
                 eyeClosedLine.style.display = 'none';
                 button.setAttribute('aria-label', 'Показать пароль');
             }
