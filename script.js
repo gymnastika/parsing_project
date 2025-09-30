@@ -495,6 +495,9 @@ class GymnastikaPlatform {
             
             // Bind Google OAuth button
             this.bindGoogleOAuth();
+
+            // Bind Categories Management
+            this.bindCategoriesManagement();
             
             // Bind email form validation
             this.bindEmailForm();
