@@ -4047,6 +4047,17 @@ class GymnastikaPlatform {
             'complete': 4
         };
 
+        const stageDescriptions = {
+            'initializing': 'Инициализация парсинга...',
+            'query-generation': 'Генерация поисковых запросов с помощью ИИ',
+            'apify-search': 'Поиск организаций в Google Maps',
+            'aggregation': 'Обработка и дедупликация результатов',
+            'web-scraping': 'Извлечение контактных данных с веб-сайтов',
+            'filtering': 'Фильтрация результатов по контактам',
+            'relevance': 'Сортировка по релевантности',
+            'complete': '✅ Парсинг завершен успешно!'
+        };
+
         const stageIndex = stageMapping[progress.stage];
         if (stageIndex !== undefined) {
             const radioInput = document.getElementById(`progress_${stageIndex}`);
@@ -4063,6 +4074,13 @@ class GymnastikaPlatform {
                         view.classList.add('active');
                     }
                 });
+
+                // Update progress text
+                const progressText = document.getElementById('progressText');
+                if (progressText) {
+                    const description = stageDescriptions[progress.stage] || progress.message || 'Обработка...';
+                    progressText.textContent = description;
+                }
 
                 console.log(`📊 Progress: ${progress.stage} → Stage ${stageIndex} (${progress.message})`);
             }
