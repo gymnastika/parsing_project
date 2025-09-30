@@ -326,7 +326,7 @@ class GymnastikaPlatform {
                     this.switchToLoginForm();
                 }, 1500);
             } else {
-                this.showSuccess('Регистрация и вход выполнены успешно!');
+                this.showSuccess('Регистрация выполнена успешно!');
                 // Clear form and redirect to login after successful registration
                 setTimeout(() => {
                     this.clearRegistrationForm();
