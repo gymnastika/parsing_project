@@ -336,16 +336,16 @@ body {
 }
 
 .category-selector-group select {
-    flex: 1 1 0;
-    min-width: 0;
-    max-width: calc(100% - 145px);
-    width: auto;
-    box-sizing: border-box;
-    position: relative;
-    z-index: 1;
-    margin-right: 0;
-    border-width: 1px;
-    padding: 0.7rem 1.8rem 0.7rem 0.9rem;
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    max-width: calc(100% - 160px) !important;
+    width: auto !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    z-index: 1 !important;
+    margin-right: 0 !important;
+    border-width: 1px !important;
+    padding: 0.7rem 1.8rem 0.7rem 0.9rem !important;
     /* All other styles inherited from .form-group select */
 }
 
