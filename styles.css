@@ -340,6 +340,8 @@ body {
     box-sizing: border-box;
     position: relative;
     z-index: 1;
+    margin-right: 0;
+    overflow: hidden;
     /* All other styles inherited from .form-group select */
 }
 
