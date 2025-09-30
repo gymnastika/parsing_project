@@ -3937,9 +3937,18 @@ class GymnastikaPlatform {
         }
 
         try {
-            // Show progress
-            this.showProgress('Инициализация поиска...', 0);
-            
+            // Hide submit button and show stylish progress bar
+            const submitBtn = document.querySelector('.submit-btn');
+            const progressBar = document.getElementById('stylishProgressBar');
+
+            if (submitBtn) submitBtn.style.display = 'none';
+            if (progressBar) progressBar.classList.add('active');
+
+            // Set up progress callback
+            this.pipelineOrchestrator.onProgressUpdate = (progress) => {
+                this.updateStylishProgress(progress);
+            };
+
             // Start pipeline with proper parameters
             const results = await this.pipelineOrchestrator.executePipeline({
                 taskName: params.taskName,
