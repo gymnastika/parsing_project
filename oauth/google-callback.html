@@ -152,35 +152,52 @@
         
         async function processGoogleCallback() {
             try {
-                updateUI('step1', 'Получение токенов от Google...', 'Извлекаем данные авторизации');
-                
+                updateUI('step1', 'Получение кода авторизации...', 'Извлекаем данные из URL');
+
+                // Parse URL parameters
+                const urlParams = new URLSearchParams(window.location.search);
+                const code = urlParams.get('code');
+                const error = urlParams.get('error');
+
+                // Check for OAuth errors
+                if (error) {
+                    throw new Error(`Google OAuth error: ${error}`);
+                }
+
+                if (!code) {
+                    throw new Error('No authorization code received from Google');
+                }
+
+                console.log('✅ Authorization code received');
+
                 // Initialize Supabase Database Client first
                 console.log('🔧 Initializing Supabase Database Client...');
                 const dbClient = new SupabaseDatabaseClient();
                 await dbClient.initialize();
                 console.log('✅ Supabase Database Client initialized');
-                
+
+                updateUI('step2', 'Обмен кода на токены...', 'Связываемся с Google API через сервер');
+
                 // Initialize Google OAuth Hybrid client
                 const oauthClient = new GoogleOAuthHybrid();
                 await oauthClient.initialize();
-                
-                updateUI('step2', 'Проверка авторизации...', 'Валидируем полученные данные');
-                
-                // Process the callback and extract tokens
-                const result = await oauthClient.handleCallback();
-                
+                console.log('✅ Google OAuth client initialized');
+
                 updateUI('step3', 'Сохранение интеграции...', 'Связываем Google аккаунт с вашим профилем');
-                
+
+                // Process the callback and exchange code for tokens
+                const result = await oauthClient.handleCallback(code);
+
                 if (result.success) {
-                    updateUI('step4', 'Интеграция завершена!', 
+                    updateUI('step4', 'Интеграция завершена!',
                              `Google аккаунт ${result.tokens.connected_email} успешно подключен`, false);
-                    
+
                     // Mark all steps as complete
                     document.querySelectorAll('.step').forEach(step => {
                         step.classList.add('complete');
                         step.classList.remove('active');
                     });
-                    
+
                     // Redirect back to the application after a short delay
                     setTimeout(() => {
                         console.log('🔄 Redirecting back to application...');
@@ -189,20 +206,20 @@
                 } else {
                     throw new Error('OAuth callback processing failed');
                 }
-                
+
             } catch (error) {
                 console.error('❌ Error in Google OAuth callback processing:', error);
-                
-                updateUI(null, 'Ошибка авторизации', 
+
+                updateUI(null, 'Ошибка авторизации',
                         error.message || 'Произошла ошибка при подключении Google аккаунта', true);
-                
+
                 // Try to redirect back after showing error
                 setTimeout(() => {
                     try {
                         const storedState = localStorage.getItem('google_oauth_state');
-                        const returnUrl = storedState ? 
+                        const returnUrl = storedState ?
                             JSON.parse(storedState).returnUrl : '/index.html';
-                        
+
                         console.log('🔄 Redirecting to:', returnUrl);
                         window.location.href = returnUrl;
                     } catch (redirectError) {
