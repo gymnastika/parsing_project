@@ -40,7 +40,7 @@ window.ENV = {
     // ================================
     // Google OAuth 2.0 settings for Gmail integration and Google Drive
     // Только OAuth — без API ключей для упрощения развертывания
-    GOOGLE_CLIENT_ID: '761071987088-qbg9m9tgpdure2v543e2cdulk6se3ur5.apps.googleusercontent.com',
+    GOOGLE_CLIENT_ID: '778229196107-ilc90p0a7b6p7mhvfmiihkbqjtpdau91.apps.googleusercontent.com',
     GOOGLE_REDIRECT_URI: window.location.origin + '/oauth/callback.html',
     GOOGLE_SCOPES: [
         'https://www.googleapis.com/auth/gmail.send',
