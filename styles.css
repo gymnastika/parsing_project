@@ -371,10 +371,9 @@ body {
     color: white;
 }
 
-/* Button - second row, right column */
+/* Button - right column */
 .category-selector-group button.category-add-button-v2 {
     grid-column: 2;
-    grid-row: 2;
     align-self: stretch;
 }
 
