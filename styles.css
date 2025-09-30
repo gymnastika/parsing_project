@@ -309,7 +309,7 @@ body {
     /* Убрали фоновую рамку и padding - теперь просто аккуратная подпись */
 }
 
-/* Category Selector Group */
+/* Category Selector Group - Layout only, styling inherited from .form-group select */
 .category-selector-group {
     display: flex;
     flex-direction: row !important;
@@ -317,26 +317,12 @@ body {
     align-items: flex-start;
 }
 
-.category-selector-group .category-select {
+.category-selector-group select {
     flex: 1;
-    padding: 10px 16px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    font-size: 0.9rem;
-    outline: none;
-    transition: all 0.2s ease;
-    backdrop-filter: blur(10px);
+    /* All other styles inherited from .form-group select */
 }
 
-.category-selector-group .category-select:focus {
-    border-color: rgba(255, 255, 255, 0.5);
-    background: rgba(255, 255, 255, 0.15);
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
-}
-
-.category-selector-group .category-select option {
+.category-selector-group select option {
     background: var(--primary-purple);
     color: white;
 }
