@@ -309,50 +309,77 @@ body {
     /* Убрали фоновую рамку и padding - теперь просто аккуратная подпись */
 }
 
-/* Category Selector Group - Layout only, styling inherited from .form-group select */
+/* ========== CATEGORY SELECTOR - CLEAN REBUILD ========== */
+
+/* Container */
 .category-selector-group {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: wrap;
-    gap: 1rem;
-    align-items: stretch;
-    position: relative;
-    overflow: visible;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
     width: 100%;
-    max-width: 100%;
 }
 
+/* Label - top row, full width */
 .category-selector-group label {
-    order: -1;
-    width: 100%;
-    flex-basis: 100%;
-    display: block;
+    grid-column: 1 / -1;
+    grid-row: 1;
     font-size: 0.85rem;
     font-weight: 600;
     color: var(--text-gray);
-    margin-bottom: 0.5rem;
-    letter-spacing: 0.3px;
-    text-transform: none;
+    margin: 0;
+    padding: 0;
 }
 
+/* Select - second row, left column */
 .category-selector-group select {
-    flex: 1 1 0 !important;
-    min-width: 0 !important;
-    max-width: calc(100% - 160px) !important;
-    width: auto !important;
-    box-sizing: border-box !important;
-    position: relative !important;
-    z-index: 1 !important;
-    margin-right: 0 !important;
-    border-width: 1px !important;
-    padding: 0.7rem 1.8rem 0.7rem 0.9rem !important;
-    /* All other styles inherited from .form-group select */
+    grid-column: 1;
+    grid-row: 2;
+
+    /* Size */
+    width: 100%;
+    min-width: 200px;
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+
+    /* Style */
+    border: 2px solid rgba(124, 58, 237, 0.2);
+    border-radius: 10px;
+    background: var(--bg-white);
+    color: var(--text-dark);
+    font-size: 0.95rem;
+    font-family: inherit;
+
+    /* Dropdown arrow */
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%237C3AED' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+
+    /* Interaction */
+    cursor: pointer;
+    transition: all 0.25s ease;
+    outline: none;
+}
+
+.category-selector-group select:focus {
+    border-color: var(--primary-purple);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
 }
 
 .category-selector-group select option {
+    background: #FFFFFF;
+    color: var(--text-dark);
+    padding: 0.5rem;
+}
+
+.category-selector-group select option:checked {
     background: var(--primary-purple);
     color: white;
 }
+
+/* Button - second row, right column (KEEP EXISTING BUTTON STYLES) */
 
 /* НОВАЯ КНОПКА ДОБАВЛЕНИЯ КАТЕГОРИИ - V2 ЧИСТЫЙ СТИЛЬ */
 button.category-add-button-v2 {
