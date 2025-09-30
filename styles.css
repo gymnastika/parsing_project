@@ -325,10 +325,9 @@ body {
     display: none;
 }
 
-/* Select - second row, left column */
+/* Select - left column */
 .category-selector-group select {
     grid-column: 1;
-    grid-row: 2;
 
     /* Size */
     width: 100%;
