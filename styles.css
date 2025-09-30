@@ -8867,23 +8867,14 @@ div.modal-overlay.results-modal .results-modal-content {
     box-shadow: 0 3px 12px rgba(124, 58, 237, 0.5);
 }
 
-@keyframes stagePulse {
-    0%, 100% {
-        box-shadow: 0 4px 18px rgba(124, 58, 237, 0.6);
-    }
-    50% {
-        box-shadow: 0 6px 24px rgba(124, 58, 237, 0.8);
-    }
-}
-
 /* Progress Description Text */
 .progress-description {
     text-align: center;
-    margin-top: 2.5rem;
+    margin-top: 2rem;
     font-family: 'Ubuntu Mono', 'Courier New', monospace;
     letter-spacing: 0.5px;
     color: var(--text-gray);
-    font-size: 1rem;
+    font-size: 0.95rem;
     min-height: 2rem;
     transition: all 0.3s ease;
     font-weight: 500;
@@ -8897,21 +8888,25 @@ div.modal-overlay.results-modal .results-modal-content {
 /* Responsive */
 @media (max-width: 768px) {
     .modern-progress-container {
-        padding-top: 30px;
+        padding-top: 28px;
     }
 
     .progress-arrow {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
+    }
+
+    .progress-track {
+        height: 6px;
     }
 
     .stage-circle {
-        width: 36px;
-        height: 36px;
-        font-size: 1rem;
+        width: 28px;
+        height: 28px;
+        font-size: 0.85rem;
     }
 
     .progress-description {
-        font-size: 0.9rem;
-        margin-top: 2rem;
+        font-size: 0.85rem;
+        margin-top: 1.5rem;
     }
 }
