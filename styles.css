@@ -8801,30 +8801,30 @@ div.modal-overlay.results-modal .results-modal-content {
     }
 }
 
-/* Progress Track (background bar) */
+/* Progress Track (background bar with padding) */
 .progress-track {
     position: relative;
     width: 100%;
-    max-width: 600px;
+    max-width: 700px;
     margin: 0 auto;
-    height: 8px;
-    background: rgba(124, 58, 237, 0.15);
-    border-radius: 10px;
+    height: 40px;
+    background: rgba(124, 58, 237, 0.1);
+    border-radius: 100px;
+    padding: 0 5px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
     overflow: visible;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* Progress Fill (purple gradient fill) */
 .progress-fill {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
+    height: 30px;
     width: 0%;
     background: linear-gradient(90deg, #7C3AED 0%, #A78BFA 100%);
-    border-radius: 10px;
+    border-radius: 100px;
     transition: width 1.2s ease-in-out;
-    box-shadow: 0 0 12px rgba(124, 58, 237, 0.5);
+    box-shadow: 0 10px 40px -10px rgba(124, 58, 237, 0.8);
 }
 
 /* Progress Stage (circles on the bar) */
@@ -8837,17 +8837,17 @@ div.modal-overlay.results-modal .results-modal-content {
 
 /* Stage Circle */
 .stage-circle {
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     background: white;
-    border: 2px solid rgba(124, 58, 237, 0.3);
+    border: 2px solid rgba(124, 58, 237, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 0.95rem;
     transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     cursor: default;
 }
 
@@ -8856,7 +8856,7 @@ div.modal-overlay.results-modal .results-modal-content {
     border-color: #10B981;
     background: #10B981;
     color: white;
-    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
 }
 
 /* Active Stage */
@@ -8864,7 +8864,7 @@ div.modal-overlay.results-modal .results-modal-content {
     border-color: var(--primary-purple);
     background: var(--primary-purple);
     color: white;
-    box-shadow: 0 3px 12px rgba(124, 58, 237, 0.5);
+    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.6);
 }
 
 /* Progress Description Text */
