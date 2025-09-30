@@ -333,9 +333,10 @@ body {
 }
 
 .category-selector-group select {
-    flex: 0 1 auto;
-    min-width: 200px;
-    width: calc(100% - 150px);
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
     position: relative;
     z-index: 1;
     /* All other styles inherited from .form-group select */
