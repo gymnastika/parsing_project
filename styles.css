@@ -316,6 +316,7 @@ body {
     flex-wrap: wrap;
     gap: 0.5rem;
     align-items: stretch;
+    position: relative;
 }
 
 .category-selector-group label {
