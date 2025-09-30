@@ -44,9 +44,31 @@
     
     <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
+
     <!-- Lottie Animation CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.9.6/lottie.min.js"></script>
+
+    <!-- Password Visibility Toggle Function -->
+    <script>
+        function togglePasswordVisibility(fieldId) {
+            const input = document.getElementById(fieldId);
+            const button = input.nextElementSibling.nextElementSibling; // Get the button after the label
+            const eyeOpenPaths = button.querySelectorAll('.eye-open');
+            const eyeClosedLine = button.querySelector('.eye-closed');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                eyeOpenPaths.forEach(path => path.style.display = 'none');
+                eyeClosedLine.style.display = 'block';
+                button.setAttribute('aria-label', 'Скрыть пароль');
+            } else {
+                input.type = 'password';
+                eyeOpenPaths.forEach(path => path.style.display = 'block');
+                eyeClosedLine.style.display = 'none';
+                button.setAttribute('aria-label', 'Показать пароль');
+            }
+        }
+    </script>
     
     <!-- Adaptive Loader -->
     <script src="lib/adaptive-loader.js"></script>
