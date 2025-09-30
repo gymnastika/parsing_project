@@ -2479,11 +2479,21 @@ class GymnastikaPlatform {
         const closeModal = () => {
             console.log('🏷️ Closing categories modal');
             categoriesModal.classList.remove('active');
-            newCategoryName.value = '';
+            if (newCategoryName) {
+                newCategoryName.value = '';
+            }
         };
 
         if (closeCategoriesModal) {
-            closeCategoriesModal.addEventListener('click', closeModal);
+            console.log('✅ Close button found, binding click event');
+            closeCategoriesModal.addEventListener('click', (e) => {
+                console.log('🔴 Close button clicked!');
+                e.preventDefault();
+                e.stopPropagation();
+                closeModal();
+            });
+        } else {
+            console.error('❌ Close button not found in DOM');
         }
 
         // Close on overlay click
