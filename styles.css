@@ -8888,20 +8888,27 @@ div.modal-overlay.results-modal .results-modal-content {
 /* Responsive */
 @media (max-width: 768px) {
     .modern-progress-container {
-        padding-top: 28px;
+        padding-top: 32px;
     }
 
     .progress-arrow {
-        font-size: 1.2rem;
+        font-size: 1.4rem;
+        top: -3px;
     }
 
     .progress-track {
-        height: 6px;
+        max-width: 90%;
+        height: 36px;
+        padding: 0 4px;
+    }
+
+    .progress-fill {
+        height: 28px;
     }
 
     .stage-circle {
-        width: 28px;
-        height: 28px;
+        width: 30px;
+        height: 30px;
         font-size: 0.85rem;
     }
 
