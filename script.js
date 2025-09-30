@@ -2735,7 +2735,10 @@ class GymnastikaPlatform {
             if (error) throw error;
 
             console.log('✅ Category deleted');
+
+            // Refresh both modal and parsing form selects
             await this.loadCategories();
+            await this.loadCategoriesIntoSelects();
 
         } catch (error) {
             console.error('❌ Error deleting category:', error);
