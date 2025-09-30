@@ -3564,7 +3564,7 @@ body {
     margin-left: auto;
 }
 
-.export-btn {
+.export-btn, .categories-btn {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -3579,7 +3579,7 @@ body {
     transition: all 0.2s ease;
 }
 
-.export-btn:hover {
+.export-btn:hover, .categories-btn:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
 }
