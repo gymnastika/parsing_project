@@ -361,6 +361,22 @@
                                     <input type="text" id="url-task-name" name="task-name" placeholder="Введите название задачи" required>
                                     <label for="url-task-name">Название задачи</label>
                                 </div>
+
+                                <!-- Category Selector -->
+                                <div class="form-group category-selector-group">
+                                    <select id="urlCategorySelect" name="category" class="category-select">
+                                        <option value="">Выберите категорию (опционально)</option>
+                                        <!-- Categories loaded dynamically -->
+                                    </select>
+                                    <button type="button" class="add-category-inline-btn" id="addCategoryInlineURL">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+                                        </svg>
+                                        Добавить
+                                    </button>
+                                    <label for="urlCategorySelect">Категория</label>
+                                </div>
+
                                 <div class="form-group">
                                     <input type="url" id="url-website" name="website-url" placeholder="https://example.com" required>
                                     <label for="url-website">URL сайта</label>
