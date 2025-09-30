@@ -56,14 +56,14 @@
             const eyeClosedLine = button.querySelector('.eye-closed');
 
             if (input.type === 'password') {
-                // Show password - display strike-through line over eye
+                // Show password - remove strike-through line (open eye)
                 input.type = 'text';
-                eyeClosedLine.style.display = 'block';
+                eyeClosedLine.style.display = 'none';
                 button.setAttribute('aria-label', 'Скрыть пароль');
             } else {
-                // Hide password - remove strike-through line
+                // Hide password - add strike-through line (closed eye)
                 input.type = 'password';
-                eyeClosedLine.style.display = 'none';
+                eyeClosedLine.style.display = 'block';
                 button.setAttribute('aria-label', 'Показать пароль');
             }
         }
