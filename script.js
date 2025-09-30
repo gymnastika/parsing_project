@@ -3957,20 +3957,19 @@ class GymnastikaPlatform {
             });
 
             if (results && results.length > 0) {
-                this.showProgress('Поиск завершен!', 100);
                 this.viewResults(results);
-                
+
                 // Invalidate cache since new parsing results have been added
                 this.invalidateCache('parsing_results');
                 this.invalidateCache('task_history');
                 this.invalidateCache('contacts_data');
                 console.log('🔄 Cache invalidated after parsing completion (parsing_results + task_history + contacts_data)');
-                
+
                 // Refresh database section if active
                 if (this.currentSection === 'database') {
                     await this.loadDatabaseData();
                 }
-                
+
                 // Send Telegram notification about parsing completion
                 const notificationData = {
                     originalQuery: params.searchQuery,
@@ -3979,23 +3978,25 @@ class GymnastikaPlatform {
                     results: results.results || results,
                     timestamp: results.timestamp || new Date().toISOString()
                 };
-                
+
                 // Send notification asynchronously (don't block modal display)
                 this.sendTelegramParsingNotification(notificationData).catch(error => {
                     console.log('🔕 Telegram notification failed (non-blocking):', error.message);
                 });
-                
+
                 // Show completion modal
                 this.showCompletionModal();
             } else {
                 this.showError('Результаты не найдены');
-                this.hideProgress();
             }
+
+            // Reset UI after parsing
+            this.resetParsingUI();
 
         } catch (error) {
             console.error('❌ Parsing error:', error);
             this.showError('Ошибка поиска: ' + error.message);
-            this.hideProgress();
+            this.resetParsingUI();
         }
     }
 
