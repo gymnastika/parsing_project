@@ -379,9 +379,14 @@ body {
     color: white;
 }
 
-/* Button - second row, right column (KEEP EXISTING BUTTON STYLES) */
+/* Button - second row, right column */
+.category-selector-group button.category-add-button-v2 {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: stretch;
+}
 
-/* НОВАЯ КНОПКА ДОБАВЛЕНИЯ КАТЕГОРИИ - V2 ЧИСТЫЙ СТИЛЬ */
+/* КНОПКА ДОБАВЛЕНИЯ КАТЕГОРИИ - V2 ЧИСТЫЙ СТИЛЬ */
 button.category-add-button-v2 {
     display: inline-flex;
     align-items: center;
@@ -389,7 +394,6 @@ button.category-add-button-v2 {
     gap: 0.5rem;
     padding: 0.8rem 1.2rem;
     min-width: 130px;
-    flex-shrink: 0;
 
     /* Solid background для видимости */
     background: #7C3AED;
