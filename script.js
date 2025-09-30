@@ -4032,6 +4032,50 @@ class GymnastikaPlatform {
         }
     }
 
+    // Update stylish progress bar based on pipeline stage
+    updateStylishProgress(progress) {
+        if (!progress || !progress.stage) return;
+
+        const stageMapping = {
+            'initializing': 0,
+            'query-generation': 1,
+            'apify-search': 2,
+            'aggregation': 2, // Same as apify-search visually
+            'web-scraping': 3,
+            'filtering': 3, // Same as web-scraping visually
+            'relevance': 3, // Same as web-scraping visually
+            'complete': 4
+        };
+
+        const stageIndex = stageMapping[progress.stage];
+        if (stageIndex !== undefined) {
+            const radioInput = document.getElementById(`progress_${stageIndex}`);
+            if (radioInput) {
+                radioInput.checked = true;
+                console.log(`📊 Progress: ${progress.stage} → Stage ${stageIndex} (${progress.message})`);
+            }
+        }
+    }
+
+    // Reset parsing UI after completion or error
+    resetParsingUI() {
+        const submitBtn = document.querySelector('.submit-btn');
+        const progressBar = document.getElementById('stylishProgressBar');
+
+        // Show submit button
+        if (submitBtn) submitBtn.style.display = 'block';
+
+        // Hide and reset progress bar
+        if (progressBar) {
+            progressBar.classList.remove('active');
+            // Reset all radio inputs
+            const radioInputs = progressBar.querySelectorAll('.progress-bar-input');
+            radioInputs.forEach(input => input.checked = false);
+        }
+
+        console.log('🔄 Parsing UI reset complete');
+    }
+
     // View results modal
     viewResults(results) {
         const modal = document.getElementById('resultsModal');
