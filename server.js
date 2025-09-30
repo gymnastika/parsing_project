@@ -414,6 +414,162 @@ app.post('/api/telegram/bot/sendMessage', async (req, res) => {
     }
 });
 
+// ================================
+// GOOGLE OAUTH ENDPOINTS
+// ================================
+
+// Exchange OAuth authorization code for tokens
+app.post('/api/google/oauth/exchange', async (req, res) => {
+    try {
+        console.log('🔄 Exchanging Google OAuth code for tokens...');
+
+        const { code, redirect_uri } = req.body;
+
+        if (!code) {
+            return res.status(400).json({ error: 'Authorization code is required' });
+        }
+
+        if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+            console.error('❌ Google OAuth credentials not configured');
+            return res.status(500).json({ error: 'Google OAuth not configured on server' });
+        }
+
+        // Exchange code for tokens with Google
+        const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                code: code,
+                client_id: process.env.GOOGLE_CLIENT_ID,
+                client_secret: process.env.GOOGLE_CLIENT_SECRET,
+                redirect_uri: redirect_uri,
+                grant_type: 'authorization_code'
+            })
+        });
+
+        if (!tokenResponse.ok) {
+            const errorData = await tokenResponse.json();
+            console.error('❌ Google token exchange failed:', errorData);
+            return res.status(tokenResponse.status).json({
+                error: 'Failed to exchange code for tokens',
+                details: errorData
+            });
+        }
+
+        const tokens = await tokenResponse.json();
+        console.log('✅ Successfully exchanged code for tokens');
+
+        // Get user info from Google
+        const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+            headers: {
+                'Authorization': `Bearer ${tokens.access_token}`
+            }
+        });
+
+        if (!userInfoResponse.ok) {
+            console.error('❌ Failed to get Google user info');
+            return res.status(500).json({ error: 'Failed to get user information' });
+        }
+
+        const userInfo = await userInfoResponse.json();
+        console.log('✅ Got Google user info:', { email: userInfo.email, name: userInfo.name });
+
+        // Calculate expires_at timestamp
+        const expiresAt = new Date(Date.now() + (tokens.expires_in * 1000)).toISOString();
+
+        // Return tokens and user info
+        res.json({
+            success: true,
+            tokens: {
+                access_token: tokens.access_token,
+                refresh_token: tokens.refresh_token,
+                expires_at: expiresAt,
+                scope: tokens.scope,
+                token_type: tokens.token_type || 'Bearer'
+            },
+            userInfo: {
+                email: userInfo.email,
+                name: userInfo.name,
+                picture: userInfo.picture,
+                verified_email: userInfo.verified_email
+            }
+        });
+
+    } catch (error) {
+        console.error('❌ Error in Google OAuth exchange:', error);
+        res.status(500).json({
+            error: 'Internal server error during token exchange',
+            message: error.message
+        });
+    }
+});
+
+// Refresh Google OAuth access token
+app.post('/api/google/oauth/refresh', async (req, res) => {
+    try {
+        console.log('🔄 Refreshing Google OAuth access token...');
+
+        const { refresh_token } = req.body;
+
+        if (!refresh_token) {
+            return res.status(400).json({ error: 'Refresh token is required' });
+        }
+
+        if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+            console.error('❌ Google OAuth credentials not configured');
+            return res.status(500).json({ error: 'Google OAuth not configured on server' });
+        }
+
+        // Refresh the access token
+        const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                client_id: process.env.GOOGLE_CLIENT_ID,
+                client_secret: process.env.GOOGLE_CLIENT_SECRET,
+                refresh_token: refresh_token,
+                grant_type: 'refresh_token'
+            })
+        });
+
+        if (!tokenResponse.ok) {
+            const errorData = await tokenResponse.json();
+            console.error('❌ Google token refresh failed:', errorData);
+            return res.status(tokenResponse.status).json({
+                error: 'Failed to refresh access token',
+                details: errorData
+            });
+        }
+
+        const tokens = await tokenResponse.json();
+        console.log('✅ Successfully refreshed access token');
+
+        // Calculate new expires_at timestamp
+        const expiresAt = new Date(Date.now() + (tokens.expires_in * 1000)).toISOString();
+
+        res.json({
+            success: true,
+            tokens: {
+                access_token: tokens.access_token,
+                expires_at: expiresAt,
+                scope: tokens.scope,
+                token_type: tokens.token_type || 'Bearer'
+            }
+        });
+
+    } catch (error) {
+        console.error('❌ Error in Google OAuth refresh:', error);
+        res.status(500).json({
+            error: 'Internal server error during token refresh',
+            message: error.message
+        });
+    }
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
     res.json({
