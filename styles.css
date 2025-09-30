@@ -322,6 +322,13 @@ body {
     order: -1;
     width: 100%;
     flex-basis: 100%;
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-gray);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.3px;
+    text-transform: none;
 }
 
 .category-selector-group select {
