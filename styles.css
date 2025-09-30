@@ -344,47 +344,70 @@ body {
     color: white;
 }
 
-.add-category-inline-btn {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 0.5rem !important;
-    padding: 0.75rem 1.25rem !important;
-    min-width: 130px !important;
-    flex-shrink: 0 !important;
-    background: #7C3AED !important;
-    border: none !important;
-    border-radius: 8px !important;
-    color: #FFFFFF !important;
-    font-size: 0.875rem !important;
-    font-weight: 600 !important;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    white-space: nowrap !important;
-    line-height: 1 !important;
-    position: relative !important;
-    z-index: 10 !important;
-    text-decoration: none !important;
-    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3) !important;
-}
-
-.add-category-inline-btn:hover {
-    background: var(--primary-purple);
-    color: white !important;
-    border-color: var(--primary-purple);
-    box-shadow:
-        0 0 0 3px rgba(124, 58, 237, 0.15),
-        0 4px 20px rgba(124, 58, 237, 0.1);
-    transform: translateY(-1px);
-}
-
-.add-category-inline-btn svg {
+/* НОВАЯ КНОПКА ДОБАВЛЕНИЯ КАТЕГОРИИ - V2 ЧИСТЫЙ СТИЛЬ */
+button.category-add-button-v2 {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.2rem;
+    min-width: 130px;
     flex-shrink: 0;
+
+    /* Solid background для видимости */
+    background: #7C3AED;
+    border: 2px solid #7C3AED;
+    border-radius: 10px;
+
+    /* Явный белый цвет текста */
+    color: #FFFFFF;
+
+    /* Typography */
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.2;
+    letter-spacing: 0.3px;
+
+    /* Взаимодействие */
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+
+    /* Позиционирование */
+    position: relative;
+    z-index: 100;
+
+    /* Тень для глубины */
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25),
+                0 4px 16px rgba(124, 58, 237, 0.15);
 }
 
-.add-category-inline-btn:hover svg {
-    color: white;
+button.category-add-button-v2 span {
+    color: #FFFFFF;
+    display: inline-block;
+    font-weight: 600;
+}
+
+button.category-add-button-v2 svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    stroke: #FFFFFF;
+    fill: none;
+}
+
+button.category-add-button-v2:hover {
+    background: #6D28D9;
+    border-color: #6D28D9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35),
+                0 8px 24px rgba(124, 58, 237, 0.2);
+}
+
+button.category-add-button-v2:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(124, 58, 237, 0.3);
 }
 
 /* Removed specific input styling to unify with textarea border style */
