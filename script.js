@@ -4035,8 +4035,8 @@ class GymnastikaPlatform {
         }
     }
 
-    // Update stylish progress bar based on pipeline stage
-    updateStylishProgress(progress) {
+    // Update modern progress bar based on pipeline stage
+    updateModernProgress(progress) {
         if (!progress || !progress.stage) return;
 
         const stageMapping = {
@@ -4048,6 +4048,14 @@ class GymnastikaPlatform {
             'filtering': 3, // Same as web-scraping visually
             'relevance': 3, // Same as web-scraping visually
             'complete': 4
+        };
+
+        const stageToPercent = {
+            0: 0,     // initializing
+            1: 25,    // query-generation
+            2: 50,    // apify-search/aggregation
+            3: 75,    // web-scraping/filtering/relevance
+            4: 100    // complete
         };
 
         const stageDescriptions = {
@@ -4063,30 +4071,38 @@ class GymnastikaPlatform {
 
         const stageIndex = stageMapping[progress.stage];
         if (stageIndex !== undefined) {
-            const radioInput = document.getElementById(`progress_${stageIndex}`);
-            if (radioInput) {
-                radioInput.checked = true;
+            const fill = document.getElementById('progressFill');
+            const arrow = document.getElementById('progressArrow');
+            const stages = document.querySelectorAll('.progress-stage');
+            const progressDesc = document.getElementById('progressDescription');
 
-                // Update visual states
-                const allViews = document.querySelectorAll('.progress-bar-view');
-                allViews.forEach((view, index) => {
-                    view.classList.remove('active', 'completed');
-                    if (index < stageIndex) {
-                        view.classList.add('completed');
-                    } else if (index === stageIndex) {
-                        view.classList.add('active');
-                    }
-                });
-
-                // Update progress text
-                const progressText = document.getElementById('progressText');
-                if (progressText) {
-                    const description = stageDescriptions[progress.stage] || progress.message || 'Обработка...';
-                    progressText.textContent = description;
-                }
-
-                console.log(`📊 Progress: ${progress.stage} → Stage ${stageIndex} (${progress.message})`);
+            // Update fill width
+            if (fill) {
+                fill.style.width = stageToPercent[stageIndex] + '%';
             }
+
+            // Update arrow position
+            if (arrow) {
+                arrow.style.left = stageToPercent[stageIndex] + '%';
+            }
+
+            // Update stage states
+            stages.forEach((stage, idx) => {
+                stage.classList.remove('active', 'completed');
+                if (idx < stageIndex) {
+                    stage.classList.add('completed');
+                } else if (idx === stageIndex) {
+                    stage.classList.add('active');
+                }
+            });
+
+            // Update progress description text
+            if (progressDesc) {
+                const description = stageDescriptions[progress.stage] || progress.message || 'Обработка...';
+                progressDesc.textContent = description;
+            }
+
+            console.log(`📊 Progress: ${progress.stage} → Stage ${stageIndex} (${stageToPercent[stageIndex]}%)`);
         }
     }
 
