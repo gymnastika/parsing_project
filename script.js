@@ -3940,9 +3940,11 @@ class GymnastikaPlatform {
             // Hide submit button and show stylish progress bar
             const submitBtn = document.querySelector('.submit-btn');
             const progressBar = document.getElementById('stylishProgressBar');
+            const progressText = document.getElementById('progressText');
 
             if (submitBtn) submitBtn.style.display = 'none';
             if (progressBar) progressBar.classList.add('active');
+            if (progressText) progressText.classList.add('active');
 
             // Set up progress callback
             this.pipelineOrchestrator.onProgressUpdate = (progress) => {
