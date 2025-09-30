@@ -2703,6 +2703,46 @@ body {
   position: relative;
 }
 
+/* Password Input Group with Toggle Button */
+.password-input-group {
+  position: relative;
+}
+
+.password-input-group .password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.password-input-group .password-toggle:hover {
+  color: rgba(255, 255, 255, 0.9);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.password-input-group .password-toggle:focus {
+  outline: 2px solid rgba(124, 58, 237, 0.5);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.password-input-group .eye-icon {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+  transition: all 0.2s ease;
+}
+
 .inputGroup input {
   font-size: 0.95rem;
   padding: 0.8em;
