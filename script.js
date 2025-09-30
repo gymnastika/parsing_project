@@ -4052,6 +4052,18 @@ class GymnastikaPlatform {
             const radioInput = document.getElementById(`progress_${stageIndex}`);
             if (radioInput) {
                 radioInput.checked = true;
+
+                // Update visual states
+                const allViews = document.querySelectorAll('.progress-bar-view');
+                allViews.forEach((view, index) => {
+                    view.classList.remove('active', 'completed');
+                    if (index < stageIndex) {
+                        view.classList.add('completed');
+                    } else if (index === stageIndex) {
+                        view.classList.add('active');
+                    }
+                });
+
                 console.log(`📊 Progress: ${progress.stage} → Stage ${stageIndex} (${progress.message})`);
             }
         }
