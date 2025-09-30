@@ -2766,6 +2766,10 @@ body {
   transition: all 0.3s ease;
   color: rgba(255, 255, 255, 0.7);
   font-weight: 500;
+  max-width: calc(100% - 50px); /* Оставляем место для иконки глаза */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .inputGroup :is(input:focus, input:valid)~label {
