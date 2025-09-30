@@ -2453,6 +2453,220 @@ class GymnastikaPlatform {
         }
     }
 
+    // Bind Categories Management
+    bindCategoriesManagement() {
+        console.log('🏷️ Binding categories management...');
+
+        const manageCategoriesBtn = document.getElementById('manageCategoriesBtn');
+        const categoriesModal = document.getElementById('categoriesModal');
+        const closeCategoriesModal = document.getElementById('closeCategoriesModal');
+        const addCategoryBtn = document.getElementById('addCategoryBtn');
+        const newCategoryName = document.getElementById('newCategoryName');
+
+        if (!manageCategoriesBtn || !categoriesModal) {
+            console.log('❌ Categories elements not found');
+            return;
+        }
+
+        // Open modal
+        manageCategoriesBtn.addEventListener('click', () => {
+            console.log('🏷️ Opening categories modal');
+            categoriesModal.classList.add('active');
+            this.loadCategories();
+        });
+
+        // Close modal
+        const closeModal = () => {
+            console.log('🏷️ Closing categories modal');
+            categoriesModal.classList.remove('active');
+            newCategoryName.value = '';
+        };
+
+        if (closeCategoriesModal) {
+            closeCategoriesModal.addEventListener('click', closeModal);
+        }
+
+        // Close on overlay click
+        categoriesModal.addEventListener('click', (e) => {
+            if (e.target === categoriesModal) {
+                closeModal();
+            }
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && categoriesModal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // Add category
+        if (addCategoryBtn && newCategoryName) {
+            const handleAddCategory = async () => {
+                const categoryName = newCategoryName.value.trim();
+                if (!categoryName) {
+                    this.showError('Введите название категории');
+                    return;
+                }
+
+                try {
+                    console.log('➕ Adding category:', categoryName);
+                    await this.createCategory(categoryName);
+                    newCategoryName.value = '';
+                    await this.loadCategories();
+                } catch (error) {
+                    console.error('❌ Error adding category:', error);
+                    this.showError('Ошибка создания категории: ' + error.message);
+                }
+            };
+
+            addCategoryBtn.addEventListener('click', handleAddCategory);
+
+            // Allow Enter key to submit
+            newCategoryName.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleAddCategory();
+                }
+            });
+        }
+
+        console.log('✅ Categories management bound');
+    }
+
+    // Load categories from database
+    async loadCategories() {
+        console.log('📋 Loading categories...');
+        const categoriesList = document.getElementById('categoriesList');
+
+        if (!categoriesList) {
+            console.error('❌ Categories list element not found');
+            return;
+        }
+
+        try {
+            // Show loading state
+            categoriesList.innerHTML = `
+                <div class="categories-loading">
+                    <div class="loading-spinner-small"></div>
+                    <p>Загрузка категорий...</p>
+                </div>
+            `;
+
+            const { data: categories, error } = await this.supabase
+                .from('categories')
+                .select('*')
+                .eq('user_id', this.currentUser.id)
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            if (!categories || categories.length === 0) {
+                categoriesList.innerHTML = `
+                    <div class="categories-empty">
+                        <p>У вас пока нет категорий. Создайте первую категорию выше.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Render categories
+            categoriesList.innerHTML = categories.map(category => `
+                <div class="category-item" data-category-id="${category.id}">
+                    <span class="category-item-name">${this.escapeHtml(category.name)}</span>
+                    <div class="category-item-actions">
+                        <button class="category-delete-btn" data-category-id="${category.id}">
+                            Удалить
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Bind delete buttons
+            categoriesList.querySelectorAll('.category-delete-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const categoryId = e.target.getAttribute('data-category-id');
+                    await this.deleteCategory(categoryId);
+                });
+            });
+
+            console.log(`✅ Loaded ${categories.length} categories`);
+
+        } catch (error) {
+            console.error('❌ Error loading categories:', error);
+            categoriesList.innerHTML = `
+                <div class="categories-empty">
+                    <p style="color: #ef4444;">Ошибка загрузки категорий: ${error.message}</p>
+                </div>
+            `;
+        }
+    }
+
+    // Create new category
+    async createCategory(name) {
+        console.log('➕ Creating category:', name);
+
+        if (!name || !name.trim()) {
+            throw new Error('Название категории не может быть пустым');
+        }
+
+        if (!this.currentUser) {
+            throw new Error('Пользователь не авторизован');
+        }
+
+        try {
+            const { data, error } = await this.supabase
+                .from('categories')
+                .insert({
+                    user_id: this.currentUser.id,
+                    name: name.trim()
+                })
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            console.log('✅ Category created:', data);
+            return data;
+
+        } catch (error) {
+            console.error('❌ Error creating category:', error);
+            throw error;
+        }
+    }
+
+    // Delete category
+    async deleteCategory(categoryId) {
+        console.log('🗑️ Deleting category:', categoryId);
+
+        if (!confirm('Вы уверены, что хотите удалить эту категорию?')) {
+            return;
+        }
+
+        try {
+            const { error } = await this.supabase
+                .from('categories')
+                .delete()
+                .eq('id', categoryId)
+                .eq('user_id', this.currentUser.id);
+
+            if (error) throw error;
+
+            console.log('✅ Category deleted');
+            await this.loadCategories();
+
+        } catch (error) {
+            console.error('❌ Error deleting category:', error);
+            this.showError('Ошибка удаления категории: ' + error.message);
+        }
+    }
+
+    // Helper method to escape HTML
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
     // Bind email form validation and save functionality
     bindEmailForm() {
         console.log('📧 Binding email form validation...');
