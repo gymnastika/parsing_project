@@ -368,12 +368,6 @@ body {
     flex-shrink: 0;
 }
 
-.category-selector-group label {
-    order: -1;
-    width: 100%;
-    margin-bottom: 0.5rem;
-}
-
 /* Removed specific input styling to unify with textarea border style */
 /* All form inputs now use the unified .form-group input, .form-group textarea styles */
 
