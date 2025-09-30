@@ -341,7 +341,8 @@ body {
     position: relative;
     z-index: 1;
     margin-right: 0;
-    overflow: hidden;
+    border-width: 1px;
+    padding: 0.7rem 1.8rem 0.7rem 0.9rem;
     /* All other styles inherited from .form-group select */
 }
 
