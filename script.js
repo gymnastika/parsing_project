@@ -3988,12 +3988,13 @@ class GymnastikaPlatform {
 
                 // Show completion modal
                 this.showCompletionModal();
+
+                // Reset UI after short delay to show completion state
+                setTimeout(() => this.resetParsingUI(), 2000);
             } else {
                 this.showError('Результаты не найдены');
+                this.resetParsingUI();
             }
-
-            // Reset UI after parsing
-            this.resetParsingUI();
 
         } catch (error) {
             console.error('❌ Parsing error:', error);
