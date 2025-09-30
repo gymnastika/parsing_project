@@ -2705,6 +2705,10 @@ class GymnastikaPlatform {
             if (error) throw error;
 
             console.log('✅ Category created:', data);
+
+            // Refresh parsing form selects after creating category
+            await this.loadCategoriesIntoSelects();
+
             return data;
 
         } catch (error) {
