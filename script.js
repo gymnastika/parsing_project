@@ -2468,12 +2468,32 @@ class GymnastikaPlatform {
             return;
         }
 
-        // Open modal
+        // Open modal from Database section
         manageCategoriesBtn.addEventListener('click', () => {
-            console.log('🏷️ Opening categories modal');
+            console.log('🏷️ Opening categories modal from Database');
             categoriesModal.classList.add('active');
             this.loadCategories();
         });
+
+        // Bind inline "Add Category" buttons in parsing forms
+        const addCategoryInlineAI = document.getElementById('addCategoryInlineAI');
+        const addCategoryInlineURL = document.getElementById('addCategoryInlineURL');
+
+        if (addCategoryInlineAI) {
+            addCategoryInlineAI.addEventListener('click', () => {
+                console.log('🏷️ Opening categories modal from AI Search form');
+                categoriesModal.classList.add('active');
+                this.loadCategories();
+            });
+        }
+
+        if (addCategoryInlineURL) {
+            addCategoryInlineURL.addEventListener('click', () => {
+                console.log('🏷️ Opening categories modal from URL Parsing form');
+                categoriesModal.classList.add('active');
+                this.loadCategories();
+            });
+        }
 
         // Close modal
         const closeModal = () => {
