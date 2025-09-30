@@ -309,46 +309,36 @@
                                 </button>
                             </form>
                             
-                            <!-- Stylish Progress Bar -->
-                            <div class="stylish-progress-bar" id="stylishProgressBar">
-                                <div class="progress-bar">
-                                    <input type="radio" class="progress-bar-input" name="progress" id="progress_0" />
-                                    <div class="progress-bar-view" data-stage="query-generation">
-                                        <div class="progress-stage-button">
-                                            <span class="progress-stage-icon">🤖</span>
-                                        </div>
+                            <!-- Modern Progress Bar -->
+                            <div class="modern-progress-container" id="modernProgressBar">
+                                <!-- Arrow indicator -->
+                                <div class="progress-arrow" id="progressArrow">▼</div>
+
+                                <!-- Progress bar track -->
+                                <div class="progress-track">
+                                    <!-- Fill bar (purple gradient) -->
+                                    <div class="progress-fill" id="progressFill"></div>
+
+                                    <!-- Stage circles -->
+                                    <div class="progress-stage" data-stage="0" style="left: 0%">
+                                        <div class="stage-circle">🤖</div>
                                     </div>
-                                    
-                                    <input type="radio" class="progress-bar-input" name="progress" id="progress_1" />
-                                    <div class="progress-bar-view" data-stage="apify-search">
-                                        <div class="progress-stage-button">
-                                            <span class="progress-stage-icon">🔍</span>
-                                        </div>
+                                    <div class="progress-stage" data-stage="1" style="left: 25%">
+                                        <div class="stage-circle">🔍</div>
                                     </div>
-                                    
-                                    <input type="radio" class="progress-bar-input" name="progress" id="progress_2" />
-                                    <div class="progress-bar-view" data-stage="validation">
-                                        <div class="progress-stage-button">
-                                            <span class="progress-stage-icon">✅</span>
-                                        </div>
+                                    <div class="progress-stage" data-stage="2" style="left: 50%">
+                                        <div class="stage-circle">✅</div>
                                     </div>
-                                    
-                                    <input type="radio" class="progress-bar-input" name="progress" id="progress_3" />
-                                    <div class="progress-bar-view" data-stage="web-scraping">
-                                        <div class="progress-stage-button">
-                                            <span class="progress-stage-icon">🌐</span>
-                                        </div>
+                                    <div class="progress-stage" data-stage="3" style="left: 75%">
+                                        <div class="stage-circle">🌐</div>
                                     </div>
-                                    
-                                    <input type="radio" class="progress-bar-input" name="progress" id="progress_4" />
-                                    <div class="progress-bar-view" data-stage="complete">
-                                        <div class="progress-stage-button">
-                                            <span class="progress-stage-icon">📊</span>
-                                        </div>
+                                    <div class="progress-stage" data-stage="4" style="left: 100%">
+                                        <div class="stage-circle">📊</div>
                                     </div>
                                 </div>
-                                
-                                <div class="progress-text" id="progressText">
+
+                                <!-- Progress text -->
+                                <div class="progress-description" id="progressDescription">
                                     Нажмите "Начать парсинг" для запуска процесса
                                 </div>
                             </div>
