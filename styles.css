@@ -335,7 +335,8 @@ body {
 .category-selector-group select {
     flex: 1 1 0;
     min-width: 0;
-    max-width: 100%;
+    max-width: calc(100% - 145px);
+    width: auto;
     box-sizing: border-box;
     position: relative;
     z-index: 1;
