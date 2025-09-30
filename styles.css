@@ -7331,8 +7331,8 @@ table.contacts-table {
     position: relative !important;
 }*/
 
-/* Ensure modal content is centered */
-.modal-overlay {
+/* Ensure modal content is centered ONLY when active */
+.modal-overlay.active {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
