@@ -335,6 +335,7 @@ body {
 .category-selector-group select {
     flex: 1;
     min-width: 200px;
+    max-width: calc(100% - 140px);
     /* All other styles inherited from .form-group select */
 }
 
