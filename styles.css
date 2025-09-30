@@ -8781,15 +8781,15 @@ div.modal-overlay.results-modal .results-modal-content {
 /* Arrow Indicator (above progress bar) */
 .progress-arrow {
     position: absolute;
-    top: 5px;
+    top: -5px;
     left: 0%;
     transform: translateX(-50%);
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     color: var(--primary-purple);
-    transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: left 1.2s ease-in-out;
     animation: arrowBounce 1s ease-in-out infinite;
     z-index: 10;
-    filter: drop-shadow(0 2px 4px rgba(124, 58, 237, 0.3));
+    filter: drop-shadow(0 2px 6px rgba(124, 58, 237, 0.4));
 }
 
 @keyframes arrowBounce {
