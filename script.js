@@ -4109,8 +4109,10 @@ class GymnastikaPlatform {
     // Reset parsing UI after completion or error
     resetParsingUI() {
         const submitBtn = document.querySelector('.submit-btn');
-        const progressBar = document.getElementById('stylishProgressBar');
-        const progressText = document.getElementById('progressText');
+        const progressBar = document.getElementById('modernProgressBar');
+        const progressDesc = document.getElementById('progressDescription');
+        const progressFill = document.getElementById('progressFill');
+        const progressArrow = document.getElementById('progressArrow');
 
         // Show submit button
         if (submitBtn) submitBtn.style.display = 'block';
@@ -4118,21 +4120,28 @@ class GymnastikaPlatform {
         // Hide and reset progress bar
         if (progressBar) {
             progressBar.classList.remove('active');
-            // Reset all radio inputs
-            const radioInputs = progressBar.querySelectorAll('.progress-bar-input');
-            radioInputs.forEach(input => input.checked = false);
 
-            // Reset all visual states
-            const allViews = progressBar.querySelectorAll('.progress-bar-view');
-            allViews.forEach(view => {
-                view.classList.remove('active', 'completed');
+            // Reset all stage visual states
+            const allStages = progressBar.querySelectorAll('.progress-stage');
+            allStages.forEach(stage => {
+                stage.classList.remove('active', 'completed');
             });
         }
 
-        // Reset progress text
-        if (progressText) {
-            progressText.textContent = 'Нажмите "Начать парсинг" для запуска процесса';
-            progressText.classList.remove('active');
+        // Reset progress fill width
+        if (progressFill) {
+            progressFill.style.width = '0%';
+        }
+
+        // Reset arrow position
+        if (progressArrow) {
+            progressArrow.style.left = '0%';
+        }
+
+        // Reset progress description
+        if (progressDesc) {
+            progressDesc.textContent = 'Нажмите "Начать парсинг" для запуска процесса';
+            progressDesc.classList.remove('active');
         }
 
         console.log('🔄 Parsing UI reset complete');
