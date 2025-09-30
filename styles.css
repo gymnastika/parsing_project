@@ -321,15 +321,9 @@ body {
     width: 100%;
 }
 
-/* Label - top row, full width */
+/* Label - hidden (placeholder is enough) */
 .category-selector-group label {
-    grid-column: 1 / -1;
-    grid-row: 1;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text-gray);
-    margin: 0;
-    padding: 0;
+    display: none;
 }
 
 /* Select - second row, left column */
