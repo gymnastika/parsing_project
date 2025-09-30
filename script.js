@@ -4091,6 +4091,7 @@ class GymnastikaPlatform {
     resetParsingUI() {
         const submitBtn = document.querySelector('.submit-btn');
         const progressBar = document.getElementById('stylishProgressBar');
+        const progressText = document.getElementById('progressText');
 
         // Show submit button
         if (submitBtn) submitBtn.style.display = 'block';
@@ -4101,6 +4102,17 @@ class GymnastikaPlatform {
             // Reset all radio inputs
             const radioInputs = progressBar.querySelectorAll('.progress-bar-input');
             radioInputs.forEach(input => input.checked = false);
+
+            // Reset all visual states
+            const allViews = progressBar.querySelectorAll('.progress-bar-view');
+            allViews.forEach(view => {
+                view.classList.remove('active', 'completed');
+            });
+        }
+
+        // Reset progress text
+        if (progressText) {
+            progressText.textContent = 'Нажмите "Начать парсинг" для запуска процесса';
         }
 
         console.log('🔄 Parsing UI reset complete');
