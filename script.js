@@ -1306,8 +1306,9 @@ class GymnastikaPlatform {
             }
 
             let results = [];
+            let taskFound = false;
 
-            // If taskId is provided, load from parsing_tasks (new system)
+            // Case 1: TaskId provided - load from parsing_tasks ONLY
             if (taskId) {
                 const { data: tasks, error } = await this.supabase
                     .from('parsing_tasks')
@@ -1322,14 +1323,15 @@ class GymnastikaPlatform {
                 }
 
                 if (tasks && tasks.length > 0) {
+                    taskFound = true;
                     results = tasks[0].final_results || [];
                     console.log(`🔍 Found task from parsing_tasks with ${results.length} results`);
                 }
             }
 
-            // If no taskId (legacy data) or task not found, try parsing_results table
-            if (!taskId || results.length === 0) {
-                console.log('📜 Attempting to load legacy data from parsing_results...');
+            // Case 2: No taskId (legacy data) - load from parsing_results
+            if (!taskId) {
+                console.log('📜 Loading legacy data from parsing_results...');
 
                 const { data: legacyResults, error: legacyError } = await this.supabase
                     .from('parsing_results')
@@ -1358,10 +1360,14 @@ class GymnastikaPlatform {
                 }
             }
 
+            // Display results or appropriate error
             if (results && results.length > 0) {
                 this.viewResults(results);
+            } else if (taskFound) {
+                // Task exists in parsing_tasks but has no results
+                this.showError('Задача завершена без результатов или еще выполняется');
             } else {
-                this.showError('Результаты не найдены или задача еще не завершена');
+                this.showError('Результаты не найдены');
             }
         } catch (error) {
             console.error('❌ Error viewing task results:', error);
