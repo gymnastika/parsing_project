@@ -5030,6 +5030,242 @@ class GymnastikaPlatform {
         console.log('✅ Custom emails cleared');
     }
 
+    // Bind Send Email button
+    bindSendEmailButton() {
+        const sendBtn = document.getElementById('sendEmailBtn');
+        if (!sendBtn) return;
+
+        // Remove existing listeners
+        const newSendBtn = sendBtn.cloneNode(true);
+        sendBtn.parentNode.replaceChild(newSendBtn, sendBtn);
+
+        // Add click handler
+        newSendBtn.addEventListener('click', () => {
+            this.showEmailConfirmationModal();
+        });
+
+        console.log('✅ Send email button bound successfully');
+    }
+
+    // Show email confirmation modal
+    showEmailConfirmationModal() {
+        console.log('📧 Showing email confirmation modal...');
+
+        // Collect recipients
+        const recipients = this.collectEmailRecipients();
+
+        if (recipients.length === 0) {
+            this.showError('Выберите хотя бы одного получателя!');
+            return;
+        }
+
+        // Get email data from step 1
+        const subject = this.currentEmailCampaign?.subject || '';
+        const attachments = this.currentEmailCampaign?.attachments || [];
+
+        // Update modal content
+        document.getElementById('confirmRecipientCount').textContent = recipients.length;
+        document.getElementById('confirmSubject').textContent = subject;
+
+        if (attachments.length > 0) {
+            const attachmentText = attachments.map(a => a.filename).join(', ');
+            document.getElementById('confirmAttachments').textContent = `${attachments.length} файлов: ${attachmentText}`;
+        } else {
+            document.getElementById('confirmAttachments').textContent = 'Нет';
+        }
+
+        // Show modal
+        const modal = document.getElementById('emailConfirmationModal');
+        if (modal) {
+            modal.classList.add('active');
+        }
+
+        // Bind modal buttons
+        this.bindConfirmationModalButtons(recipients);
+
+        console.log('✅ Email confirmation modal shown', {
+            recipientCount: recipients.length,
+            subject: subject,
+            attachmentCount: attachments.length
+        });
+    }
+
+    // Collect email recipients from selected contacts or custom emails
+    collectEmailRecipients() {
+        const recipients = [];
+
+        // Check which tab is active
+        const customTab = document.getElementById('custom-contacts-content');
+        const isCustomTabActive = customTab?.classList.contains('active');
+
+        if (isCustomTabActive) {
+            // Use custom emails
+            console.log('📧 Using custom emails:', this.customEmails?.length || 0);
+            if (this.customEmails && this.customEmails.length > 0) {
+                recipients.push(...this.customEmails);
+            }
+        } else {
+            // Use selected contacts from database
+            console.log('📧 Using selected contacts from database:', this.selectedEmailContacts?.length || 0);
+            if (this.selectedEmailContacts && this.selectedEmailContacts.length > 0) {
+                this.selectedEmailContacts.forEach(contact => {
+                    if (contact.email) {
+                        recipients.push(contact.email);
+                    }
+                });
+            }
+        }
+
+        console.log('✅ Collected recipients:', recipients.length);
+        return recipients;
+    }
+
+    // Bind confirmation modal buttons
+    bindConfirmationModalButtons(recipients) {
+        const confirmBtn = document.getElementById('confirmSendBtn');
+        const cancelBtn = document.getElementById('cancelSendBtn');
+        const modal = document.getElementById('emailConfirmationModal');
+
+        // Confirm button
+        if (confirmBtn) {
+            const newConfirmBtn = confirmBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+            newConfirmBtn.addEventListener('click', async () => {
+                await this.sendEmailCampaign(recipients);
+                if (modal) modal.classList.remove('active');
+            });
+        }
+
+        // Cancel button
+        if (cancelBtn) {
+            const newCancelBtn = cancelBtn.cloneNode(true);
+            cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+
+            newCancelBtn.addEventListener('click', () => {
+                if (modal) modal.classList.remove('active');
+                console.log('❌ Email sending cancelled');
+            });
+        }
+
+        // Close on overlay click
+        if (modal) {
+            const newModal = modal.cloneNode(true);
+            modal.parentNode.replaceChild(newModal, modal);
+
+            newModal.addEventListener('click', (e) => {
+                if (e.target === newModal) {
+                    newModal.classList.remove('active');
+                    console.log('❌ Email sending cancelled (overlay click)');
+                }
+            });
+        }
+    }
+
+    // Send email campaign via Gmail API
+    async sendEmailCampaign(recipients) {
+        console.log('📧 Starting email campaign send...', {
+            recipientCount: recipients.length
+        });
+
+        try {
+            // Show loading state
+            const sendBtn = document.getElementById('confirmSendBtn');
+            const originalText = sendBtn?.innerHTML;
+            if (sendBtn) {
+                sendBtn.disabled = true;
+                sendBtn.innerHTML = `
+                    <svg class="animate-spin" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                        <path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z"/>
+                    </svg>
+                    Отправка...
+                `;
+            }
+
+            // Check Google OAuth connection
+            if (!window.googleOAuth) {
+                throw new Error('Google OAuth client not available');
+            }
+
+            const isConnected = await window.googleOAuth.isConnected(this.currentUser.id);
+            if (!isConnected) {
+                throw new Error('Google account not connected. Please connect your Google account in Settings.');
+            }
+
+            // Prepare email data
+            const emailData = {
+                to: recipients,
+                subject: this.currentEmailCampaign.subject,
+                body: this.currentEmailCampaign.body,
+                attachments: this.currentEmailCampaign.attachments || []
+            };
+
+            console.log('📨 Sending email via Gmail API...', {
+                recipientCount: emailData.to.length,
+                hasAttachments: emailData.attachments.length > 0
+            });
+
+            // Send email via Gmail API
+            const result = await window.googleOAuth.sendEmail(this.currentUser.id, emailData);
+
+            console.log('✅ Email campaign sent successfully:', result);
+
+            // Show success message
+            this.showSuccess(`✅ Письмо успешно отправлено ${result.recipientCount} получателям!`);
+
+            // Reset form
+            this.resetEmailWizard();
+
+        } catch (error) {
+            console.error('❌ Error sending email campaign:', error);
+            this.showError(`Ошибка отправки email: ${error.message}`);
+        } finally {
+            // Restore button state
+            const sendBtn = document.getElementById('confirmSendBtn');
+            if (sendBtn && originalText) {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = originalText;
+            }
+        }
+    }
+
+    // Reset email wizard to initial state
+    resetEmailWizard() {
+        console.log('🔄 Resetting email wizard...');
+
+        // Clear form data
+        const emailSubject = document.getElementById('emailSubject');
+        const emailBody = document.getElementById('emailBody');
+        const attachmentsList = document.getElementById('attachmentsList');
+
+        if (emailSubject) emailSubject.value = '';
+        if (emailBody) emailBody.value = '';
+        if (attachmentsList) {
+            attachmentsList.innerHTML = '';
+            attachmentsList.classList.remove('has-files');
+        }
+
+        // Reset campaign data
+        this.currentEmailCampaign = {
+            subject: '',
+            body: '',
+            attachments: []
+        };
+
+        // Reset selected contacts
+        this.selectedEmailContacts = [];
+        this.customEmails = [];
+
+        // Clear custom emails textarea
+        const customEmailsList = document.getElementById('customEmailsList');
+        if (customEmailsList) customEmailsList.value = '';
+
+        // Go back to step 1
+        this.backToEmailStep1();
+
+        console.log('✅ Email wizard reset');
+    }
+
     // Go back to email step 1 (preserve all data)
     backToEmailStep1() {
         console.log('🔙 Returning to email step 1...');
