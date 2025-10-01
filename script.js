@@ -4363,7 +4363,9 @@ class GymnastikaPlatform {
             });
 
             if (results && results.length > 0) {
-                this.viewResults(results);
+                // Check if any results have email
+                const resultsWithEmail = results.filter(r => r.email || r.contact?.email);
+                const hasEmail = resultsWithEmail.length > 0;
 
                 // 6. Mark task as completed in DB
                 if (this.currentTaskId) {
@@ -4389,8 +4391,17 @@ class GymnastikaPlatform {
                     await this.loadDatabaseData();
                 }
 
-                // Show completion modal
-                this.showCompletionModal();
+                // Show result notification based on email presence
+                if (!hasEmail) {
+                    this.showError(`Email на сайте не найден. Контакт не добавлен в базу данных.`);
+                } else if (resultsWithEmail.length < results.length) {
+                    this.showSuccess(`Парсинг завершен! Найдено ${resultsWithEmail.length} из ${results.length} контактов с email.`);
+                } else {
+                    this.showCompletionModal();
+                }
+
+                // Show results modal to display what was found
+                this.showResultsModal(params.taskName, results);
 
                 // Reset UI after short delay
                 setTimeout(() => {
