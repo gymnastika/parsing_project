@@ -1755,6 +1755,7 @@ class GymnastikaPlatform {
                                         website: result.website || result.url || '',
                                         country: result.country || 'Не определено',
                                         task_name: (task.task_data && task.task_data.taskName) || 'Неизвестная задача',
+                                        category_id: task.category_id || (task.task_data && task.task_data.categoryId) || null,
                                         parsing_timestamp: task.created_at
                                     });
                                 }
