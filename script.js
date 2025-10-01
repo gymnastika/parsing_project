@@ -1709,6 +1709,7 @@ class GymnastikaPlatform {
                         website: contact.website || contact.source_url || '',
                         country: contact.country || 'Не определено',
                         task_name: contact.task_name,
+                        category_id: contact.category_id || null,  // Category for filtering
                         parsing_timestamp: contact.parsing_timestamp || contact.created_at
                     }));
                 }
