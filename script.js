@@ -4150,7 +4150,7 @@ class GymnastikaPlatform {
 
         // Reset arrow position and transform
         if (progressArrow) {
-            progressArrow.style.left = '0%';
+            progressArrow.style.left = '17px';  // Reset to stage 0 position
             progressArrow.style.transform = 'none';
         }
 
