@@ -157,8 +157,6 @@ const { data: legacyResults } = await this.supabase
 ```
 
 **Impact**: Data now visible from ANY browser/device with same account!
-}
-```
 
 ---
 
