@@ -1298,41 +1298,65 @@ class GymnastikaPlatform {
     // View results for a specific task (from parsing_tasks table)
     async viewTaskResults(taskName, taskId = null) {
         try {
-            console.log(`👁 Viewing results for task: ${taskName}`, taskId ? `(ID: ${taskId})` : '');
+            console.log(`👁 Viewing results for task: ${taskName}`, taskId ? `(ID: ${taskId})` : '(legacy)');
 
             if (!this.supabase) {
                 console.error('❌ Supabase client not available');
                 return;
             }
 
-            // Get task from parsing_tasks table
-            let query = this.supabase
-                .from('parsing_tasks')
-                .select('*');
+            let results = [];
 
+            // If taskId is provided, load from parsing_tasks (new system)
             if (taskId) {
-                query = query.eq('id', taskId);
-            } else {
-                query = query.eq('task_name', taskName).eq('user_id', this.currentUser?.id);
+                const { data: tasks, error } = await this.supabase
+                    .from('parsing_tasks')
+                    .select('*')
+                    .eq('id', taskId)
+                    .limit(1);
+
+                if (error) {
+                    console.error('❌ Error fetching task:', error);
+                    this.showError('Ошибка загрузки результатов');
+                    return;
+                }
+
+                if (tasks && tasks.length > 0) {
+                    results = tasks[0].final_results || [];
+                    console.log(`🔍 Found task from parsing_tasks with ${results.length} results`);
+                }
             }
 
-            const { data: tasks, error } = await query.order('created_at', { ascending: false }).limit(1);
+            // If no taskId (legacy data) or task not found, try parsing_results table
+            if (!taskId || results.length === 0) {
+                console.log('📜 Attempting to load legacy data from parsing_results...');
 
-            if (error) {
-                console.error('❌ Error fetching task:', error);
-                this.showError('Ошибка загрузки результатов');
-                return;
+                const { data: legacyResults, error: legacyError } = await this.supabase
+                    .from('parsing_results')
+                    .select('*')
+                    .eq('task_name', taskName)
+                    .eq('user_id', this.currentUser?.id);
+
+                if (legacyError) {
+                    console.error('❌ Error fetching legacy results:', legacyError);
+                    this.showError('Ошибка загрузки результатов');
+                    return;
+                }
+
+                if (legacyResults && legacyResults.length > 0) {
+                    // Transform legacy results to new format
+                    results = legacyResults.map(item => ({
+                        organization_name: item.organization_name || 'Неизвестная организация',
+                        email: item.email || '',
+                        phone: item.phone || '',
+                        description: item.description || '',
+                        website: item.website || item.source_url || '',
+                        country: item.country || 'Не определено',
+                        parsing_timestamp: item.parsing_timestamp || item.created_at
+                    }));
+                    console.log(`📜 Found ${results.length} legacy results from parsing_results`);
+                }
             }
-
-            if (!tasks || tasks.length === 0) {
-                this.showError('Задача не найдена');
-                return;
-            }
-
-            const task = tasks[0];
-            const results = task.final_results || [];
-
-            console.log(`🔍 Found task with ${results.length} results`);
 
             if (results && results.length > 0) {
                 this.viewResults(results);
