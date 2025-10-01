@@ -1131,7 +1131,7 @@ class GymnastikaPlatform {
                 const { data: legacyResults, error: legacyError } = await this.supabase
                     .from('parsing_results')
                     .select('*')
-                    .eq('user_id', this.currentUser?.id)
+                    .eq('user_id', supabaseUserId)
                     .order('parsing_timestamp', { ascending: false });
 
                 if (!legacyError && legacyResults && legacyResults.length > 0) {
