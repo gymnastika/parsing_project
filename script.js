@@ -1102,7 +1102,7 @@ class GymnastikaPlatform {
                     task_name: task.task_name,
                     search_query: task.search_query || task.website_url || 'Unknown Query',
                     total_results: task.final_results?.length || 0,
-                    contacts_count: task.final_results?.filter(r => r.email || r.phone)?.length || 0,
+                    contacts_count: task.final_results?.filter(r => r.email)?.length || 0,
                     latest_date: task.completed_at || task.updated_at || task.created_at,
                     task_type: task.task_type,  // 'ai-search' or 'url-parsing'
                     status: task.status,
