@@ -1138,7 +1138,7 @@ class GymnastikaPlatform {
                         task_name: name,
                         search_query: items[0].original_query || 'Не указан',
                         total_results: items.length,
-                        contacts_count: items.filter(i => i.email || i.phone).length,
+                        contacts_count: items.filter(i => i.email).length,
                         latest_date: items[0].parsing_timestamp || items[0].created_at,
                         task_type: 'ai-search',  // Legacy data was from AI Search
                         status: 'completed',
