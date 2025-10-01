@@ -75,17 +75,36 @@ const { data, error } = await this.supabase
 
 ### Шаг 2: Выполните SQL миграцию
 
+**ВАЖНО**: Есть зависимость! VIEW `user_parsing_stats` использует колонку `country`.
+
 **Скопируйте и выполните** весь SQL из файла:
 ```
 database/REMOVE_COUNTRY_COLUMN_OPTIONAL.sql
 ```
 
-Или выполните напрямую:
+Или выполните напрямую **В ПРАВИЛЬНОЙ ПОСЛЕДОВАТЕЛЬНОСТИ**:
+
 ```sql
--- Удалить индекс
+-- Шаг 1: Пересоздать VIEW БЕЗ country (удалить зависимость)
+CREATE OR REPLACE VIEW user_parsing_stats AS
+SELECT
+    user_id,
+    COUNT(*) as total_results,
+    COUNT(*) FILTER (WHERE email IS NOT NULL) as results_with_email,
+    COUNT(DISTINCT task_name) as unique_tasks,
+    -- COUNT(DISTINCT country) as unique_countries,  ← УДАЛИЛИ ЭТУ СТРОКУ
+    MIN(parsing_timestamp) as first_parsing,
+    MAX(parsing_timestamp) as last_parsing,
+    ROUND(
+        (COUNT(*) FILTER (WHERE email IS NOT NULL)::decimal / COUNT(*) * 100), 2
+    ) as email_success_rate
+FROM parsing_results
+GROUP BY user_id;
+
+-- Шаг 2: Удалить индекс
 DROP INDEX IF EXISTS idx_parsing_results_country;
 
--- Удалить колонку
+-- Шаг 3: Удалить колонку
 ALTER TABLE parsing_results DROP COLUMN IF EXISTS country;
 ```
 
