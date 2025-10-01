@@ -3274,7 +3274,6 @@ class GymnastikaPlatform {
                     escapeCSV(contact.email || 'Не определен'),
                     escapeCSV(contact.description || 'Описание отсутствует'),
                     escapeCSV(contact.website || 'Не определен'),
-                    escapeCSV(contact.country || 'Не определена'),
                     escapeCSV(formattedDate)
                 ].join(',');
             });
