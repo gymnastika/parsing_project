@@ -4925,7 +4925,7 @@ class GymnastikaPlatform {
             console.log(`📊 Saving ${resultCount} results to database...`);
 
             // Save results to database
-            await this.saveResultsToDatabase(task.id, results);
+            await this.saveResultsToDatabase(task, results);
 
             // Show completion notification
             this.showNotification(
