@@ -3858,10 +3858,19 @@ class GymnastikaPlatform {
         const nextToStep2Btn = document.getElementById('nextToStep2');
         const emailAttachments = document.getElementById('emailAttachments');
 
+        console.log('📧 Email form elements:', {
+            subject: !!emailSubject,
+            body: !!emailBody,
+            nextButton: !!nextToStep2Btn,
+            attachments: !!emailAttachments
+        });
+
         if (!emailSubject || !emailBody || !nextToStep2Btn) {
             console.log('❌ Email form elements not found');
             return;
         }
+        
+        console.log('✅ All required email form elements found');
 
         // Initialize current campaign data storage
         this.currentEmailCampaign = {
@@ -3881,8 +3890,16 @@ class GymnastikaPlatform {
         };
 
         // Bind input events for real-time validation
-        emailSubject.addEventListener('input', validateEmailForm);
-        emailBody.addEventListener('input', validateEmailForm);
+        console.log('📧 Binding input event listeners...');
+        emailSubject.addEventListener('input', () => {
+            console.log('📧 Subject input event fired');
+            validateEmailForm();
+        });
+        emailBody.addEventListener('input', () => {
+            console.log('📧 Body input event fired');
+            validateEmailForm();
+        });
+        console.log('✅ Input event listeners bound successfully');
 
         // File upload handling
         const fileDropZone = document.querySelector('.file-drop-zone');
@@ -3931,16 +3948,25 @@ class GymnastikaPlatform {
         });
 
         // Initial validation
-        validateEmailForm();
+        console.log('📧 Running initial validation...');
+        const initialValidation = validateEmailForm();
+        console.log('📧 Initial validation result:', initialValidation);
     }
 
     // Enhanced email form validation as class method
     validateEmailForm() {
-        if (!this.emailFormElements) return { isValid: false, errorMessage: 'Form not initialized' };
+        console.log('🔍 validateEmailForm() called');
+        
+        if (!this.emailFormElements) {
+            console.log('❌ emailFormElements not initialized');
+            return { isValid: false, errorMessage: 'Form not initialized' };
+        }
 
         const subject = this.emailFormElements.subject.value.trim();
         const body = this.emailFormElements.body.value.trim();
         const nextBtn = this.emailFormElements.nextButton;
+        
+        console.log(`📧 Current values - Subject: "${subject}" (${subject.length} chars), Body: "${body.substring(0, 50)}..." (${body.length} chars)`);
 
         // Check if both required fields are filled
         const hasRequiredFields = subject.length > 0 && body.length > 0;
