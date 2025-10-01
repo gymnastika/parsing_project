@@ -6791,10 +6791,16 @@ let platform = null;
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', async () => {
     try {
+        // Prevent double initialization
+        if (window.platform) {
+            console.log('⚠️ Platform already initialized, skipping duplicate init');
+            return;
+        }
+
         console.log('🌟 DOM loaded, initializing platform...');
         platform = new GymnastikaPlatform();
         await platform.init();
-        
+
         // Make platform accessible globally after successful initialization
         window.platform = platform;
         console.log('✅ Platform exposed globally as window.platform');
