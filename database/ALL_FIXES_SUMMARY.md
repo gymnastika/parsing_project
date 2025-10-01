@@ -157,10 +157,6 @@ const { data: legacyResults } = await this.supabase
 ```
 
 **Impact**: Data now visible from ANY browser/device with same account!
-
-// FALLBACK: parsing_tasks.final_results for old data
-if (freshContactsData.length === 0) {
-    // Load from parsing_tasks and handle nested structure
 }
 ```
 
