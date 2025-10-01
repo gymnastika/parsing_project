@@ -3254,6 +3254,76 @@ class GymnastikaPlatform {
         }
     }
 
+    // Load categories into filter dropdowns
+    loadCategoriesIntoFilters(categories) {
+        const historyFilter = document.getElementById('historyCategoryFilter');
+        const contactsFilter = document.getElementById('contactsCategoryFilter');
+
+        if (!historyFilter || !contactsFilter) {
+            console.log('❌ Category filter elements not found');
+            return;
+        }
+
+        // Build filter options HTML
+        let filterOptionsHTML = '<option value="">Все категории</option>';
+        if (categories && categories.length > 0) {
+            filterOptionsHTML += categories.map(cat =>
+                `<option value="${cat.id}">${this.escapeHtml(cat.name)}</option>`
+            ).join('');
+        }
+
+        historyFilter.innerHTML = filterOptionsHTML;
+        contactsFilter.innerHTML = filterOptionsHTML;
+
+        console.log(`✅ Loaded ${categories ? categories.length : 0} categories into filters`);
+    }
+
+    // Filter history by category
+    filterHistoryByCategory(categoryId) {
+        const cachedHistory = this.getCacheData('task_history') || [];
+
+        if (!categoryId) {
+            // Show all
+            const container = document.getElementById('databaseEmpty');
+            if (container) {
+                this.displayHistory(cachedHistory, container);
+            }
+            return;
+        }
+
+        // Filter by category
+        const filtered = cachedHistory.filter(task => task.category_id === categoryId);
+        const container = document.getElementById('databaseEmpty');
+        if (container) {
+            this.displayHistory(filtered, container);
+        }
+
+        console.log(`📋 Filtered history: ${filtered.length}/${cachedHistory.length} tasks for category ${categoryId}`);
+    }
+
+    // Filter contacts by category
+    filterContactsByCategory(categoryId) {
+        const cachedContacts = this.getCacheData('contacts_data') || [];
+
+        if (!categoryId) {
+            // Show all
+            const container = document.getElementById('contactsEmpty');
+            if (container) {
+                this.displayContacts(cachedContacts, container);
+            }
+            return;
+        }
+
+        // Filter by category
+        const filtered = cachedContacts.filter(contact => contact.category_id === categoryId);
+        const container = document.getElementById('contactsEmpty');
+        if (container) {
+            this.displayContacts(filtered, container);
+        }
+
+        console.log(`📋 Filtered contacts: ${filtered.length}/${cachedContacts.length} contacts for category ${categoryId}`);
+    }
+
     // Create new category
     async createCategory(name) {
         console.log('➕ Creating category:', name);
