@@ -524,6 +524,9 @@ class GymnastikaPlatform {
             // Bind Export Contacts
             this.bindExportContacts();
 
+            // Bind Add Contact Form
+            this.bindAddContactForm();
+
             // Bind email form validation
             this.bindEmailForm();
             
