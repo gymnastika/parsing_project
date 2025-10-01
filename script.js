@@ -4106,7 +4106,6 @@ class GymnastikaPlatform {
         const progressBar = document.getElementById('modernProgressBar');
         const progressDesc = document.getElementById('progressDescription');
         const progressFill = document.getElementById('progressFill');
-        const progressArrow = document.getElementById('progressArrow');
 
         // Show submit button
         if (submitBtn) submitBtn.style.display = 'block';
@@ -4125,21 +4124,6 @@ class GymnastikaPlatform {
         // Reset progress fill width
         if (progressFill) {
             progressFill.style.width = '0%';
-        }
-
-        // Reset arrow to stage 0 position using same logic as updateModernProgress
-        if (progressArrow && progressBar) {
-            const stages = progressBar.querySelectorAll('.progress-stage');
-            if (stages[0]) {
-                const targetStage = stages[0];
-                const track = targetStage.parentElement;
-                const stageRect = targetStage.getBoundingClientRect();
-                const trackRect = track.getBoundingClientRect();
-                const iconCenterX = stageRect.left + (stageRect.width / 2) - trackRect.left;
-
-                progressArrow.style.left = iconCenterX + 'px';
-                progressArrow.style.transform = 'translateX(-50%)';
-            }
         }
 
         // Reset progress description
