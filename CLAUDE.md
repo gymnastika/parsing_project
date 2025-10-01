@@ -781,6 +781,22 @@ Solution: ИСПРАВЛЕНО - метод был переименован в s
 - Client-side: `pipeline-orchestrator.js` использует `scrapeWebsiteDetails()`
 - Server-side: `server-pipeline-orchestrator.js` использует wrapper метод
 
+#### **URL Parsing задачи не отображаются в истории**
+```javascript
+Problem: URL parsing завершается успешно, но задача не видна в "История задач"
+Solution: ИСПРАВЛЕНО - UI читает из parsing_tasks вместо parsing_results
+```
+
+**Причина**: UI читал историю из старой таблицы `parsing_results`, а новые задачи сохраняются в `parsing_tasks`
+
+**Исправления** (2025-10-01):
+- ✅ `loadHistoryData()` теперь читает из `parsing_tasks` (script.js:1085-1113)
+- ✅ `viewTaskResults()` извлекает данные из `final_results` JSONB (script.js:1250-1298)
+- ✅ `loadContactsData()` читает контакты из `parsing_tasks.final_results` (script.js:1387-1438)
+- ✅ `displayHistory()` передает `task_id` для точного поиска (script.js:1563)
+
+**См. документацию**: `database/HISTORY_DISPLAY_FIX.md`
+
 #### **Pipeline Stage Failures**
 ```javascript
 // Stage 1: OpenAI Assistant не отвечает
