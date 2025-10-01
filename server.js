@@ -1098,6 +1098,28 @@ app.get('/api/parsing-tasks/active', async (req, res) => {
     }
 });
 
+// Get task by ID
+app.get('/api/parsing-tasks/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!id) {
+            return res.status(400).json({ error: 'Task ID is required' });
+        }
+
+        const task = await tasksService.getTask(id);
+
+        if (!task) {
+            return res.status(404).json({ error: 'Task not found' });
+        }
+
+        res.json(task);
+    } catch (error) {
+        console.error(`❌ Error getting task ${req.params.id}:`, error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // ================================
 // UTILITY ENDPOINTS
 // ================================
