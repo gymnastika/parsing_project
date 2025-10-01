@@ -4559,22 +4559,54 @@ class GymnastikaPlatform {
             if (!response.ok) return;
 
             const activeTasks = await response.json();
-            if (!activeTasks || activeTasks.length === 0) return;
+            if (!activeTasks || activeTasks.length === 0) {
+                // ✅ No active tasks - ensure UI is clean
+                this.resetParsingUI();
+                return;
+            }
 
             // Get the most recent active task
             const activeTask = activeTasks[0];
-            this.currentTaskId = activeTask.id;
+            
+            // ✅ Check if task is actually recent (within last 30 minutes)
+            const taskTime = new Date(activeTask.created_at).getTime();
+            const now = Date.now();
+            const thirtyMinutes = 30 * 60 * 1000;
+            
+            if (now - taskTime > thirtyMinutes) {
+                console.log('⏰ Active task is too old (>30min), not restoring UI');
+                // Task is too old, likely stuck - don't restore UI
+                this.resetParsingUI();
+                return;
+            }
 
+            this.currentTaskId = activeTask.id;
             console.log('🔄 Restoring active parsing task:', activeTask.id);
 
-            // Restore progress bar UI
-            const submitBtn = document.querySelector('.submit-btn');
+            // ✅ FIX: Use specific selectors for both buttons
+            const aiSearchBtn = document.querySelector('#parsingForm .submit-btn');
+            const urlParsingBtn = document.querySelector('#urlParsingForm .submit-btn');
             const progressBar = document.getElementById('modernProgressBar');
             const progressDesc = document.getElementById('progressDescription');
 
-            if (submitBtn) submitBtn.style.display = 'none';
-            if (progressBar) progressBar.classList.add('active');
-            if (progressDesc) progressDesc.classList.add('active');
+            // Hide both submit buttons
+            if (aiSearchBtn) {
+                aiSearchBtn.style.display = 'none';
+                console.log('✅ AI Search button hidden for active task');
+            }
+            if (urlParsingBtn) {
+                urlParsingBtn.style.display = 'none';
+                console.log('✅ URL Parsing button hidden for active task');
+            }
+            
+            // Show progress bar
+            if (progressBar) {
+                progressBar.classList.add('active');
+                console.log('✅ Progress bar activated for active task');
+            }
+            if (progressDesc) {
+                progressDesc.classList.add('active');
+            }
 
             // Restore progress state from DB
             if (activeTask.progress && activeTask.current_stage) {
@@ -4590,7 +4622,8 @@ class GymnastikaPlatform {
 
         } catch (error) {
             console.warn('⚠️ Failed to restore active task:', error.message);
-            // Don't block app initialization if restore fails
+            // Ensure clean UI if restore fails
+            this.resetParsingUI();
         }
     }
 
