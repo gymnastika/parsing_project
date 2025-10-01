@@ -4081,9 +4081,17 @@ class GymnastikaPlatform {
                 fill.style.width = stageToPercent[stageIndex] + '%';
             }
 
-            // Update arrow position
+            // Update arrow position - align with stage circles (no transform offset)
             if (arrow) {
-                arrow.style.left = stageToPercent[stageIndex] + '%';
+                const percent = stageToPercent[stageIndex];
+                arrow.style.left = percent + '%';
+
+                // Add transform only for middle stages to center arrow
+                if (stageIndex > 0 && stageIndex < 4) {
+                    arrow.style.transform = 'translateX(-50%)';
+                } else {
+                    arrow.style.transform = 'none';
+                }
             }
 
             // Update stage states
