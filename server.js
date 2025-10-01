@@ -990,11 +990,22 @@ app.post('/api/tasks/:taskId/cancel', async (req, res) => {
 // Create new parsing task
 app.post('/api/parsing-tasks', async (req, res) => {
     try {
+        console.log('📥 Received parsing task request:', JSON.stringify(req.body, null, 2));
+
         const { userId, taskData } = req.body;
 
         if (!userId || !taskData) {
+            console.error('❌ Missing required fields:', { userId: !!userId, taskData: !!taskData });
             return res.status(400).json({ error: 'userId and taskData are required' });
         }
+
+        console.log('📋 Creating task with data:', {
+            userId,
+            taskName: taskData.taskName,
+            type: taskData.type,
+            hasSearchQuery: !!taskData.searchQuery,
+            hasWebsiteUrl: !!taskData.websiteUrl
+        });
 
         const task = await tasksService.createTask(userId, taskData);
         console.log(`✅ Created parsing task ${task.id} for user ${userId}`);
@@ -1002,7 +1013,11 @@ app.post('/api/parsing-tasks', async (req, res) => {
         res.json(task);
     } catch (error) {
         console.error('❌ Error creating parsing task:', error);
-        res.status(500).json({ error: error.message });
+        console.error('❌ Error stack:', error.stack);
+        res.status(500).json({
+            error: error.message,
+            details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
     }
 });
 
