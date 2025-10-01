@@ -1941,22 +1941,23 @@ class GymnastikaPlatform {
         container.appendChild(table);
     }
 
-    // Display contacts - Exact replica of user's original design
+    // Display contacts - With category column
     displayContacts(contacts, container) {
         const table = document.createElement('table');
         table.className = 'contacts-table';
-        
-        // Create header with sorting button for date column
+
+        // Create header with category column and sorting button for date column
         const header = document.createElement('thead');
         header.innerHTML = `
             <tr>
+                <th>Категория</th>
                 <th>Название организации</th>
                 <th>Email</th>
                 <th>Описание</th>
                 <th>Веб-сайт</th>
                 <th>Страна</th>
                 <th class="sortable-header" data-sort="date">
-                    Дата добавления 
+                    Дата добавления
                     <span class="sort-icon" id="dateSortIcon">${this.dateSortDirection === 'desc' ? '↓' : '↑'}</span>
                 </th>
             </tr>
