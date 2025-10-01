@@ -1853,8 +1853,8 @@ class GymnastikaPlatform {
         container.appendChild(table);
     }
 
-    // Display history - Exact replica of user's original design
-    displayHistory(history, container) {
+    // Display history - With category column
+    async displayHistory(history, container) {
         const table = document.createElement('table');
         table.className = 'history-table';
 
@@ -1873,17 +1873,21 @@ class GymnastikaPlatform {
             </tr>
         `;
         table.appendChild(header);
-        
+
         // Create body
         const body = document.createElement('tbody');
+
+        // Load all categories once
+        const categories = this.getCacheData('categories_map') || [];
+
         history.forEach(task => {
             const row = document.createElement('tr');
-            
+
             // Format date and time like in screenshot (10.09.2025 12:16:55)
             const dateObj = new Date(task.latest_date);
             const formattedDate = dateObj.toLocaleDateString('ru-RU', {
                 day: '2-digit',
-                month: '2-digit', 
+                month: '2-digit',
                 year: 'numeric'
             });
             const formattedTime = dateObj.toLocaleTimeString('ru-RU', {
@@ -1891,13 +1895,18 @@ class GymnastikaPlatform {
                 minute: '2-digit',
                 second: '2-digit'
             });
-            
+
             // Determine task type display name
             const taskTypeDisplay = task.task_type === 'ai-search' ? 'AI Поиск' : 'По URL';
+
+            // Get category name
+            const category = categories.find(c => c.id === task.category_id);
+            const categoryName = category ? category.name : (task.category_id ? 'Неизвестно' : 'Без категории');
 
             row.innerHTML = `
                 <td class="date-cell">${formattedDate}<br>${formattedTime}</td>
                 <td class="type-cell">${taskTypeDisplay}</td>
+                <td class="category-cell">${categoryName}</td>
                 <td class="task-name-cell">${task.task_name || 'Без названия'}</td>
                 <td class="query-cell">${task.search_query || 'Не указан'}</td>
                 <td class="count-cell">${task.total_results || 0}</td>
@@ -1910,7 +1919,7 @@ class GymnastikaPlatform {
             body.appendChild(row);
         });
         table.appendChild(body);
-        
+
         container.innerHTML = '';
         container.appendChild(table);
     }
