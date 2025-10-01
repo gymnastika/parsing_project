@@ -3000,11 +3000,10 @@ class GymnastikaPlatform {
             const emailCell = row.querySelector('.email-cell')?.textContent?.toLowerCase() || '';
             const descriptionCell = row.querySelector('.description-cell')?.textContent?.toLowerCase() || '';
             const websiteCell = row.querySelector('.website-cell')?.textContent?.toLowerCase() || '';
-            const countryCell = row.querySelector('.country-cell')?.textContent?.toLowerCase() || '';
             const dateCell = row.querySelector('.date-cell')?.textContent?.toLowerCase() || '';
 
             // Combine all cell values for searching
-            const rowText = `${orgNameCell} ${emailCell} ${descriptionCell} ${websiteCell} ${countryCell} ${dateCell}`;
+            const rowText = `${orgNameCell} ${emailCell} ${descriptionCell} ${websiteCell} ${dateCell}`;
 
             // Show/hide row based on search match
             if (rowText.includes(searchTerm) || searchTerm === '') {
