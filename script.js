@@ -1120,7 +1120,8 @@ class GymnastikaPlatform {
                     latest_date: task.completed_at || task.updated_at || task.created_at,
                     task_type: task.task_type,  // 'ai-search' or 'url-parsing'
                     status: task.status,
-                    task_id: task.id
+                    task_id: task.id,
+                    category_id: task.category_id  // Category for filtering
                 }));
 
                 console.log(`📊 Background sync transformed into ${freshHistoryData.length} history items`);
