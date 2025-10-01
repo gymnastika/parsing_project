@@ -2391,8 +2391,14 @@ class GymnastikaPlatform {
     switchTab(tabName) {
         console.log(`🔄 Switching to tab: ${tabName}`);
         
-        // ✅ FIX: Reset progress bar when switching tabs to prevent stale state
-        this.resetParsingUI();
+        // ✅ FIX: Reset progress bar ONLY if no active parsing
+        // Don't reset during active parsing to preserve progress visibility
+        if (!this.currentTaskId) {
+            this.resetParsingUI();
+            console.log('✅ UI reset - no active parsing');
+        } else {
+            console.log('⏸️ UI reset skipped - parsing in progress (taskId:', this.currentTaskId + ')');
+        }
         
         // Remove active class from all tab buttons
         document.querySelectorAll('.tab-button').forEach(btn => {
