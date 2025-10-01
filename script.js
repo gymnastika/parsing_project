@@ -717,6 +717,36 @@ class GymnastikaPlatform {
         return age < maxAge;
     }
 
+    // Get category name by ID (with caching)
+    async getCategoryName(categoryId) {
+        if (!categoryId) return 'Без категории';
+
+        // Try to get from cache first
+        let categories = this.getCacheData('categories_map');
+
+        // If no cache, load from database
+        if (!categories) {
+            try {
+                const { data, error } = await this.supabase
+                    .from('categories')
+                    .select('*')
+                    .eq('user_id', this.currentUser?.id || (await this.supabase.auth.getUser()).data.user?.id);
+
+                if (error) throw error;
+
+                categories = data || [];
+                this.setCacheData('categories_map', categories);
+            } catch (error) {
+                console.error('❌ Error loading categories:', error);
+                return 'Неизвестно';
+            }
+        }
+
+        // Find category by ID
+        const category = categories.find(c => c.id === categoryId);
+        return category ? category.name : 'Неизвестно';
+    }
+
     // Invalidate (clear) cache for specific key
     invalidateCache(key) {
         try {
