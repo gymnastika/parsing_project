@@ -4273,6 +4273,56 @@ class GymnastikaPlatform {
         }
     }
 
+    // Check for active parsing tasks and restore UI state
+    async checkAndRestoreActiveTask() {
+        try {
+            if (!this.currentUser) return;
+
+            // Get active tasks (running or pending)
+            const response = await fetch(`/api/parsing-tasks/active?userId=${this.currentUser.id}`, {
+                headers: {
+                    'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                }
+            });
+
+            if (!response.ok) return;
+
+            const activeTasks = await response.json();
+            if (!activeTasks || activeTasks.length === 0) return;
+
+            // Get the most recent active task
+            const activeTask = activeTasks[0];
+            this.currentTaskId = activeTask.id;
+
+            console.log('🔄 Restoring active parsing task:', activeTask.id);
+
+            // Restore progress bar UI
+            const submitBtn = document.querySelector('.submit-btn');
+            const progressBar = document.getElementById('modernProgressBar');
+            const progressDesc = document.getElementById('progressDescription');
+
+            if (submitBtn) submitBtn.style.display = 'none';
+            if (progressBar) progressBar.classList.add('active');
+            if (progressDesc) progressDesc.classList.add('active');
+
+            // Restore progress state from DB
+            if (activeTask.progress && activeTask.current_stage) {
+                this.updateModernProgress({
+                    stage: activeTask.current_stage,
+                    current: activeTask.progress.current || 0,
+                    total: activeTask.progress.total || 100,
+                    message: activeTask.progress.message || 'Продолжение парсинга...'
+                });
+            }
+
+            console.log('✅ Active task restored successfully');
+
+        } catch (error) {
+            console.warn('⚠️ Failed to restore active task:', error.message);
+            // Don't block app initialization if restore fails
+        }
+    }
+
     // View results modal
     viewResults(results) {
         const modal = document.getElementById('resultsModal');
