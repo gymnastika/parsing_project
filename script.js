@@ -4003,7 +4003,7 @@ class GymnastikaPlatform {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                    'Authorization': `Bearer ${await this.getAuthToken()}`
                 },
                 body: JSON.stringify({
                     userId: this.currentUser?.id,
@@ -4042,7 +4042,7 @@ class GymnastikaPlatform {
             await fetch(`/api/parsing-tasks/${this.currentTaskId}/running`, {
                 method: 'PATCH',
                 headers: {
-                    'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                    'Authorization': `Bearer ${await this.getAuthToken()}`
                 }
             });
 
@@ -4062,7 +4062,7 @@ class GymnastikaPlatform {
                         method: 'PATCH',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                            'Authorization': `Bearer ${await this.getAuthToken()}`
                         },
                         body: JSON.stringify({
                             results: results
@@ -4110,7 +4110,7 @@ class GymnastikaPlatform {
                         method: 'PATCH',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                            'Authorization': `Bearer ${await this.getAuthToken()}`
                         },
                         body: JSON.stringify({
                             error: 'No results found'
@@ -4132,7 +4132,7 @@ class GymnastikaPlatform {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                        'Authorization': `Bearer ${await this.getAuthToken()}`
                     },
                     body: JSON.stringify({
                         error: error.message
@@ -4165,7 +4165,7 @@ class GymnastikaPlatform {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                    'Authorization': `Bearer ${await this.getAuthToken()}`
                 },
                 body: JSON.stringify({
                     userId: this.currentUser?.id,
@@ -4204,7 +4204,7 @@ class GymnastikaPlatform {
             await fetch(`/api/parsing-tasks/${this.currentTaskId}/running`, {
                 method: 'PATCH',
                 headers: {
-                    'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                    'Authorization': `Bearer ${await this.getAuthToken()}`
                 }
             });
 
@@ -4223,7 +4223,7 @@ class GymnastikaPlatform {
                         method: 'PATCH',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                            'Authorization': `Bearer ${await this.getAuthToken()}`
                         },
                         body: JSON.stringify({
                             results: results
@@ -4256,7 +4256,7 @@ class GymnastikaPlatform {
                         method: 'PATCH',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                            'Authorization': `Bearer ${await this.getAuthToken()}`
                         },
                         body: JSON.stringify({
                             error: 'No data extracted from website'
@@ -4278,7 +4278,7 @@ class GymnastikaPlatform {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                        'Authorization': `Bearer ${await this.getAuthToken()}`
                     },
                     body: JSON.stringify({
                         error: error.message
@@ -4455,7 +4455,7 @@ class GymnastikaPlatform {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                    'Authorization': `Bearer ${await this.getAuthToken()}`
                 },
                 body: JSON.stringify({
                     stage: stageMapping[progress.stage] || progress.stage,
@@ -4478,7 +4478,7 @@ class GymnastikaPlatform {
             // Get active tasks (running or pending)
             const response = await fetch(`/api/parsing-tasks/active?userId=${this.currentUser.id}`, {
                 headers: {
-                    'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                    'Authorization': `Bearer ${await this.getAuthToken()}`
                 }
             });
 
