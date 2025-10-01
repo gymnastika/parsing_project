@@ -4084,13 +4084,17 @@ class GymnastikaPlatform {
             });
 
             // 5. Start pipeline with proper parameters
-            const results = await this.pipelineOrchestrator.executePipeline({
+            const pipelineResults = await this.pipelineOrchestrator.executePipeline({
                 taskName: params.taskName,
                 searchQuery: params.searchQuery,
                 resultCount: 10 // TESTING: Reduced from 50 to 10 for faster testing
             });
 
-            if (results && results.length > 0) {
+            // ✅ FIX: AI Search returns OBJECT with results array, URL parsing returns ARRAY directly
+            const results = pipelineResults?.results || pipelineResults;
+            const hasResults = Array.isArray(results) && results.length > 0;
+
+            if (hasResults) {
                 this.viewResults(results);
 
                 // 6. Mark task as completed in DB
