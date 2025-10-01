@@ -1092,14 +1092,18 @@ class GymnastikaPlatform {
                 }
             }
 
+            // Get Supabase auth user ID
+            const supabaseUserId = (await this.supabase.auth.getUser()).data.user?.id;
+            console.log('🔑 Supabase auth user ID for history:', supabaseUserId);
+
             // Get all parsing tasks from NEW persistent tasks table
             const { data: tasks, error } = await this.supabase
                 .from('parsing_tasks')
                 .select('*')
-                .eq('user_id', this.currentUser?.id)
+                .eq('user_id', supabaseUserId)
                 .order('created_at', { ascending: false });
 
-            console.log('📊 Background history sync result:', { data: tasks?.length, error: error });
+            console.log('📊 Background history sync result:', { data: tasks?.length, error: error, userId: supabaseUserId });
 
             if (error) throw error;
 
