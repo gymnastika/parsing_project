@@ -1372,7 +1372,25 @@ class GymnastikaPlatform {
 
             // Display results or appropriate error
             if (results && results.length > 0) {
-                this.showResultsModal(taskName, results);
+                // Normalize results to standard format
+                const normalizedResults = results.map(item => {
+                    // Check if it's URL Parsing format (has 'url' field)
+                    if (item.url) {
+                        return {
+                            organization_name: item.title || item.name || 'Не указано',
+                            email: item.email || item.contact?.email || '',
+                            phone: item.phone || item.contact?.phone || '',
+                            description: item.description || '',
+                            website: item.url || item.website || '',
+                            country: item.country || 'Не указана',
+                            parsing_timestamp: item.timestamp || item.created_at || new Date().toISOString()
+                        };
+                    }
+                    // Legacy format - already normalized
+                    return item;
+                });
+
+                this.showResultsModal(taskName, normalizedResults);
             } else if (taskFound) {
                 // Task exists in parsing_tasks but has no results
                 this.showError('Задача завершена без результатов или еще выполняется');
