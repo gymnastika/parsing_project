@@ -1658,6 +1658,10 @@ class GymnastikaPlatform {
     async syncContactsDataInBackground(container, cachedData) {
         try {
             console.log('🔄 Starting background sync for contacts data...');
+            console.log('📦 Initial cached data:', {
+                hasCachedData: !!cachedData,
+                cachedCount: cachedData?.length || 0
+            });
 
             // Wait for Supabase client to be ready
             if (!this.supabase) {
