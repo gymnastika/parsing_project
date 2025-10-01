@@ -570,6 +570,58 @@ app.post('/api/google/oauth/refresh', async (req, res) => {
     }
 });
 
+// ================================
+// GMAIL API PROXY ENDPOINTS
+// ================================
+
+// Gmail API - Send Email
+app.post('/api/gmail/send', async (req, res) => {
+    try {
+        console.log('📧 Proxying Gmail API send request...');
+
+        const { access_token, message } = req.body;
+
+        if (!access_token) {
+            return res.status(400).json({ error: 'Access token is required' });
+        }
+
+        if (!message || !message.raw) {
+            return res.status(400).json({ error: 'Message with raw MIME content is required' });
+        }
+
+        console.log('📮 Sending email via Gmail API...');
+
+        // Send email via Gmail API
+        const response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${access_token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                raw: message.raw
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.error('❌ Gmail API error:', data);
+            return res.status(response.status).json(data);
+        }
+
+        console.log('✅ Email sent successfully via Gmail API:', data.id);
+        res.json(data);
+
+    } catch (error) {
+        console.error('❌ Error in Gmail API proxy:', error);
+        res.status(500).json({
+            error: 'Internal server error during email send',
+            message: error.message
+        });
+    }
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
     res.json({
