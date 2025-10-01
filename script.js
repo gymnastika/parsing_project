@@ -5353,19 +5353,7 @@ class GymnastikaPlatform {
             }
 
             const results = finalResults.results;
-            const resultCount = results.length;
-
-            // DEBUG: Analyze results for duplicate detection
-            console.log('🔍 DEBUG: Notification mismatch analysis:', {
-                totalResults: results.length,
-                resultsWithEmail: results.filter(r => r.email).length,
-                resultsWithPhone: results.filter(r => r.phone).length,
-                finalCount: finalResults.finalCount,
-                scrapedCount: finalResults.scrapedCount,
-                sampleEmails: results.slice(0, 3).map(r => r.email)
-            });
-
-            console.log(`📊 Saving ${resultCount} results to database...`);
+            console.log(`📊 Saving ${results.length} results to database...`);
 
             // Save results to database
             await this.saveResultsToDatabase(task, results);
