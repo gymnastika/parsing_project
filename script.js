@@ -5390,7 +5390,7 @@ class GymnastikaPlatform {
     }
 
     /**
-     * Save parsing results to database
+     * Save parsing results to database with intelligent deduplication
      */
     async saveResultsToDatabase(task, results) {
         try {
@@ -5431,27 +5431,110 @@ class GymnastikaPlatform {
                 error_type: result.errorType || null
             }));
 
-            // Insert in batches of 100 to avoid Supabase limits
-            const batchSize = 100;
+            // 🔍 DEDUPLICATION: Check for existing emails in database
+            console.log('🔍 Checking for duplicate emails in existing database...');
+            const newEmails = records
+                .filter(r => r.email && r.email.trim() !== '')
+                .map(r => r.email.toLowerCase().trim());
+
+            console.log(`📧 Found ${newEmails.length} contacts with valid emails to check`);
+
+            if (newEmails.length === 0) {
+                console.log('⚠️ No contacts with emails to save - skipping deduplication');
+                return;
+            }
+
+            // Fetch existing emails from database in batches (Supabase has query limits)
+            const emailBatchSize = 1000; // Supabase can handle up to 1000 items in .in() filter
+            const existingEmailsSet = new Set();
+
+            for (let i = 0; i < newEmails.length; i += emailBatchSize) {
+                const emailBatch = newEmails.slice(i, i + emailBatchSize);
+
+                const { data: existingContacts, error } = await this.supabase
+                    .from('parsing_results')
+                    .select('email')
+                    .eq('user_id', supabaseUserId)
+                    .in('email', emailBatch);
+
+                if (error) {
+                    console.error('❌ Error checking existing emails:', error);
+                    throw error;
+                }
+
+                // Add all existing emails to Set (case-insensitive)
+                if (existingContacts && existingContacts.length > 0) {
+                    existingContacts.forEach(contact => {
+                        if (contact.email) {
+                            existingEmailsSet.add(contact.email.toLowerCase().trim());
+                        }
+                    });
+                }
+
+                console.log(`🔍 Batch ${Math.floor(i / emailBatchSize) + 1}: Found ${existingContacts?.length || 0} existing emails`);
+            }
+
+            console.log(`📊 Total existing emails in database: ${existingEmailsSet.size}`);
+
+            // Filter out records with duplicate emails
+            const uniqueRecords = records.filter(record => {
+                if (!record.email || record.email.trim() === '') {
+                    return false; // Skip contacts without email
+                }
+
+                const normalizedEmail = record.email.toLowerCase().trim();
+                const isDuplicate = existingEmailsSet.has(normalizedEmail);
+
+                if (isDuplicate) {
+                    console.log(`⛔ Skipping duplicate: ${record.email} (${record.organization_name})`);
+                }
+
+                return !isDuplicate;
+            });
+
+            const duplicatesCount = records.length - uniqueRecords.length;
+            console.log(`📊 Deduplication results: ${uniqueRecords.length} unique, ${duplicatesCount} duplicates filtered out`);
+
+            if (uniqueRecords.length === 0) {
+                console.log('⚠️ All contacts are duplicates - nothing to save');
+                this.showNotification(
+                    'Дубликаты отфильтрованы',
+                    `Все ${duplicatesCount} контактов уже существуют в базе данных`,
+                    'info'
+                );
+                return;
+            }
+
+            // Insert unique records in batches of 100 to avoid Supabase limits
+            const insertBatchSize = 100;
             let insertedCount = 0;
 
-            for (let i = 0; i < records.length; i += batchSize) {
-                const batch = records.slice(i, i + batchSize);
+            for (let i = 0; i < uniqueRecords.length; i += insertBatchSize) {
+                const batch = uniqueRecords.slice(i, i + insertBatchSize);
 
                 const { data, error } = await this.supabase
                     .from('parsing_results')
                     .insert(batch);
 
                 if (error) {
-                    console.error(`❌ Error inserting batch ${i / batchSize + 1}:`, error);
+                    console.error(`❌ Error inserting batch ${i / insertBatchSize + 1}:`, error);
                     throw error;
                 }
 
                 insertedCount += batch.length;
-                console.log(`✅ Inserted batch: ${insertedCount}/${records.length}`);
+                console.log(`✅ Inserted batch: ${insertedCount}/${uniqueRecords.length}`);
             }
 
-            console.log(`✅ Successfully saved ${insertedCount} results to database`);
+            console.log(`✅ Successfully saved ${insertedCount} unique results to database`);
+
+            // Show summary notification
+            if (duplicatesCount > 0) {
+                this.showNotification(
+                    'Данные сохранены',
+                    `Добавлено ${insertedCount} новых контактов. Отфильтровано ${duplicatesCount} дубликатов.`,
+                    'success'
+                );
+            }
 
         } catch (error) {
             console.error('❌ Error saving results to database:', error);
