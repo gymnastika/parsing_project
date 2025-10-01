@@ -517,7 +517,10 @@ class GymnastikaPlatform {
 
             // Bind Categories Management
             this.bindCategoriesManagement();
-            
+
+            // Bind Category Filters
+            this.bindCategoryFilters();
+
             // Bind email form validation
             this.bindEmailForm();
             
