@@ -3240,7 +3240,10 @@ class GymnastikaPlatform {
             aiSelect.innerHTML = optionsHTML;
             urlSelect.innerHTML = optionsHTML;
 
-            console.log(`✅ Loaded ${categories ? categories.length : 0} categories into selects`);
+            // Also update filter dropdowns
+            this.loadCategoriesIntoFilters(categories);
+
+            console.log(`✅ Loaded ${categories ? categories.length : 0} categories into selects and filters`);
 
         } catch (error) {
             console.error('❌ Error loading categories into selects:', error);
