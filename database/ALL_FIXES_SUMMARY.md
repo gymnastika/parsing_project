@@ -153,11 +153,10 @@ const { data: tasks } = await this.supabase
 const { data: legacyResults } = await this.supabase
     .from('parsing_results')
     .select('*')
-    .eq('user_id', supabaseUserId)  // Same UUID in all browsers!
-);
+    .eq('user_id', supabaseUserId);  // Same UUID in all browsers!
+```
 
-// Normalize from parsing_results schema
-freshContactsData = contactsWithInfo.map(contact => ({
+**Impact**: Data now visible from ANY browser/device with same account!
     organization_name: contact.organization_name,
     email: contact.email,
     description: contact.description,
