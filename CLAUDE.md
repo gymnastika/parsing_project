@@ -741,6 +741,68 @@ HSTS_ENABLED=true
 - Включить все security headers в production
 - Использовать HTTPS обязательно в production
 
+---
+
+## ⚠️ Critical Database Migrations
+
+### **REQUIRED: Category ID Migration** (October 1, 2025)
+
+#### **Problem**
+After implementing category filtering functionality, parsing results fail to save with **400 Bad Request** error:
+```
+❌ Error inserting batch 1: Object
+❌ Error saving results to database
+```
+
+**Root Cause**: Code attempts to save `category_id` field, but column doesn't exist in `parsing_results` table.
+
+#### **Solution: Execute SQL Migration**
+
+**Step 1**: Open Supabase SQL Editor (https://supabase.com/dashboard → SQL Editor)
+
+**Step 2**: Run migration from `database/ADD_CATEGORY_ID_COLUMN.sql`:
+
+```sql
+-- Add category_id column to parsing_results
+ALTER TABLE parsing_results ADD COLUMN category_id UUID;
+
+-- Add foreign key constraint
+ALTER TABLE parsing_results
+ADD CONSTRAINT parsing_results_category_id_fkey
+FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL;
+
+-- Add index for performance
+CREATE INDEX idx_parsing_results_category_id ON parsing_results(category_id);
+```
+
+**Step 3**: Verify migration:
+```sql
+SELECT column_name, data_type
+FROM information_schema.columns
+WHERE table_name = 'parsing_results' AND column_name = 'category_id';
+```
+
+#### **Migration Files**
+- 📜 **SQL Script**: `database/ADD_CATEGORY_ID_COLUMN.sql`
+- 📖 **Full Guide**: `database/CATEGORY_ID_MIGRATION_GUIDE.md`
+- 📝 **Quick Summary**: `database/CATEGORY_FIX_SUMMARY.md`
+
+#### **Post-Migration Testing**
+1. ✅ Run new parsing task with category selected
+2. ✅ Verify contacts appear in Contacts section
+3. ✅ Test category filtering functionality
+4. ✅ Test CSV export with category column
+
+#### **Impact**
+- ✅ Fixes 400 error when saving parsing results
+- ✅ Enables category filtering in History and Contacts
+- ✅ Adds category column to exported CSV files
+- ✅ Old records display as "Без категории" (No category)
+
+**Migration Status**: ⚠️ **REQUIRED FOR NEW INSTALLATIONS**
+
+---
+
 ### **Scaling Considerations**
 - **Memory**: Pipeline может использовать до 2GB для больших datasets
 - **Concurrency**: Apify plan определяет максимальную конкурентность
