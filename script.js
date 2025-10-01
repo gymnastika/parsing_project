@@ -4851,10 +4851,67 @@ class GymnastikaPlatform {
         if (progressStep1) progressStep1.classList.remove('active');
         if (progressStep2) progressStep2.classList.add('active');
 
+        // Bind "Back to Step 1" button
+        const backBtn = document.getElementById('backToStep1');
+        if (backBtn) {
+            // Remove existing listeners to prevent duplicates
+            const newBackBtn = backBtn.cloneNode(true);
+            backBtn.parentNode.replaceChild(newBackBtn, backBtn);
+            
+            // Add click handler
+            newBackBtn.addEventListener('click', () => {
+                console.log('🔙 Back to step 1 clicked');
+                this.backToEmailStep1();
+            });
+            console.log('✅ Back button bound successfully');
+        }
+
         // Load contacts for recipient selection
         this.loadEmailContacts();
 
         console.log('✅ Email step 2 activated');
+    }
+
+    // Go back to email step 1 (preserve all data)
+    backToEmailStep1() {
+        console.log('🔙 Returning to email step 1...');
+        
+        const step1 = document.getElementById('emailStep1');
+        const step2 = document.getElementById('emailStep2');
+        const progressStep1 = document.querySelector('[data-step="1"]');
+        const progressStep2 = document.querySelector('[data-step="2"]');
+
+        // Show step 1, hide step 2
+        if (step1) step1.classList.add('active');
+        if (step2) step2.classList.remove('active');
+        if (progressStep1) progressStep1.classList.add('active');
+        if (progressStep2) progressStep2.classList.remove('active');
+
+        // Restore form data from currentEmailCampaign
+        if (this.currentEmailCampaign) {
+            const emailSubject = document.getElementById('emailSubject');
+            const emailBody = document.getElementById('emailBody');
+
+            if (emailSubject && this.currentEmailCampaign.subject) {
+                emailSubject.value = this.currentEmailCampaign.subject;
+            }
+
+            if (emailBody && this.currentEmailCampaign.body) {
+                emailBody.value = this.currentEmailCampaign.body;
+            }
+
+            // Attachments are already in the UI, no need to re-render
+            console.log('✅ Form data restored:', {
+                subject: this.currentEmailCampaign.subject,
+                body: this.currentEmailCampaign.body?.substring(0, 50) + '...',
+                attachments: this.currentEmailCampaign.attachments?.length || 0
+            });
+        }
+
+        // Re-validate form to enable/disable Next button
+        this.validateEmailForm();
+
+        console.log('✅ Returned to email step 1');
     }
 
     // Load contacts for email recipients selection
