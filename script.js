@@ -4135,6 +4135,152 @@ class GymnastikaPlatform {
         }
     }
 
+    // Start URL parsing process (direct web scraping without AI/Google Maps)
+    async startUrlParsing(params) {
+        if (!this.pipelineOrchestrator) {
+            this.showError('Система не готова. Попробуйте позже.');
+            return;
+        }
+
+        try {
+            // 1. Create task in database BEFORE starting
+            const taskData = {
+                taskName: params.taskName,
+                websiteUrl: params.websiteUrl,
+                type: 'url-parsing'
+            };
+
+            const taskResponse = await fetch('/api/parsing-tasks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                },
+                body: JSON.stringify({
+                    userId: this.currentUser?.id,
+                    taskData: taskData
+                })
+            });
+
+            if (!taskResponse.ok) {
+                throw new Error('Failed to create task in database');
+            }
+
+            const createdTask = await taskResponse.json();
+            this.currentTaskId = createdTask.id;
+            console.log('✅ URL parsing task created in DB:', this.currentTaskId);
+
+            // 2. Hide submit button and show modern progress bar
+            const submitBtn = document.querySelector('.submit-btn');
+            const progressBar = document.getElementById('modernProgressBar');
+            const progressDesc = document.getElementById('progressDescription');
+
+            if (submitBtn) submitBtn.style.display = 'none';
+            if (progressBar) progressBar.classList.add('active');
+            if (progressDesc) progressDesc.classList.add('active');
+
+            // 3. Set up progress callback WITH database updates
+            this.pipelineOrchestrator.onProgressUpdate = async (progress) => {
+                this.updateModernProgress(progress);
+
+                // Save progress to database
+                if (this.currentTaskId) {
+                    await this.updateTaskProgress(progress);
+                }
+            };
+
+            // 4. Mark task as running in DB
+            await fetch(`/api/parsing-tasks/${this.currentTaskId}/running`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                }
+            });
+
+            // 5. Execute URL parsing (direct web scraping)
+            const results = await this.pipelineOrchestrator.executeUrlParsing({
+                websiteUrl: params.websiteUrl,
+                taskName: params.taskName
+            });
+
+            if (results && results.length > 0) {
+                this.viewResults(results);
+
+                // 6. Mark task as completed in DB
+                if (this.currentTaskId) {
+                    await fetch(`/api/parsing-tasks/${this.currentTaskId}/completed`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                        },
+                        body: JSON.stringify({
+                            results: results
+                        })
+                    });
+                }
+
+                // Invalidate cache
+                this.invalidateCache('parsing_results');
+                this.invalidateCache('task_history');
+                this.invalidateCache('contacts_data');
+
+                // Refresh database section if active
+                if (this.currentSection === 'database') {
+                    await this.loadDatabaseData();
+                }
+
+                // Show completion modal
+                this.showCompletionModal();
+
+                // Reset UI after short delay
+                setTimeout(() => {
+                    this.resetParsingUI();
+                    this.currentTaskId = null;
+                }, 2000);
+            } else {
+                // Mark task as failed in DB
+                if (this.currentTaskId) {
+                    await fetch(`/api/parsing-tasks/${this.currentTaskId}/failed`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                        },
+                        body: JSON.stringify({
+                            error: 'No data extracted from website'
+                        })
+                    });
+                    this.currentTaskId = null;
+                }
+
+                this.showError('Не удалось извлечь данные с сайта');
+                this.resetParsingUI();
+            }
+
+        } catch (error) {
+            console.error('❌ URL parsing error:', error);
+
+            // Mark task as failed in DB
+            if (this.currentTaskId) {
+                await fetch(`/api/parsing-tasks/${this.currentTaskId}/failed`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                    },
+                    body: JSON.stringify({
+                        error: error.message
+                    })
+                });
+                this.currentTaskId = null;
+            }
+
+            this.showError('Ошибка парсинга URL: ' + error.message);
+            this.resetParsingUI();
+        }
+    }
+
     // Show progress
     showProgress(message, percentage) {
         const progressContainer = document.getElementById('progressContainer');
