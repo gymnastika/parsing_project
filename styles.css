@@ -8834,16 +8834,16 @@ div.modal-overlay.results-modal .results-modal-content {
     z-index: 5;
 }
 
-/* First stage (0%) - offset by icon radius to stay within bounds */
+/* First stage (0%) - left edge aligned, no horizontal transform */
 .progress-stage[data-stage="0"] {
-    left: 17px;
-    transform: translateY(-50%);
+    left: 0%;
+    transform: translate(0, -50%);
 }
 
-/* Last stage (100%) - offset by icon radius from right edge */
+/* Last stage (100%) - right edge aligned, translate full width left */
 .progress-stage[data-stage="4"] {
-    left: calc(100% - 17px);
-    transform: translateY(-50%);
+    left: 100%;
+    transform: translate(-100%, -50%);
 }
 
 /* Middle stages - center horizontally with percentage positioning */
