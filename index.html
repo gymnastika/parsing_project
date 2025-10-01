@@ -277,6 +277,38 @@
                             </button>
                         </div>
 
+                        <!-- ✅ FIX: Modern Progress Bar moved OUTSIDE tabs to be visible from both AI Search and URL Parsing -->
+                        <!-- Modern Progress Bar -->
+                        <div class="modern-progress-container" id="modernProgressBar">
+                            <!-- Progress bar track -->
+                            <div class="progress-track">
+                                <!-- Fill bar (purple gradient) -->
+                                <div class="progress-fill" id="progressFill"></div>
+
+                                <!-- Stage circles -->
+                                <div class="progress-stage" data-stage="0">
+                                    <div class="stage-circle">🤖</div>
+                                </div>
+                                <div class="progress-stage" data-stage="1" style="left: 25%">
+                                    <div class="stage-circle">🔍</div>
+                                </div>
+                                <div class="progress-stage" data-stage="2" style="left: 50%">
+                                    <div class="stage-circle">✅</div>
+                                </div>
+                                <div class="progress-stage" data-stage="3" style="left: 75%">
+                                    <div class="stage-circle">🌐</div>
+                                </div>
+                                <div class="progress-stage" data-stage="4">
+                                    <div class="stage-circle">📊</div>
+                                </div>
+                            </div>
+
+                            <!-- Progress text -->
+                            <div class="progress-description" id="progressDescription">
+                                Нажмите "Начать парсинг" для запуска процесса
+                            </div>
+                        </div>
+
                         <!-- AI Search Tab Content -->
                         <div id="ai-search-content" class="tab-content active">
                             <form id="parsingForm" class="parsing-form">
