@@ -1360,7 +1360,6 @@ class GymnastikaPlatform {
                     results = legacyResults.map(item => ({
                         organization_name: item.organization_name || 'Неизвестная организация',
                         email: item.email || '',
-                        phone: item.phone || '',
                         description: item.description || '',
                         website: item.website || item.source_url || '',
                         country: item.country || 'Не определено',
