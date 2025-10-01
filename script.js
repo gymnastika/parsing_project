@@ -1352,6 +1352,8 @@ class GymnastikaPlatform {
 
                     if (resultsError) {
                         console.error('❌ Error querying parsing_results:', resultsError);
+                    } else {
+                        console.log(`📊 Query returned ${savedResults?.length || 0} results from parsing_results`);
                     }
 
                     if (!resultsError && savedResults && savedResults.length > 0) {
@@ -1364,9 +1366,10 @@ class GymnastikaPlatform {
                             country: item.country || 'Не определено',
                             parsing_timestamp: item.parsing_timestamp || item.created_at
                         }));
-                        console.log(`🔍 Found ${results.length} results from parsing_results table`);
+                        console.log(`✅ Found ${results.length} results from parsing_results table`);
                     } else {
                         // Fallback to final_results in parsing_tasks (old system)
+                        console.log(`⚠️ No results in parsing_results table, checking parsing_tasks.final_results...`);
                         let rawResults = task.final_results || [];
                         if (typeof rawResults === 'string') {
                             try {
@@ -1376,8 +1379,15 @@ class GymnastikaPlatform {
                                 rawResults = [];
                             }
                         }
-                        results = Array.isArray(rawResults) ? rawResults : [];
-                        console.log(`🔍 Found ${results.length} results from parsing_tasks.final_results (fallback)`);
+
+                        // Check if final_results has a nested structure
+                        if (rawResults && rawResults.results && Array.isArray(rawResults.results)) {
+                            results = rawResults.results;
+                            console.log(`🔍 Found ${results.length} results from parsing_tasks.final_results.results`);
+                        } else {
+                            results = Array.isArray(rawResults) ? rawResults : [];
+                            console.log(`🔍 Found ${results.length} results from parsing_tasks.final_results (fallback)`);
+                        }
                     }
                 }
             }
