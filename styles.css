@@ -8831,8 +8831,28 @@ div.modal-overlay.results-modal .results-modal-content {
 .progress-stage {
     position: absolute;
     top: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateY(-50%);
     z-index: 5;
+}
+
+/* First stage (0%) - no horizontal transform */
+.progress-stage[data-stage="0"] {
+    left: 0%;
+    transform: translateY(-50%);
+}
+
+/* Last stage (100%) - anchor to right */
+.progress-stage[data-stage="4"] {
+    left: auto;
+    right: 0%;
+    transform: translateY(-50%);
+}
+
+/* Middle stages - center horizontally */
+.progress-stage[data-stage="1"],
+.progress-stage[data-stage="2"],
+.progress-stage[data-stage="3"] {
+    transform: translate(-50%, -50%);
 }
 
 /* Stage Circle */
