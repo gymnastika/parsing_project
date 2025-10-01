@@ -6455,6 +6455,130 @@ button.category-add-button-v2:active {
     display: block;
 }
 
+/* Custom Emails Form */
+.custom-emails-form {
+    background: var(--bg-white);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.custom-emails-form .form-header {
+    margin-bottom: 1.5rem;
+}
+
+.custom-emails-form .form-header h4 {
+    color: var(--text-dark);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+}
+
+.custom-emails-form .form-description {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.custom-emails-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.custom-emails-form .form-group label {
+    display: block;
+    color: var(--text-dark);
+    font-weight: 500;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+}
+
+.custom-emails-textarea {
+    width: 100%;
+    min-height: 300px;
+    padding: 1rem;
+    border: 2px solid var(--border-light);
+    border-radius: 8px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-dark);
+    background: var(--bg-white);
+    resize: vertical;
+    transition: all 0.3s ease;
+}
+
+.custom-emails-textarea:focus {
+    outline: none;
+    border-color: var(--primary-purple);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.custom-emails-textarea::placeholder {
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+/* Email Validation Info */
+.email-validation-info {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--bg-light);
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+}
+
+.email-validation-info .info-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    color: var(--text-dark);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.email-validation-info .info-row:not(:last-child) {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.email-validation-info .info-row svg {
+    flex-shrink: 0;
+}
+
+.email-validation-info .stats-row {
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+    border-top: 2px solid var(--border-light);
+    font-weight: 600;
+}
+
+.email-validation-info .stats-row #customEmailsCount {
+    color: var(--primary-purple);
+    font-size: 1.05rem;
+}
+
+/* Custom Emails Actions */
+.custom-emails-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.custom-emails-actions .wizard-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 150px;
+    justify-content: center;
+}
+
+.custom-emails-actions .wizard-btn svg {
+    flex-shrink: 0;
+}
+
 /* Email Contacts Selection */
 .email-database-content {
     max-width: 100%;

@@ -875,14 +875,66 @@
 
                                             <!-- Custom Contacts Tab Content -->
                                             <div id="custom-contacts-content" class="email-tab-content">
-                                                <div class="placeholder-content">
-                                                    <div class="placeholder-icon">
-                                                        <svg viewBox="0 0 24 24" width="64" height="64" fill="#ccc">
-                                                            <path d="M19,13H5V11H19V13Z"/>
-                                                        </svg>
+                                                <div class="custom-emails-form">
+                                                    <div class="form-header">
+                                                        <h4>Собственная база email адресов</h4>
+                                                        <p class="form-description">Введите email адреса для рассылки (один адрес на строке)</p>
                                                     </div>
-                                                    <h4>Скоро будет доступно</h4>
-                                                    <p>Возможность загрузки собственной базы email адресов</p>
+
+                                                    <div class="form-group">
+                                                        <label for="customEmailsList">Email адреса</label>
+                                                        <textarea 
+                                                            id="customEmailsList" 
+                                                            name="customEmails"
+                                                            rows="12"
+                                                            placeholder="example1@email.com&#10;example2@email.com&#10;example3@email.com&#10;...&#10;&#10;Введите по одному email на строку"
+                                                            class="custom-emails-textarea"
+                                                        ></textarea>
+                                                        
+                                                        <!-- Validation Info -->
+                                                        <div class="email-validation-info">
+                                                            <div class="info-row">
+                                                                <svg viewBox="0 0 24 24" width="16" height="16" fill="#4285f4">
+                                                                    <path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"/>
+                                                                </svg>
+                                                                <span><strong>Формат:</strong> один email адрес на каждой строке</span>
+                                                            </div>
+                                                            <div class="info-row">
+                                                                <svg viewBox="0 0 24 24" width="16" height="16" fill="#34a853">
+                                                                    <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>
+                                                                </svg>
+                                                                <span>Пустые строки будут автоматически пропущены</span>
+                                                            </div>
+                                                            <div class="info-row">
+                                                                <svg viewBox="0 0 24 24" width="16" height="16" fill="#fbbc05">
+                                                                    <path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z"/>
+                                                                </svg>
+                                                                <span>Некорректные email адреса будут отфильтрованы</span>
+                                                            </div>
+                                                            <div class="info-row stats-row" id="customEmailsStats">
+                                                                <svg viewBox="0 0 24 24" width="16" height="16" fill="#7c3aed">
+                                                                    <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2M17,13H13V17H11V13H7V11H11V7H13V11H17V13Z"/>
+                                                                </svg>
+                                                                <span><strong>Всего email адресов:</strong> <span id="customEmailsCount">0</span></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Action Buttons -->
+                                                    <div class="custom-emails-actions">
+                                                        <button type="button" id="validateCustomEmails" class="wizard-btn wizard-btn-secondary">
+                                                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                                                <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2M17,13H13V17H11V13H7V11H11V7H13V11H17V13Z"/>
+                                                            </svg>
+                                                            Проверить адреса
+                                                        </button>
+                                                        <button type="button" id="clearCustomEmails" class="wizard-btn wizard-btn-secondary">
+                                                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                                                <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/>
+                                                            </svg>
+                                                            Очистить
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
 
