@@ -4919,6 +4919,187 @@ class GymnastikaPlatform {
         }
     }
 
+    /**
+     * Setup real-time subscription for parsing tasks
+     */
+    async setupTaskSubscription() {
+        try {
+            if (!this.currentUser) {
+                console.log('⚠️ No user session - skipping task subscription');
+                return;
+            }
+
+            console.log('📡 Setting up real-time task subscription...');
+
+            // Unsubscribe from previous subscription if exists
+            if (this.taskSubscription) {
+                await this.supabase.removeChannel(this.taskSubscription);
+                this.taskSubscription = null;
+            }
+
+            // Create new real-time subscription
+            this.taskSubscription = this.supabase
+                .channel(`parsing_tasks_${this.currentUser.id}`)
+                .on('postgres_changes', {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'parsing_tasks',
+                    filter: `user_id=eq.${this.currentUser.id}`
+                }, (payload) => {
+                    console.log('📨 Real-time task update received:', payload.new);
+                    this.handleTaskUpdate(payload.new);
+                })
+                .subscribe((status) => {
+                    console.log('📡 Task subscription status:', status);
+                });
+
+            console.log('✅ Real-time task subscription active');
+
+        } catch (error) {
+            console.error('❌ Failed to setup task subscription:', error);
+        }
+    }
+
+    /**
+     * Handle real-time task updates
+     */
+    async handleTaskUpdate(task) {
+        try {
+            console.log('🔄 Handling task update:', task.id, 'status:', task.status);
+
+            // Update progress bar for running tasks
+            if (task.status === 'running' && task.progress) {
+                this.updateModernProgress({
+                    stage: task.current_stage || 'processing',
+                    current: task.progress.current || 0,
+                    total: task.progress.total || 100,
+                    message: task.progress.message || 'Обработка...'
+                });
+            }
+
+            // Handle completed tasks
+            if (task.status === 'completed') {
+                await this.handleTaskCompletion(task);
+            }
+
+            // Handle failed tasks
+            if (task.status === 'failed') {
+                this.resetParsingUI();
+                this.showNotification('Парсинг не удался', task.error_message || 'Неизвестная ошибка', 'error');
+            }
+
+        } catch (error) {
+            console.error('❌ Error handling task update:', error);
+        }
+    }
+
+    /**
+     * Handle task completion
+     */
+    async handleTaskCompletion(task) {
+        try {
+            console.log('🎉 Task completed:', task.id);
+
+            // Reset UI
+            this.resetParsingUI();
+
+            // Get final results from task
+            const finalResults = task.final_results;
+
+            if (!finalResults || !finalResults.results) {
+                console.warn('⚠️ No results in completed task');
+                this.showNotification('Парсинг завершен', 'Результаты не найдены', 'warning');
+                return;
+            }
+
+            const results = finalResults.results;
+            const resultCount = results.length;
+
+            console.log(`📊 Saving ${resultCount} results to database...`);
+
+            // Save results to database
+            await this.saveResultsToDatabase(task.id, results);
+
+            // Show completion notification
+            this.showNotification(
+                'Парсинг завершен успешно!',
+                `Найдено ${resultCount} результатов с контактными данными`,
+                'success'
+            );
+
+            // Refresh UI tables
+            await this.loadTaskHistory();
+            await this.loadContacts();
+
+            console.log('✅ Task completion handled successfully');
+
+        } catch (error) {
+            console.error('❌ Error handling task completion:', error);
+            this.showNotification('Ошибка сохранения результатов', error.message, 'error');
+        }
+    }
+
+    /**
+     * Save parsing results to database
+     */
+    async saveResultsToDatabase(taskId, results) {
+        try {
+            if (!results || results.length === 0) {
+                console.log('⚠️ No results to save');
+                return;
+            }
+
+            console.log(`💾 Saving ${results.length} results for task ${taskId}...`);
+
+            // Prepare records for insertion
+            const records = results.map(result => ({
+                user_id: this.currentUser.id,
+                task_id: taskId,
+                organization_name: result.organizationName || result.name || 'Неизвестно',
+                email: result.email || null,
+                phone: result.phone || null,
+                website: result.website || null,
+                address: result.address || null,
+                description: result.description || null,
+                country: result.country || 'Не определено',
+                rating: result.rating || null,
+                reviews_count: result.reviewsCount || null,
+                categories: result.categories || null,
+                metadata: {
+                    relevanceScore: result.relevanceScore || 0,
+                    dataSource: result.dataSource || 'unknown',
+                    scrapedAt: result.scrapedAt || new Date().toISOString()
+                }
+            }));
+
+            // Insert in batches of 100 to avoid Supabase limits
+            const batchSize = 100;
+            let insertedCount = 0;
+
+            for (let i = 0; i < records.length; i += batchSize) {
+                const batch = records.slice(i, i + batchSize);
+
+                const { data, error } = await this.supabase
+                    .from('parsing_results')
+                    .insert(batch);
+
+                if (error) {
+                    console.error(`❌ Error inserting batch ${i / batchSize + 1}:`, error);
+                    throw error;
+                }
+
+                insertedCount += batch.length;
+                console.log(`✅ Inserted batch: ${insertedCount}/${records.length}`);
+            }
+
+            console.log(`✅ Successfully saved ${insertedCount} results to database`);
+
+        } catch (error) {
+            console.error('❌ Error saving results to database:', error);
+            throw error;
+        }
+    }
+
     // View results modal
     viewResults(results) {
         const modal = document.getElementById('resultsModal');
