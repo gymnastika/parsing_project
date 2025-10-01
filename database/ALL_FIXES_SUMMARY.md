@@ -157,10 +157,6 @@ const { data: legacyResults } = await this.supabase
 ```
 
 **Impact**: Data now visible from ANY browser/device with same account!
-    country: contact.country,
-    task_name: contact.task_name,
-    parsing_timestamp: contact.parsing_timestamp || contact.created_at
-}));
 
 // FALLBACK: parsing_tasks.final_results for old data
 if (freshContactsData.length === 0) {
