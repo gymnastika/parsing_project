@@ -373,12 +373,43 @@ const plan = await apifyClient.detectPlanType();
 // Таблицы
 - profiles: Пользовательские профили
 - parsing_results: Результаты парсинга
+- parsing_tasks: Задачи парсинга (с прогрессом и состоянием)
 - tasks: Фоновые задачи
 - contacts: Извлеченные контакты
 
 // RLS Policies
 - Пользователи видят только свои данные
 - Admins имеют полный доступ
+```
+
+### **Persistent Parsing System**
+```javascript
+// Архитектура персистентности
+1. Task Creation (перед стартом): ParsingTasksService.createTask()
+2. Progress Updates (во время): ParsingTasksService.updateProgress()
+3. State Restoration (при загрузке): checkAndRestoreActiveTask()
+4. Completion Tracking: markAsCompleted() / markAsFailed()
+
+// parsing_tasks schema
+{
+  id: UUID,
+  user_id: UUID,
+  task_name: string,
+  search_query: string,
+  status: 'pending' | 'running' | 'completed' | 'failed',
+  current_stage: string,
+  progress: { current, total, message },
+  results: JSON,
+  created_at: timestamp
+}
+
+// Endpoints
+POST   /api/parsing-tasks                    // Create task
+PATCH  /api/parsing-tasks/:id/running        // Mark as running
+PATCH  /api/parsing-tasks/:id/progress       // Update progress
+PATCH  /api/parsing-tasks/:id/completed      // Mark completed
+PATCH  /api/parsing-tasks/:id/failed         // Mark failed
+GET    /api/parsing-tasks/active?userId=...  // Get active tasks
 ```
 
 ### **Google APIs Ecosystem**
