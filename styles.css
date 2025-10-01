@@ -8794,10 +8794,10 @@ div.modal-overlay.results-modal .results-modal-content {
 
 @keyframes arrowBounce {
     0%, 100% {
-        transform: translateY(0);
+        transform: translateX(-50%) translateY(0);
     }
     50% {
-        transform: translateY(-6px);
+        transform: translateX(-50%) translateY(-6px);
     }
 }
 
