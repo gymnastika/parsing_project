@@ -2378,7 +2378,6 @@ class GymnastikaPlatform {
                     organization_name: organizationName,
                     email: email || null,
                     website: website || null,
-                    country: country || null,
                     description: description || null,
                     updated_at: new Date().toISOString()
                 })
