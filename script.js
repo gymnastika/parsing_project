@@ -1817,6 +1817,11 @@ class GymnastikaPlatform {
             }
 
             // Check if we need to update the UI
+            console.log('📊 Final data summary before UI update check:', {
+                cachedCount: cachedData?.length || 0,
+                freshCount: freshContactsData?.length || 0,
+                source: freshContactsData?.length > 0 ? 'parsing_results or fallback' : 'none'
+            });
             const needsUpdate = this.shouldUpdateContactsUI(cachedData, freshContactsData);
             
             if (needsUpdate) {
