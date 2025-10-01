@@ -157,10 +157,6 @@ const { data: legacyResults } = await this.supabase
 ```
 
 **Impact**: Data now visible from ANY browser/device with same account!
-    organization_name: contact.organization_name,
-    email: contact.email,
-    description: contact.description,
-    website: contact.website || contact.source_url,
     country: contact.country,
     task_name: contact.task_name,
     parsing_timestamp: contact.parsing_timestamp || contact.created_at
