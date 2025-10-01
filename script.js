@@ -1623,6 +1623,7 @@ class GymnastikaPlatform {
 
             // Get Supabase auth user ID
             const supabaseUserId = (await this.supabase.auth.getUser()).data.user?.id;
+            console.log('🔑 Supabase auth user ID for contacts query:', supabaseUserId);
 
             // Load contacts from parsing_results table (new system)
             console.log('🔍 Background sync loading contacts from parsing_results table...');
@@ -1633,7 +1634,7 @@ class GymnastikaPlatform {
                 .order('created_at', { ascending: false })
                 .limit(500);
 
-            console.log('📊 Background contacts sync result:', { data: contacts?.length, error: error });
+            console.log('📊 Background contacts sync result:', { data: contacts?.length, error: error, userId: supabaseUserId });
 
             if (error) throw error;
 
