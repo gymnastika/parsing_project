@@ -2283,6 +2283,45 @@ class GymnastikaPlatform {
         });
     }
 
+    // Bind URL parsing form
+    bindUrlParsingForm() {
+        const form = document.getElementById('urlParsingForm');
+        if (!form) return;
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const taskName = document.getElementById('url-task-name').value.trim();
+            const websiteUrl = document.getElementById('url-website').value.trim();
+            const categoryId = document.getElementById('urlCategorySelect')?.value;
+
+            if (!taskName) {
+                this.showError('Введите название задачи');
+                return;
+            }
+
+            if (!websiteUrl) {
+                this.showError('Введите URL сайта');
+                return;
+            }
+
+            if (!categoryId) {
+                this.showError('Выберите категорию перед началом парсинга');
+                return;
+            }
+
+            // Validate URL format
+            try {
+                new URL(websiteUrl);
+            } catch (error) {
+                this.showError('Введите корректный URL (например: https://example.com)');
+                return;
+            }
+
+            await this.startUrlParsing({ taskName, websiteUrl, categoryId });
+        });
+    }
+
     // Bind tab buttons (AI search and URL parsing)
     bindTabButtons() {
         const tabButtons = document.querySelectorAll('.tab-button');
