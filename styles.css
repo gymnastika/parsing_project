@@ -8807,9 +8807,9 @@ div.modal-overlay.results-modal .results-modal-content {
     z-index: 5;
 }
 
-/* First stage (0%) - left edge aligned with track padding compensation */
+/* First stage (0%) - left edge aligned at track start */
 .progress-stage[data-stage="0"] {
-    left: 5px;  /* Compensate for track padding */
+    left: 0%;
     transform: translateY(-50%);
 }
 
