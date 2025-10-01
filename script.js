@@ -1621,54 +1621,43 @@ class GymnastikaPlatform {
                 }
             }
 
-            // Load contacts from parsing_tasks.final_results
-            console.log('🔍 Background sync loading contacts from parsing_tasks...');
-            const { data: tasks, error } = await this.supabase
-                .from('parsing_tasks')
-                .select('final_results, task_name, created_at')
-                .eq('user_id', this.currentUser?.id)
-                .eq('status', 'completed')
-                .not('final_results', 'is', null)
-                .order('created_at', { ascending: false })
-                .limit(50);
+            // Get Supabase auth user ID
+            const supabaseUserId = (await this.supabase.auth.getUser()).data.user?.id;
 
-            console.log('📊 Background contacts sync result:', { data: tasks?.length, error: error });
+            // Load contacts from parsing_results table (new system)
+            console.log('🔍 Background sync loading contacts from parsing_results table...');
+            const { data: contacts, error } = await this.supabase
+                .from('parsing_results')
+                .select('*')
+                .eq('user_id', supabaseUserId)
+                .order('created_at', { ascending: false })
+                .limit(500);
+
+            console.log('📊 Background contacts sync result:', { data: contacts?.length, error: error });
 
             if (error) throw error;
 
             let freshContactsData = [];
-            if (tasks && tasks.length > 0) {
-                console.log(`🔄 Background sync found ${tasks.length} completed tasks`);
-
-                // Extract all contacts from final_results
-                const allContacts = [];
-                tasks.forEach(task => {
-                    if (task.final_results && Array.isArray(task.final_results)) {
-                        task.final_results.forEach(result => {
-                            allContacts.push({
-                                ...result,
-                                task_name: task.task_name,
-                                parsing_timestamp: task.created_at
-                            });
-                        });
-                    }
-                });
-
-                console.log(`📧 Background sync: extracted ${allContacts.length} total contacts`);
+            if (contacts && contacts.length > 0) {
+                console.log(`🔄 Background sync found ${contacts.length} contacts from parsing_results`);
 
                 // Filter contacts that have email
-                const contactsWithInfo = allContacts.filter(contact =>
+                const contactsWithInfo = contacts.filter(contact =>
                     (contact.email && contact.email.trim() !== '')
                 );
 
                 console.log(`📧 Background sync: ${contactsWithInfo.length} contacts with email`);
 
                 if (contactsWithInfo.length > 0) {
-                    // Normalize contact data
+                    // Normalize contact data from parsing_results schema
                     freshContactsData = contactsWithInfo.map(contact => ({
-                        ...contact,
-                        organization_name: contact.organizationName || contact.title || 'Неизвестная организация',
-                        description: contact.description || 'Описание отсутствует'
+                        organization_name: contact.organization_name || 'Неизвестная организация',
+                        email: contact.email || '',
+                        description: contact.description || 'Описание отсутствует',
+                        website: contact.website || contact.source_url || '',
+                        country: contact.country || 'Не определено',
+                        task_name: contact.task_name,
+                        parsing_timestamp: contact.parsing_timestamp || contact.created_at
                     }));
                 }
             }
