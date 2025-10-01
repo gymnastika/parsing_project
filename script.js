@@ -521,11 +521,8 @@ class GymnastikaPlatform {
             // Bind Category Filters
             this.bindCategoryFilters();
 
-            // Bind Export Contacts
-            this.bindExportContacts();
-
-            // Bind Export History
-            this.bindExportHistory();
+            // Bind Export Buttons (smart export with tab detection)
+            this.bindExportButtons();
 
             // Bind Add Contact Form
             this.bindAddContactForm();
@@ -3321,37 +3318,51 @@ class GymnastikaPlatform {
         }
     }
 
-    // Bind export contacts button
-    bindExportContacts() {
-        console.log('📥 Binding export contacts button...');
+    // Bind export history button
 
-        const exportBtn = document.getElementById('exportContactsBtn');
+    // Smart export - detects active tab and exports appropriate data
+    exportCurrentTab() {
+        console.log('🔍 Detecting active database tab for smart export...');
 
-        if (exportBtn) {
-            exportBtn.addEventListener('click', () => {
-                console.log('📥 Export contacts button clicked');
-                this.exportContactsToCSV();
-            });
-            console.log('✅ Export contacts button bound successfully');
+        // Find active database tab
+        const activeTab = document.querySelector('.database-tab.active');
+        const currentTab = activeTab?.dataset?.tab;
+
+        console.log(`📍 Active tab detected: ${currentTab}`);
+
+        if (currentTab === 'task-history') {
+            console.log('📥 Exporting task history...');
+            this.exportHistoryToCSV();
+        } else if (currentTab === 'contacts') {
+            console.log('📥 Exporting contacts...');
+            this.exportContactsToCSV();
         } else {
-            console.log('❌ Export contacts button not found');
+            console.warn('⚠️ Unknown tab, defaulting to history export');
+            this.exportHistoryToCSV();
         }
     }
 
-    // Bind export history button
-    bindExportHistory() {
-        console.log('📥 Binding export history button...');
+    bindExportButtons() {
+        console.log('📥 Binding export buttons with smart tab detection...');
 
-        const exportBtn = document.getElementById('exportBtn');
-
-        if (exportBtn) {
-            exportBtn.addEventListener('click', () => {
-                console.log('📥 Export history button clicked');
-                this.exportHistoryToCSV();
+        // Bind History Export Button
+        const exportHistoryBtn = document.getElementById('exportBtn');
+        if (exportHistoryBtn) {
+            exportHistoryBtn.addEventListener('click', () => {
+                console.log('📥 Export button clicked - detecting active tab...');
+                this.exportCurrentTab();
             });
-            console.log('✅ Export history button bound successfully');
-        } else {
-            console.log('❌ Export history button not found');
+            console.log('✅ Export history button bound');
+        }
+
+        // Bind Contacts Export Button  
+        const exportContactsBtn = document.getElementById('exportContactsBtn');
+        if (exportContactsBtn) {
+            exportContactsBtn.addEventListener('click', () => {
+                console.log('📥 Export contacts button clicked');
+                this.exportContactsToCSV();
+            });
+            console.log('✅ Export contacts button bound');
         }
     }
 
