@@ -294,10 +294,15 @@ Result: Only first 3 queries executed
   - Added deduplication logic with Set
   - Added hard limit of 3 queries
   - Enhanced logging for debugging
+- ✅ `lib/pipeline-orchestrator.js` (lines 304-370) **[SECOND FIX]**
+  - CLIENT-side version - same deduplication logic
+  - Was missing in initial fix (only server version was fixed)
+  - Now both client and server pipelines deduplicate correctly
 
 ### Unchanged Files (Working as Intended)
 - `lib/server-openai-client.js` - OpenAI Assistant integration (no changes needed)
 - `lib/server-apify-client.js` - Apify execution (works correctly with deduplicated input)
+- `lib/openai-client.js` - Client OpenAI integration (no changes needed)
 
 ### Related Documentation
 - `database/PIPELINE_CONCURRENCY_FIX.md` - Per-task orchestrator instances
