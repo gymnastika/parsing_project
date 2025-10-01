@@ -4996,7 +4996,7 @@ class GymnastikaPlatform {
 
         if (invalidEmails.length > 0) {
             console.log('Invalid email addresses:', invalidEmails);
-            this.showWarning(`Найдено ${validEmails.length} корректных адресов и ${invalidEmails.length} некорректных. Некорректные адреса будут проигнорированы.`);
+            this.showError(`Найдено ${validEmails.length} корректных адресов и ${invalidEmails.length} некорректных. Некорректные адреса будут проигнорированы.`);
         } else {
             this.showSuccess(`✅ Все ${validEmails.length} email адресов прошли проверку!`);
         }
@@ -5126,40 +5126,37 @@ class GymnastikaPlatform {
         const cancelBtn = document.getElementById('cancelSendBtn');
         const modal = document.getElementById('emailConfirmationModal');
 
-        // Confirm button
-        if (confirmBtn) {
-            const newConfirmBtn = confirmBtn.cloneNode(true);
-            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-
-            newConfirmBtn.addEventListener('click', async () => {
-                await this.sendEmailCampaign(recipients);
-                if (modal) modal.classList.remove('active');
-            });
+        if (!confirmBtn || !cancelBtn || !modal) {
+            console.error('❌ Modal buttons not found');
+            return;
         }
 
-        // Cancel button
-        if (cancelBtn) {
-            const newCancelBtn = cancelBtn.cloneNode(true);
-            cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+        // Remove old listeners by cloning buttons
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
 
-            newCancelBtn.addEventListener('click', () => {
-                if (modal) modal.classList.remove('active');
-                console.log('❌ Email sending cancelled');
-            });
-        }
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
 
-        // Close on overlay click
-        if (modal) {
-            const newModal = modal.cloneNode(true);
-            modal.parentNode.replaceChild(newModal, modal);
+        // Bind new listeners
+        newConfirmBtn.addEventListener('click', async () => {
+            console.log('✅ Confirm send button clicked');
+            await this.sendEmailCampaign(recipients);
+            modal.classList.remove('active');
+        });
 
-            newModal.addEventListener('click', (e) => {
-                if (e.target === newModal) {
-                    newModal.classList.remove('active');
-                    console.log('❌ Email sending cancelled (overlay click)');
-                }
-            });
-        }
+        newCancelBtn.addEventListener('click', () => {
+            console.log('❌ Cancel button clicked');
+            modal.classList.remove('active');
+        });
+
+        // Close on overlay click (don't clone modal - it has children)
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                console.log('❌ Overlay clicked, closing modal');
+                modal.classList.remove('active');
+            }
+        };
     }
 
     // Send email campaign via Gmail API

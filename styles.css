@@ -6555,7 +6555,7 @@ button.category-add-button-v2:active {
 .custom-emails-form .form-group label {
     display: block;
     color: var(--text-dark);
-    font-weight: 500;
+    font-weight: 400;  /* Changed from 500 to normal weight */
     font-size: 0.95rem;
     margin-bottom: 0.5rem;
 }
