@@ -3241,7 +3241,7 @@ class GymnastikaPlatform {
             }
 
             // CSV header
-            const headers = ['Категория', 'Название организации', 'Email', 'Описание', 'Веб-сайт', 'Страна', 'Дата добавления'];
+            const headers = ['Категория', 'Название организации', 'Email', 'Описание', 'Веб-сайт', 'Дата добавления'];
 
             // Helper function to escape CSV values
             const escapeCSV = (value) => {
