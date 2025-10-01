@@ -2377,8 +2377,7 @@ class GymnastikaPlatform {
                     organization_name: organizationName,
                     email: email || null,
                     website: website || null,
-                    description: description || null,
-                    updated_at: new Date().toISOString()
+                    description: description || null
                 })
                 .eq('id', contactId)
                 .select();
