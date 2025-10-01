@@ -8777,7 +8777,7 @@ div.modal-overlay.results-modal .results-modal-content {
     opacity: 1;
 }
 
-/* Progress Track (background bar with padding) */
+/* Progress Track (background bar) */
 .progress-track {
     position: relative;
     width: 100%;
@@ -8786,16 +8786,12 @@ div.modal-overlay.results-modal .results-modal-content {
     height: 40px;
     background: rgba(124, 58, 237, 0.1);
     border-radius: 100px;
-    padding: 0 5px;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
     overflow: visible;
 }
 
 /* Progress Fill (purple gradient fill) */
 .progress-fill {
-    height: 30px;
+    height: 40px;
     width: 0%;
     background: linear-gradient(90deg, #7C3AED 0%, #A78BFA 100%);
     border-radius: 100px;
