@@ -154,9 +154,6 @@ const { data: legacyResults } = await this.supabase
     .from('parsing_results')
     .select('*')
     .eq('user_id', supabaseUserId)  // Same UUID in all browsers!
-    .select('*')
-    .eq('user_id', supabaseUserId)  // ✅ Correct UUID
-    .limit(500);
 
 // Filter contacts with email
 const contactsWithInfo = contacts.filter(contact =>
