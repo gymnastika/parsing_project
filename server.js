@@ -984,6 +984,106 @@ app.post('/api/tasks/:taskId/cancel', async (req, res) => {
 });
 
 // ================================
+// PARSING TASKS ENDPOINTS (for persistent parsing)
+// ================================
+
+// Create new parsing task
+app.post('/api/parsing-tasks', async (req, res) => {
+    try {
+        const { userId, taskData } = req.body;
+
+        if (!userId || !taskData) {
+            return res.status(400).json({ error: 'userId and taskData are required' });
+        }
+
+        const task = await tasksService.createTask(userId, taskData);
+        console.log(`✅ Created parsing task ${task.id} for user ${userId}`);
+
+        res.json(task);
+    } catch (error) {
+        console.error('❌ Error creating parsing task:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Mark task as running
+app.patch('/api/parsing-tasks/:taskId/running', async (req, res) => {
+    try {
+        const { taskId } = req.params;
+        const task = await tasksService.markAsRunning(taskId);
+
+        console.log(`▶️ Marked task ${taskId} as running`);
+        res.json(task);
+    } catch (error) {
+        console.error(`❌ Error marking task ${taskId} as running:`, error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Update task progress
+app.patch('/api/parsing-tasks/:taskId/progress', async (req, res) => {
+    try {
+        const { taskId } = req.params;
+        const { stage, current, total, message } = req.body;
+
+        const task = await tasksService.updateProgress(taskId, stage, current, total, message);
+        res.json(task);
+    } catch (error) {
+        console.error(`❌ Error updating task ${taskId} progress:`, error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Mark task as completed
+app.patch('/api/parsing-tasks/:taskId/completed', async (req, res) => {
+    try {
+        const { taskId } = req.params;
+        const { results } = req.body;
+
+        const task = await tasksService.markAsCompleted(taskId, results);
+        console.log(`✅ Marked task ${taskId} as completed`);
+
+        res.json(task);
+    } catch (error) {
+        console.error(`❌ Error marking task ${taskId} as completed:`, error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Mark task as failed
+app.patch('/api/parsing-tasks/:taskId/failed', async (req, res) => {
+    try {
+        const { taskId } = req.params;
+        const { error: errorMessage } = req.body;
+
+        const task = await tasksService.markAsFailed(taskId, errorMessage);
+        console.log(`❌ Marked task ${taskId} as failed:`, errorMessage);
+
+        res.json(task);
+    } catch (error) {
+        console.error(`❌ Error marking task ${taskId} as failed:`, error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get active tasks for user
+app.get('/api/parsing-tasks/active', async (req, res) => {
+    try {
+        const { userId } = req.query;
+
+        if (!userId) {
+            return res.status(400).json({ error: 'userId is required' });
+        }
+
+        const activeTasks = await tasksService.getActiveTasks(userId);
+        res.json(activeTasks);
+    } catch (error) {
+        console.error('❌ Error getting active tasks:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ================================
 // UTILITY ENDPOINTS
 // ================================
 
