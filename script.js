@@ -5366,9 +5366,15 @@ class GymnastikaPlatform {
                 return;
             }
 
+            // Store all contacts for filtering
+            this.allEmailContacts = emailContacts;
+
             // Display contacts with checkboxes
             this.displayEmailContacts(emailContacts);
-            
+
+            // Load categories into filter
+            await this.loadEmailCategoriesFilter();
+
             // Hide loading, show selection
             if (loadingState) loadingState.classList.add('hidden');
             if (selectionState) selectionState.classList.remove('hidden');
