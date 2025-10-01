@@ -5099,10 +5099,23 @@ class GymnastikaPlatform {
         const isCustomTabActive = customTab?.classList.contains('active');
 
         if (isCustomTabActive) {
-            // Use custom emails
-            console.log('📧 Using custom emails:', this.customEmails?.length || 0);
+            // Use custom emails - parse from textarea if not validated yet
             if (this.customEmails && this.customEmails.length > 0) {
+                console.log('📧 Using validated custom emails:', this.customEmails.length);
                 recipients.push(...this.customEmails);
+            } else {
+                // Parse directly from textarea if validation not done
+                const customEmailsList = document.getElementById('customEmailsList');
+                if (customEmailsList && customEmailsList.value.trim()) {
+                    const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+                    const lines = customEmailsList.value.split('\n');
+                    const emails = lines
+                        .map(line => line.trim())
+                        .filter(line => line && emailRegex.test(line));
+                    
+                    console.log('📧 Parsed custom emails from textarea:', emails.length);
+                    recipients.push(...emails);
+                }
             }
         } else {
             // Use selected contacts from database
