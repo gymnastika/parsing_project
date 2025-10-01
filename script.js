@@ -1983,9 +1983,13 @@ class GymnastikaPlatform {
         
         // Create body
         const body = document.createElement('tbody');
+
+        // Load all categories once
+        const categories = this.getCacheData('categories_map') || [];
+
         sortedContacts.forEach(contact => {
             const row = document.createElement('tr');
-            
+
             // Format date like in screenshot (10.09.25)
             const dateObj = new Date(contact.parsing_timestamp || contact.created_at || new Date());
             const shortDate = dateObj.toLocaleDateString('ru-RU', {
@@ -1993,8 +1997,13 @@ class GymnastikaPlatform {
                 month: '2-digit',
                 year: '2-digit'
             });
-            
+
+            // Get category name
+            const category = categories.find(c => c.id === contact.category_id);
+            const categoryName = category ? category.name : (contact.category_id ? 'Неизвестно' : 'Без категории');
+
             row.innerHTML = `
+                <td class="category-cell">${categoryName}</td>
                 <td class="org-name-cell">${contact.organization_name || 'Неизвестная организация'}</td>
                 <td class="email-cell">
                     ${contact.email ? `<a href="mailto:${contact.email}" class="email-link">${contact.email}</a>` : 'Не определен'}
