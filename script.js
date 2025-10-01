@@ -4039,6 +4039,16 @@ class GymnastikaPlatform {
             return;
         }
 
+        // Ensure currentEmailCampaign is initialized
+        if (!this.currentEmailCampaign) {
+            console.log('⚠️ currentEmailCampaign was null in handleEmailAttachments, reinitializing...');
+            this.currentEmailCampaign = {
+                subject: '',
+                body: '',
+                attachments: []
+            };
+        }
+
         // Keep existing attachments - just add new ones
         console.log(`📎 Adding ${files.length} new files to existing ${this.currentEmailCampaign.attachments.length} files`);
         
