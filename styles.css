@@ -7969,6 +7969,17 @@ div.modal-overlay.results-modal .results-modal-content {
     border-radius: 6px;
 }
 
+/* Email filter controls */
+.email-filter-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.email-filter-controls .category-filter {
+    min-width: 200px;
+}
+
 /* Email contacts table */
 .email-contacts-table-container {
     background: var(--bg-white);
