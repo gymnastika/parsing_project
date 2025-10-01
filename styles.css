@@ -8778,29 +8778,6 @@ div.modal-overlay.results-modal .results-modal-content {
     opacity: 1;
 }
 
-/* Arrow Indicator (above progress bar) */
-.progress-arrow {
-    position: absolute;
-    top: -5px;
-    left: 0;  /* Will be positioned dynamically by JavaScript */
-    font-size: 1.8rem;
-    color: var(--primary-purple);
-    transition: left 1.2s ease-in-out, transform 1.2s ease-in-out;
-    animation: arrowBounce 1s ease-in-out infinite;
-    z-index: 10;
-    filter: drop-shadow(0 2px 6px rgba(124, 58, 237, 0.4));
-    transform: translateX(-50%);
-}
-
-@keyframes arrowBounce {
-    0%, 100% {
-        transform: translateX(-50%) translateY(0);
-    }
-    50% {
-        transform: translateX(-50%) translateY(-6px);
-    }
-}
-
 /* Progress Track (background bar with padding) */
 .progress-track {
     position: relative;
