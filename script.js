@@ -4366,49 +4366,10 @@ class GymnastikaPlatform {
 
             // 4. Real-time subscription will handle all progress updates from Background Worker
             // No need to execute pipeline here - Background Worker does everything!
-                setTimeout(() => {
-                    this.resetParsingUI();
-                    this.currentTaskId = null; // Clear task ID
-                }, 2000);
-            } else {
-                // 6. Mark task as failed in DB
-                if (this.currentTaskId) {
-                    await fetch(`/api/parsing-tasks/${this.currentTaskId}/failed`, {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${await this.getAuthToken()}`
-                        },
-                        body: JSON.stringify({
-                            error: 'No results found'
-                        })
-                    });
-                    this.currentTaskId = null;
-                }
-
-                this.showError('Результаты не найдены');
-                this.resetParsingUI();
-            }
 
         } catch (error) {
-            console.error('❌ Parsing error:', error);
-
-            // 6. Mark task as failed in DB
-            if (this.currentTaskId) {
-                await fetch(`/api/parsing-tasks/${this.currentTaskId}/failed`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${await this.getAuthToken()}`
-                    },
-                    body: JSON.stringify({
-                        error: error.message
-                    })
-                });
-                this.currentTaskId = null;
-            }
-
-            this.showError('Ошибка поиска: ' + error.message);
+            console.error('❌ Task creation error:', error);
+            this.showError('Ошибка создания задачи: ' + error.message);
             this.resetParsingUI();
         }
     }
