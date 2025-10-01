@@ -521,6 +521,9 @@ class GymnastikaPlatform {
             // Bind Category Filters
             this.bindCategoryFilters();
 
+            // Bind Export Contacts
+            this.bindExportContacts();
+
             // Bind email form validation
             this.bindEmailForm();
             
