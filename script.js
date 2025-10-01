@@ -3968,6 +3968,16 @@ class GymnastikaPlatform {
         
         console.log(`📧 Current values - Subject: "${subject}" (${subject.length} chars), Body: "${body.substring(0, 50)}..." (${body.length} chars)`);
 
+        // Ensure currentEmailCampaign is initialized
+        if (!this.currentEmailCampaign) {
+            console.log('⚠️ currentEmailCampaign was null, reinitializing...');
+            this.currentEmailCampaign = {
+                subject: '',
+                body: '',
+                attachments: []
+            };
+        }
+
         // Check if both required fields are filled
         const hasRequiredFields = subject.length > 0 && body.length > 0;
 
