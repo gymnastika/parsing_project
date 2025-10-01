@@ -8782,14 +8782,13 @@ div.modal-overlay.results-modal .results-modal-content {
 .progress-arrow {
     position: absolute;
     top: -5px;
-    left: 0%;
+    left: 17px;  /* Initial position matches stage 0 icon (offset by icon radius) */
     font-size: 1.8rem;
     color: var(--primary-purple);
     transition: left 1.2s ease-in-out;
     animation: arrowBounce 1s ease-in-out infinite;
     z-index: 10;
     filter: drop-shadow(0 2px 6px rgba(124, 58, 237, 0.4));
-    /* Arrow positioned to match stage circles - no transform needed for edges */
 }
 
 @keyframes arrowBounce {
