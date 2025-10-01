@@ -5355,14 +5355,24 @@ class GymnastikaPlatform {
             const results = finalResults.results;
             const resultCount = results.length;
 
+            // DEBUG: Check finalResults structure
+            console.log('🔍 DEBUG: finalResults structure:', {
+                hasResults: !!finalResults.results,
+                resultsLength: finalResults.results?.length,
+                hasFinalCount: !!finalResults.finalCount,
+                finalCount: finalResults.finalCount,
+                hasScrapedCount: !!finalResults.scrapedCount,
+                scrapedCount: finalResults.scrapedCount,
+                allKeys: Object.keys(finalResults)
+            });
+
             // DEBUG: Check for duplicate results by website
             const websites = results.map(r => r.website || r.url);
             const uniqueWebsites = new Set(websites);
-            console.log('🔍 DEBUG: Results analysis:', {
+            console.log('🔍 DEBUG: Results array analysis:', {
                 totalResults: results.length,
                 uniqueWebsites: uniqueWebsites.size,
-                hasDuplicates: results.length !== uniqueWebsites.size,
-                sampleResult: results[0]
+                hasDuplicates: results.length !== uniqueWebsites.size
             });
 
             console.log(`📊 Saving ${resultCount} results to database...`);
