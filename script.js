@@ -1716,6 +1716,7 @@ class GymnastikaPlatform {
 
             let freshContactsData = [];
             if (contacts && contacts.length > 0) {
+                console.log(`✅ Found ${contacts.length} records in parsing_results`);
                 console.log(`🔄 Background sync found ${contacts.length} contacts from parsing_results`);
 
                 // Filter contacts that have email
