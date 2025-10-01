@@ -5421,6 +5421,91 @@ class GymnastikaPlatform {
         this.bindEmailContactsSelection();
     }
 
+    // Load categories into email filter dropdown
+    async loadEmailCategoriesFilter() {
+        console.log('📂 Loading categories for email filter...');
+
+        const categoryFilter = document.getElementById('emailCategoryFilter');
+        if (!categoryFilter) return;
+
+        try {
+            // Get categories from cache or database
+            let categories = this.getCacheData('categories');
+
+            if (!categories) {
+                // Load from database
+                const { data, error } = await this.supabase
+                    .from('categories')
+                    .select('*')
+                    .eq('user_id', this.currentUser?.id || (await this.supabase.auth.getUser()).data.user?.id)
+                    .order('name');
+
+                if (error) throw error;
+
+                categories = data || [];
+                this.setCacheData('categories', categories);
+            }
+
+            // Clear existing options except "Все категории"
+            categoryFilter.innerHTML = '<option value="">Все категории</option>';
+
+            // Add categories to dropdown
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.id;
+                option.textContent = category.name;
+                categoryFilter.appendChild(option);
+            });
+
+            // Bind change event for filtering
+            categoryFilter.addEventListener('change', () => {
+                this.filterEmailContactsByCategory();
+            });
+
+            console.log(`✅ Loaded ${categories.length} categories into email filter`);
+
+        } catch (error) {
+            console.error('❌ Failed to load categories for email filter:', error);
+        }
+    }
+
+    // Filter email contacts by selected category
+    filterEmailContactsByCategory() {
+        const categoryFilter = document.getElementById('emailCategoryFilter');
+        const selectedCategoryId = categoryFilter?.value;
+
+        console.log('🔍 Filtering email contacts by category:', selectedCategoryId || 'All');
+
+        if (!this.allEmailContacts) {
+            console.warn('⚠️ No email contacts loaded for filtering');
+            return;
+        }
+
+        let filteredContacts = this.allEmailContacts;
+
+        if (selectedCategoryId) {
+            // Filter by category
+            filteredContacts = this.allEmailContacts.filter(contact =>
+                contact.category_id === selectedCategoryId
+            );
+        }
+
+        console.log(`📧 Displaying ${filteredContacts.length} contacts (filtered from ${this.allEmailContacts.length})`);
+
+        // Re-display contacts with filter applied
+        this.displayEmailContacts(filteredContacts);
+
+        // Update select all checkbox state
+        const selectAllCheckbox = document.getElementById('selectAllEmailContacts');
+        if (selectAllCheckbox) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        }
+
+        // Update selected count
+        this.updateSelectedEmailContacts();
+    }
+
     // Bind email contacts selection logic
     bindEmailContactsSelection() {
         console.log('📧 Binding email contacts selection...');
