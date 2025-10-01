@@ -121,11 +121,39 @@ const contactsWithInfo = contacts.filter(contact =>
 
 ### 4. Cross-Browser Fix 🔴 CRITICAL (`script.js:1095-1135`)
 
-**Changed**:
+**BEFORE (Broken - caused cross-browser data loss)**:
 ```javascript
-// PRIMARY: Load from parsing_results
-const { data: contacts } = await this.supabase
-    .from('parsing_results')  // ✅ New table
+// ❌ WRONG: Used this.currentUser?.id (browser-specific)
+const { data: tasks } = await this.supabase
+    .from('parsing_tasks')
+    .select('*')
+    .eq('user_id', this.currentUser?.id)  // Different in each browser!
+    .order('created_at', { ascending: false });
+
+// Legacy results - same problem
+const { data: legacyResults } = await this.supabase
+    .from('parsing_results')
+    .select('*')
+    .eq('user_id', this.currentUser?.id)  // Different in each browser!
+```
+
+**AFTER (Fixed - works everywhere)**:
+```javascript
+// ✅ CORRECT: Use Supabase auth UUID (same everywhere)
+const supabaseUserId = (await this.supabase.auth.getUser()).data.user?.id;
+console.log('🔑 Supabase auth user ID for history:', supabaseUserId);
+
+const { data: tasks } = await this.supabase
+    .from('parsing_tasks')
+    .select('*')
+    .eq('user_id', supabaseUserId)  // Same UUID in all browsers!
+    .order('created_at', { ascending: false });
+
+// Legacy results - fixed
+const { data: legacyResults } = await this.supabase
+    .from('parsing_results')
+    .select('*')
+    .eq('user_id', supabaseUserId)  // Same UUID in all browsers!
     .select('*')
     .eq('user_id', supabaseUserId)  // ✅ Correct UUID
     .limit(500);
