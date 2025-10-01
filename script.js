@@ -1112,6 +1112,54 @@ class GymnastikaPlatform {
                 console.log(`📊 Background sync transformed into ${freshHistoryData.length} history items`);
             }
 
+            // ✅ FIX: Load legacy data from parsing_results table for backward compatibility
+            try {
+                const { data: legacyResults, error: legacyError } = await this.supabase
+                    .from('parsing_results')
+                    .select('*')
+                    .eq('user_id', this.currentUser?.id)
+                    .order('parsing_timestamp', { ascending: false });
+
+                if (!legacyError && legacyResults && legacyResults.length > 0) {
+                    console.log(`📜 Found ${legacyResults.length} legacy results from parsing_results table`);
+
+                    // Group legacy results by task_name
+                    const legacyGroups = legacyResults.reduce((acc, item) => {
+                        const key = item.task_name || 'Без названия';
+                        if (!acc[key]) {
+                            acc[key] = [];
+                        }
+                        acc[key].push(item);
+                        return acc;
+                    }, {});
+
+                    // Transform legacy groups to history format
+                    const legacyHistory = Object.entries(legacyGroups).map(([name, items]) => ({
+                        task_name: name,
+                        search_query: items[0].original_query || 'Не указан',
+                        total_results: items.length,
+                        contacts_count: items.filter(i => i.email || i.phone).length,
+                        latest_date: items[0].parsing_timestamp || items[0].created_at,
+                        task_type: 'ai-search',  // Legacy data was from AI Search
+                        status: 'completed',
+                        task_id: null  // No task_id for legacy data
+                    }));
+
+                    console.log(`📜 Transformed ${legacyHistory.length} legacy task groups`);
+
+                    // Merge with current tasks
+                    freshHistoryData = [...freshHistoryData, ...legacyHistory];
+
+                    // Sort all by date (most recent first)
+                    freshHistoryData.sort((a, b) => new Date(b.latest_date) - new Date(a.latest_date));
+
+                    console.log(`✅ Total history items: ${freshHistoryData.length} (including legacy)`);
+                }
+            } catch (legacyError) {
+                console.warn('⚠️ Failed to load legacy data:', legacyError.message);
+                // Continue with current tasks only if legacy load fails
+            }
+
             // Check if we need to update the UI
             const needsUpdate = this.shouldUpdateHistoryUI(cachedData, freshHistoryData);
             
