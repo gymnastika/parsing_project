@@ -1318,34 +1318,59 @@ class GymnastikaPlatform {
             let results = [];
             let taskFound = false;
 
-            // Case 1: TaskId provided - load from parsing_tasks ONLY
+            // Case 1: TaskId provided - load from parsing_results table first, then fallback to parsing_tasks
             if (taskId) {
-                const { data: tasks, error } = await this.supabase
+                // First, get the task to find task_name
+                const { data: tasks, error: taskError } = await this.supabase
                     .from('parsing_tasks')
                     .select('*')
                     .eq('id', taskId)
                     .limit(1);
 
-                if (error) {
-                    console.error('❌ Error fetching task:', error);
+                if (taskError) {
+                    console.error('❌ Error fetching task:', taskError);
                     this.showError('Ошибка загрузки результатов');
                     return;
                 }
 
                 if (tasks && tasks.length > 0) {
                     taskFound = true;
-                    // Parse final_results if it's a JSON string
-                    let rawResults = tasks[0].final_results || [];
-                    if (typeof rawResults === 'string') {
-                        try {
-                            rawResults = JSON.parse(rawResults);
-                        } catch (e) {
-                            console.error('❌ Failed to parse final_results:', e);
-                            rawResults = [];
+                    const task = tasks[0];
+                    const taskData = task.task_data || {};
+                    const taskNameForQuery = taskData.taskName || task.task_name || taskName;
+
+                    // Try to load from parsing_results table (new system)
+                    const { data: savedResults, error: resultsError } = await this.supabase
+                        .from('parsing_results')
+                        .select('*')
+                        .eq('task_name', taskNameForQuery)
+                        .eq('user_id', this.currentUser?.id);
+
+                    if (!resultsError && savedResults && savedResults.length > 0) {
+                        // Transform from parsing_results table format
+                        results = savedResults.map(item => ({
+                            organization_name: item.organization_name || 'Неизвестная организация',
+                            email: item.email || '',
+                            description: item.description || '',
+                            website: item.website || item.source_url || '',
+                            country: item.country || 'Не определено',
+                            parsing_timestamp: item.parsing_timestamp || item.created_at
+                        }));
+                        console.log(`🔍 Found ${results.length} results from parsing_results table`);
+                    } else {
+                        // Fallback to final_results in parsing_tasks (old system)
+                        let rawResults = task.final_results || [];
+                        if (typeof rawResults === 'string') {
+                            try {
+                                rawResults = JSON.parse(rawResults);
+                            } catch (e) {
+                                console.error('❌ Failed to parse final_results:', e);
+                                rawResults = [];
+                            }
                         }
+                        results = Array.isArray(rawResults) ? rawResults : [];
+                        console.log(`🔍 Found ${results.length} results from parsing_tasks.final_results (fallback)`);
                     }
-                    results = Array.isArray(rawResults) ? rawResults : [];
-                    console.log(`🔍 Found task from parsing_tasks with ${results.length} results`);
                 }
             }
 
