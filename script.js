@@ -1378,7 +1378,6 @@ class GymnastikaPlatform {
                         return {
                             organization_name: item.title || item.name || 'Не указано',
                             email: item.email || item.contact?.email || '',
-                            phone: item.phone || item.contact?.phone || '',
                             description: item.description || '',
                             website: item.url || item.website || '',
                             country: item.country || 'Не указана',
