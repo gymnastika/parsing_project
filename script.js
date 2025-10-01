@@ -2017,7 +2017,6 @@ class GymnastikaPlatform {
                 <th>Email</th>
                 <th>Описание</th>
                 <th>Веб-сайт</th>
-                <th>Страна</th>
                 <th class="sortable-header" data-sort="date">
                     Дата добавления
                     <span class="sort-icon" id="dateSortIcon">${this.dateSortDirection === 'desc' ? '↓' : '↑'}</span>
