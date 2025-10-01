@@ -5082,6 +5082,10 @@ class GymnastikaPlatform {
         try {
             console.log('🔄 Handling task update:', task.id, 'status:', task.status);
 
+            // Track current task ID and status for polling
+            this.currentTaskId = task.id;
+            this.lastTaskStatus = task.status;
+
             // Update progress bar for running tasks
             if (task.status === 'running' && task.progress) {
                 this.updateModernProgress({
@@ -5095,12 +5099,20 @@ class GymnastikaPlatform {
             // Handle completed tasks
             if (task.status === 'completed') {
                 await this.handleTaskCompletion(task);
+                // Stop polling after completion
+                this.stopTaskPolling();
+                this.currentTaskId = null;
+                this.lastTaskStatus = null;
             }
 
             // Handle failed tasks
             if (task.status === 'failed') {
                 this.resetParsingUI();
                 this.showNotification('Парсинг не удался', task.error_message || 'Неизвестная ошибка', 'error');
+                // Stop polling after failure
+                this.stopTaskPolling();
+                this.currentTaskId = null;
+                this.lastTaskStatus = null;
             }
 
         } catch (error) {
