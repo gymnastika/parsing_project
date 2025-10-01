@@ -25,6 +25,12 @@
 - **Fix**: Load from `parsing_results` + fallback to `parsing_tasks` for old data
 - **Documentation**: `database/CONTACTS_SECTION_FIX.md`
 
+### Issue 4: Cross-Browser Data Not Visible 🔴 CRITICAL ✅
+- **Problem**: Same account shows NO DATA in different browser/device
+- **Root Cause**: Saved with Supabase UUID, loaded with `this.currentUser?.id` (browser-specific)
+- **Fix**: All queries now use Supabase auth UUID consistently
+- **Documentation**: `database/CROSS_BROWSER_DATA_FIX.md`
+
 ---
 
 ## 🔧 All Code Changes
