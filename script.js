@@ -4316,18 +4316,14 @@ class GymnastikaPlatform {
 
     // Start parsing process
     async startParsing(params) {
-        if (!this.pipelineOrchestrator) {
-            this.showError('Система не готова. Попробуйте позже.');
-            return;
-        }
-
         try {
-            // 1. Create task in database BEFORE starting
+            // 1. Create task in database with 'pending' status
             const taskData = {
                 taskName: params.taskName,
                 searchQuery: params.searchQuery,
                 websiteUrl: params.websiteUrl,
-                type: 'ai-search'
+                type: params.websiteUrl ? 'url-parsing' : 'ai-search',
+                categoryId: params.categoryId
             };
 
             const taskResponse = await fetch('/api/parsing-tasks', {
@@ -4347,19 +4343,11 @@ class GymnastikaPlatform {
             }
 
             const createdTask = await taskResponse.json();
-            this.currentTaskId = createdTask.id; // Store task ID for progress updates
-            console.log('✅ Task created in DB:', this.currentTaskId);
+            this.currentTaskId = createdTask.id;
+            console.log('✅ Task created with status: pending, ID:', this.currentTaskId);
+            console.log('🔄 Background Worker will pick up and execute this task automatically');
 
-            // 2. IMMEDIATELY mark task as running to prevent Background Worker from picking it up
-            await fetch(`/api/parsing-tasks/${this.currentTaskId}/running`, {
-                method: 'PATCH',
-                headers: {
-                    'Authorization': `Bearer ${await this.getAuthToken()}`
-                }
-            });
-            console.log('🔒 Task marked as RUNNING - Background Worker will skip it');
-
-            // 3. Hide submit button and show modern progress bar
+            // 2. Show visual feedback - task sent to server
             const submitBtn = document.querySelector('.submit-btn');
             const progressBar = document.getElementById('modernProgressBar');
             const progressDesc = document.getElementById('progressDescription');
@@ -4368,73 +4356,16 @@ class GymnastikaPlatform {
             if (progressBar) progressBar.classList.add('active');
             if (progressDesc) progressDesc.classList.add('active');
 
-            // 4. Set up progress callback WITH database updates
-            this.pipelineOrchestrator.onProgressUpdate = async (progress) => {
-                this.updateModernProgress(progress);
-
-                // Save progress to database
-                if (this.currentTaskId) {
-                    await this.updateTaskProgress(progress);
-                }
-            };
-
-            // 5. Start pipeline with proper parameters
-            const pipelineResults = await this.pipelineOrchestrator.executePipeline({
-                taskName: params.taskName,
-                searchQuery: params.searchQuery,
-                resultCount: 10 // TESTING: Reduced from 50 to 10 for faster testing
+            // 3. Show initial progress state - waiting for Background Worker
+            this.updateModernProgress({
+                stage: 'initializing',
+                current: 0,
+                total: 100,
+                message: 'Задача отправлена на сервер... Ожидание Background Worker...'
             });
 
-            // ✅ FIX: AI Search returns OBJECT with results array, URL parsing returns ARRAY directly
-            const results = pipelineResults?.results || pipelineResults;
-            const hasResults = Array.isArray(results) && results.length > 0;
-
-            if (hasResults) {
-                this.viewResults(results);
-
-                // 6. Mark task as completed in DB
-                if (this.currentTaskId) {
-                    await fetch(`/api/parsing-tasks/${this.currentTaskId}/completed`, {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${await this.getAuthToken()}`
-                        },
-                        body: JSON.stringify({
-                            results: results
-                        })
-                    });
-                }
-
-                // Invalidate cache since new parsing results have been added
-                this.invalidateCache('parsing_results');
-                this.invalidateCache('task_history');
-                this.invalidateCache('contacts_data');
-                console.log('🔄 Cache invalidated after parsing completion (parsing_results + task_history + contacts_data)');
-
-                // Refresh database section if active
-                if (this.currentSection === 'database') {
-                    await this.loadDatabaseData();
-                }
-
-                // Send Telegram notification about parsing completion
-                const notificationData = {
-                    originalQuery: params.searchQuery,
-                    taskName: params.taskName,
-                    queryInfo: pipelineResults.queryInfo || {},
-                    results: results,
-                    timestamp: pipelineResults.timestamp || new Date().toISOString()
-                };
-
-                // Send notification asynchronously (don't block modal display)
-                this.sendTelegramParsingNotification(notificationData).catch(error => {
-                    console.log('🔕 Telegram notification failed (non-blocking):', error.message);
-                });
-
-                // Show completion modal
-                this.showCompletionModal();
-
-                // Reset UI after short delay to show completion state
+            // 4. Real-time subscription will handle all progress updates from Background Worker
+            // No need to execute pipeline here - Background Worker does everything!
                 setTimeout(() => {
                     this.resetParsingUI();
                     this.currentTaskId = null; // Clear task ID
