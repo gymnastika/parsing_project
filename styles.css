@@ -8807,10 +8807,10 @@ div.modal-overlay.results-modal .results-modal-content {
     z-index: 5;
 }
 
-/* First stage (0%) - left edge aligned at track start */
+/* First stage (0%) - center aligned at track start */
 .progress-stage[data-stage="0"] {
     left: 0%;
-    transform: translateY(-50%);
+    transform: translate(-50%, -50%);
 }
 
 /* Last stage (100%) - right edge aligned, translate full width left */
