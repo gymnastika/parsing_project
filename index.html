@@ -530,26 +530,36 @@
                                 <div class="contact-form">
                                     <h3>Добавить новый контакт</h3>
                                     <form id="addContactForm" class="parsing-form">
-                                        <div class="form-group">
-                                            <input type="text" id="orgName" name="orgName" placeholder="Введите название организации" required>
-                                            <label for="orgName">Название организации</label>
-                                        </div>
+                                        <!-- Required Fields -->
                                         <div class="form-group">
                                             <input type="email" id="contactEmail" name="contactEmail" placeholder="contact@example.com" required>
-                                            <label for="contactEmail">Email</label>
+                                            <label for="contactEmail">Email <span style="color: #EF4444;">*</span></label>
                                         </div>
+
+                                        <div class="form-group">
+                                            <select id="contactCategory" name="contactCategory" required>
+                                                <option value="">Выберите категорию</option>
+                                                <!-- Categories will be loaded dynamically -->
+                                            </select>
+                                            <label for="contactCategory">Категория <span style="color: #EF4444;">*</span></label>
+                                        </div>
+
+                                        <!-- Optional Fields -->
+                                        <div class="form-group">
+                                            <input type="text" id="orgName" name="orgName" placeholder="Введите название организации">
+                                            <label for="orgName">Название организации</label>
+                                        </div>
+
                                         <div class="form-group">
                                             <textarea id="contactDescription" name="contactDescription" placeholder="Краткое описание организации" rows="3"></textarea>
                                             <label for="contactDescription">Описание</label>
                                         </div>
+
                                         <div class="form-group">
                                             <input type="url" id="contactWebsite" name="contactWebsite" placeholder="https://example.com">
-                                            <label for="contactWebsite">Ссылка на сайт</label>
+                                            <label for="contactWebsite">Веб-сайт</label>
                                         </div>
-                                        <div class="form-group">
-                                            <input type="text" id="contactCountry" name="contactCountry" placeholder="ОАЭ" required>
-                                            <label for="contactCountry">Страна</label>
-                                        </div>
+
                                         <div class="form-actions">
                                             <button type="submit" class="submit-btn">Сохранить контакт</button>
                                             <button type="button" id="cancelContactBtn" class="cancel-btn">Отмена</button>
