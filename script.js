@@ -2142,7 +2142,8 @@ class GymnastikaPlatform {
     // Show results modal - displays parsing results in modal window
     showResultsModal(taskName, results) {
         console.log('🖼️ Showing results modal for task:', taskName, 'with', results.length, 'results');
-        
+        console.log('📊 First result structure:', results[0]);
+
         // Remove any existing modal
         const existingModal = document.querySelector('.results-modal');
         if (existingModal) existingModal.remove();
