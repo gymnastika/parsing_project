@@ -8835,10 +8835,10 @@ div.modal-overlay.results-modal .results-modal-content {
     z-index: 5;
 }
 
-/* First stage (0%) - left edge aligned, no horizontal transform */
+/* First stage (0%) - left edge aligned with track padding compensation */
 .progress-stage[data-stage="0"] {
-    left: 0%;
-    transform: translate(0, -50%);
+    left: 5px;  /* Compensate for track padding */
+    transform: translateY(-50%);
 }
 
 /* Last stage (100%) - right edge aligned, translate full width left */
