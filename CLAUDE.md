@@ -772,6 +772,10 @@ claudedocs/
 ├── test-pipeline.html        # Pipeline тестирование
 ├── test-form.html           # UI компоненты
 └── tests/                   # Автоматизированные тесты
+
+database/
+├── create_parsing_tasks_table.sql  # SQL миграция для persistent parsing
+└── README.md                       # Инструкции по database setup
 ```
 
 ## 🎯 Development Patterns
