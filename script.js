@@ -3137,6 +3137,36 @@ class GymnastikaPlatform {
         console.log('✅ Categories management bound');
     }
 
+    // Bind category filter dropdowns
+    bindCategoryFilters() {
+        console.log('🔽 Binding category filters...');
+
+        const historyFilter = document.getElementById('historyCategoryFilter');
+        const contactsFilter = document.getElementById('contactsCategoryFilter');
+
+        if (historyFilter) {
+            historyFilter.addEventListener('change', (e) => {
+                const categoryId = e.target.value;
+                console.log(`📋 History filter changed to category: ${categoryId || 'All'}`);
+                this.filterHistoryByCategory(categoryId);
+            });
+        } else {
+            console.log('❌ History category filter not found');
+        }
+
+        if (contactsFilter) {
+            contactsFilter.addEventListener('change', (e) => {
+                const categoryId = e.target.value;
+                console.log(`📋 Contacts filter changed to category: ${categoryId || 'All'}`);
+                this.filterContactsByCategory(categoryId);
+            });
+        } else {
+            console.log('❌ Contacts category filter not found');
+        }
+
+        console.log('✅ Category filters bound successfully');
+    }
+
     // Load categories from database
     async loadCategories() {
         console.log('📋 Loading categories...');
