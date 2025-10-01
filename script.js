@@ -4872,6 +4872,9 @@ class GymnastikaPlatform {
         // Bind email tab switching
         this.bindEmailTabSwitching();
 
+        // Bind Send button
+        this.bindSendEmailButton();
+
         // Load contacts for recipient selection
         this.loadEmailContacts();
 
