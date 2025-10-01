@@ -5352,30 +5352,20 @@ class GymnastikaPlatform {
                 return;
             }
 
-            // Get all results
-            const allResults = finalResults.results;
-
-            // Filter: keep only results with contact info (email or phone)
-            const results = allResults.filter(r => r.email || r.phone);
+            const results = finalResults.results;
             const resultCount = results.length;
 
-            console.log(`📊 Results filtering:`, {
-                total: allResults.length,
-                withContacts: results.length,
-                filtered: allResults.length - results.length
+            // DEBUG: Analyze results for duplicate detection
+            console.log('🔍 DEBUG: Notification mismatch analysis:', {
+                totalResults: results.length,
+                resultsWithEmail: results.filter(r => r.email).length,
+                resultsWithPhone: results.filter(r => r.phone).length,
+                finalCount: finalResults.finalCount,
+                scrapedCount: finalResults.scrapedCount,
+                sampleEmails: results.slice(0, 3).map(r => r.email)
             });
 
-            if (results.length === 0) {
-                console.warn('⚠️ No results with contact information');
-                this.showNotification(
-                    'Парсинг завершен',
-                    `Найдено ${allResults.length} организаций, но ни у одной нет контактных данных`,
-                    'warning'
-                );
-                return;
-            }
-
-            console.log(`📊 Saving ${resultCount} results with contacts to database...`);
+            console.log(`📊 Saving ${resultCount} results to database...`);
 
             // Save results to database
             await this.saveResultsToDatabase(task, results);
