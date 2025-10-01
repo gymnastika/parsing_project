@@ -1343,11 +1343,16 @@ class GymnastikaPlatform {
                     const supabaseUserId = (await this.supabase.auth.getUser()).data.user?.id;
 
                     // Try to load from parsing_results table (new system)
+                    console.log(`🔍 Looking for results: task_name="${taskNameForQuery}", user_id="${supabaseUserId}"`);
                     const { data: savedResults, error: resultsError } = await this.supabase
                         .from('parsing_results')
                         .select('*')
                         .eq('task_name', taskNameForQuery)
                         .eq('user_id', supabaseUserId);
+
+                    if (resultsError) {
+                        console.error('❌ Error querying parsing_results:', resultsError);
+                    }
 
                     if (!resultsError && savedResults && savedResults.length > 0) {
                         // Transform from parsing_results table format
