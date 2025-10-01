@@ -4365,6 +4365,12 @@ class GymnastikaPlatform {
     updateModernProgress(progress) {
         if (!progress || !progress.stage) return;
 
+        // Calculate percentage from progress.current and progress.total
+        const percentage = progress.total > 0
+            ? Math.round((progress.current / progress.total) * 100)
+            : 0;
+
+        // Stage mapping for visual indicators (AI Search has more stages)
         const stageMapping = {
             'initializing': 0,
             'query-generation': 1,
@@ -4376,14 +4382,7 @@ class GymnastikaPlatform {
             'complete': 4
         };
 
-        const stageToPercent = {
-            0: 0,     // initializing
-            1: 25,    // query-generation
-            2: 50,    // apify-search/aggregation
-            3: 75,    // web-scraping/filtering/relevance
-            4: 100    // complete
-        };
-
+        // Description for each stage
         const stageDescriptions = {
             'initializing': 'Инициализация парсинга...',
             'query-generation': 'Генерация поисковых запросов с помощью ИИ',
@@ -4396,17 +4395,17 @@ class GymnastikaPlatform {
         };
 
         const stageIndex = stageMapping[progress.stage];
+        const fill = document.getElementById('progressFill');
+        const stages = document.querySelectorAll('.progress-stage');
+        const progressDesc = document.getElementById('progressDescription');
+
+        // Update fill width using calculated percentage
+        if (fill) {
+            fill.style.width = percentage + '%';
+        }
+
+        // Update stage states if we have stage mapping
         if (stageIndex !== undefined) {
-            const fill = document.getElementById('progressFill');
-            const stages = document.querySelectorAll('.progress-stage');
-            const progressDesc = document.getElementById('progressDescription');
-
-            // Update fill width
-            if (fill) {
-                fill.style.width = stageToPercent[stageIndex] + '%';
-            }
-
-            // Update stage states
             stages.forEach((stage, idx) => {
                 stage.classList.remove('active', 'completed');
                 if (idx < stageIndex) {
@@ -4415,15 +4414,15 @@ class GymnastikaPlatform {
                     stage.classList.add('active');
                 }
             });
-
-            // Update progress description text
-            if (progressDesc) {
-                const description = stageDescriptions[progress.stage] || progress.message || 'Обработка...';
-                progressDesc.textContent = description;
-            }
-
-            console.log(`📊 Progress: ${progress.stage} → Stage ${stageIndex} (${stageToPercent[stageIndex]}%)`);
         }
+
+        // Update progress description text
+        if (progressDesc) {
+            const description = stageDescriptions[progress.stage] || progress.message || 'Обработка...';
+            progressDesc.textContent = description;
+        }
+
+        console.log(`📊 Progress: ${progress.stage} → ${percentage}% (${progress.current}/${progress.total})`);
     }
 
     // Reset parsing UI after completion or error
