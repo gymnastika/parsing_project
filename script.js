@@ -5355,6 +5355,16 @@ class GymnastikaPlatform {
             const results = finalResults.results;
             const resultCount = results.length;
 
+            // DEBUG: Check for duplicate results by website
+            const websites = results.map(r => r.website || r.url);
+            const uniqueWebsites = new Set(websites);
+            console.log('🔍 DEBUG: Results analysis:', {
+                totalResults: results.length,
+                uniqueWebsites: uniqueWebsites.size,
+                hasDuplicates: results.length !== uniqueWebsites.size,
+                sampleResult: results[0]
+            });
+
             console.log(`📊 Saving ${resultCount} results to database...`);
 
             // Save results to database
