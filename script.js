@@ -4924,16 +4924,36 @@ class GymnastikaPlatform {
     }
 
     /**
-     * Setup real-time subscription for parsing tasks
+     * Setup hybrid task monitoring (real-time + polling fallback)
      */
-    async setupTaskSubscription() {
+    async setupTaskMonitoring() {
         try {
             if (!this.currentUser) {
-                console.log('⚠️ No user session - skipping task subscription');
+                console.log('⚠️ No user session - skipping task monitoring');
                 return;
             }
 
-            console.log('📡 Setting up real-time task subscription...');
+            console.log('🔄 Setting up hybrid task monitoring system...');
+
+            // Try to setup real-time subscription (if Realtime is enabled in Supabase)
+            await this.setupTaskSubscription();
+
+            // Always start polling fallback (works even if Realtime is disabled)
+            this.startTaskPolling();
+
+            console.log('✅ Hybrid task monitoring active (real-time + polling)');
+
+        } catch (error) {
+            console.error('❌ Failed to setup task monitoring:', error);
+        }
+    }
+
+    /**
+     * Setup real-time subscription for parsing tasks (if enabled)
+     */
+    async setupTaskSubscription() {
+        try {
+            console.log('📡 Attempting real-time subscription setup...');
 
             // Unsubscribe from previous subscription if exists
             if (this.taskSubscription) {
@@ -4950,17 +4970,108 @@ class GymnastikaPlatform {
                     table: 'parsing_tasks',
                     filter: `user_id=eq.${this.currentUser.id}`
                 }, (payload) => {
-                    console.log('📨 Real-time task update received:', payload.new);
+                    console.log('📨 Real-time event received:', payload.new);
                     this.handleTaskUpdate(payload.new);
                 })
                 .subscribe((status) => {
-                    console.log('📡 Task subscription status:', status);
+                    if (status === 'SUBSCRIBED') {
+                        console.log('✅ Real-time subscription active');
+                    } else if (status === 'CLOSED') {
+                        console.warn('⚠️ Real-time subscription closed, relying on polling');
+                    } else {
+                        console.log('📡 Subscription status:', status);
+                    }
                 });
 
-            console.log('✅ Real-time task subscription active');
-
         } catch (error) {
-            console.error('❌ Failed to setup task subscription:', error);
+            console.warn('⚠️ Real-time subscription failed, relying on polling:', error.message);
+        }
+    }
+
+    /**
+     * Start polling fallback for task updates
+     */
+    startTaskPolling() {
+        // Stop existing polling if any
+        if (this.taskPollingInterval) {
+            clearInterval(this.taskPollingInterval);
+            this.taskPollingInterval = null;
+        }
+
+        console.log('🔄 Starting polling fallback (checks every 5 seconds)');
+
+        // Poll every 5 seconds
+        this.taskPollingInterval = setInterval(async () => {
+            try {
+                // Only poll if there's an active task
+                if (!this.currentTaskId) {
+                    // Check if there's an active task we don't know about
+                    await this.checkForActiveTask();
+                    return;
+                }
+
+                // Fetch current task status
+                const response = await fetch(`/api/parsing-tasks/${this.currentTaskId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${await this.getAuthToken()}`
+                    }
+                });
+
+                if (!response.ok) {
+                    console.warn(`⚠️ Task ${this.currentTaskId} not found, stopping polling`);
+                    this.currentTaskId = null;
+                    this.lastTaskStatus = null;
+                    return;
+                }
+
+                const task = await response.json();
+
+                // Check if status changed
+                if (task.status !== this.lastTaskStatus) {
+                    console.log(`🔔 Polling detected status change: ${this.lastTaskStatus} → ${task.status}`);
+                    await this.handleTaskUpdate(task);
+                }
+
+            } catch (error) {
+                console.error('❌ Polling error:', error.message);
+            }
+        }, 5000);
+    }
+
+    /**
+     * Check for active tasks that we might not know about
+     */
+    async checkForActiveTask() {
+        try {
+            const response = await fetch(`/api/parsing-tasks/active?userId=${this.currentUser.id}`, {
+                headers: {
+                    'Authorization': `Bearer ${await this.getAuthToken()}`
+                }
+            });
+
+            if (!response.ok) return;
+
+            const activeTasks = await response.json();
+            if (activeTasks && activeTasks.length > 0) {
+                const task = activeTasks[0];
+                console.log(`🔍 Polling found active task: ${task.id}`);
+                this.currentTaskId = task.id;
+                this.lastTaskStatus = task.status;
+                await this.handleTaskUpdate(task);
+            }
+        } catch (error) {
+            // Silent fail - this is just a background check
+        }
+    }
+
+    /**
+     * Stop task polling
+     */
+    stopTaskPolling() {
+        if (this.taskPollingInterval) {
+            console.log('⏸️ Stopping task polling');
+            clearInterval(this.taskPollingInterval);
+            this.taskPollingInterval = null;
         }
     }
 
