@@ -5589,32 +5589,61 @@ class GymnastikaPlatform {
     }
 
     // Show notification using toast system
-    showNotification(message, type) {
+    showNotification(titleOrMessage, messageOrType, type) {
+        // Handle both 2-param and 3-param calls
+        let title, message, notificationType;
+
+        if (type !== undefined) {
+            // 3 parameters: title, message, type
+            title = titleOrMessage;
+            message = messageOrType;
+            notificationType = type;
+        } else {
+            // 2 parameters: message, type
+            title = null;
+            message = titleOrMessage;
+            notificationType = messageOrType;
+        }
+
         // Get toast container
         const toastContainer = document.getElementById('toast-container');
         if (!toastContainer) return;
 
         // Create toast element
         const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        
+        toast.className = `toast ${notificationType}`;
+
         // Create toast content with icon
         const toastContent = document.createElement('div');
         toastContent.className = 'toast-content';
-        
+
         // Create icon
         const icon = document.createElement('div');
         icon.className = 'toast-icon';
-        icon.textContent = type === 'success' ? '✓' : type === 'error' ? '✕' : 'i';
-        
-        // Create message
+        icon.textContent = notificationType === 'success' ? '✓' : notificationType === 'error' ? '✕' : 'i';
+
+        // Create message container
+        const messageContainer = document.createElement('div');
+        messageContainer.className = 'toast-message';
+
+        // Add title if provided
+        if (title) {
+            const titleEl = document.createElement('div');
+            titleEl.className = 'toast-title';
+            titleEl.style.fontWeight = 'bold';
+            titleEl.style.marginBottom = '4px';
+            titleEl.textContent = title;
+            messageContainer.appendChild(titleEl);
+        }
+
+        // Add message
         const messageEl = document.createElement('div');
-        messageEl.className = 'toast-message';
         messageEl.textContent = message;
-        
+        messageContainer.appendChild(messageEl);
+
         // Assemble toast
         toastContent.appendChild(icon);
-        toastContent.appendChild(messageEl);
+        toastContent.appendChild(messageContainer);
         toast.appendChild(toastContent);
         
         // Add to container
