@@ -13,6 +13,9 @@ class GymnastikaPlatform {
         this.navigationBound = false;
         this.adaptiveLoader = null;
         this.taskSubscription = null; // Real-time subscription for parsing tasks
+        this.taskPollingInterval = null; // Polling fallback for task updates
+        this.currentTaskId = null; // Currently active task ID
+        this.lastTaskStatus = null; // Last known task status for polling
         this.settings = {
             telegramBotToken: localStorage.getItem('telegramBotToken') || ''
         };
