@@ -92,6 +92,17 @@ class GymnastikaPlatform {
         }
     }
 
+    // Get auth token helper method
+    async getAuthToken() {
+        try {
+            const { data: { session } } = await this.supabase.auth.getSession();
+            return session?.access_token || null;
+        } catch (error) {
+            console.error('❌ Failed to get auth token:', error);
+            return null;
+        }
+    }
+
     // Check authentication status
     async checkAuth() {
         try {
@@ -108,11 +119,11 @@ class GymnastikaPlatform {
 
             this.supabase = window.SupabaseClient.getClient();
             console.log('✅ Supabase client ready, checking session...');
-            
+
             try {
                 const { data: { session }, error } = await this.supabase.auth.getSession();
                 console.log('🔍 Session check result:', { session: !!session, error });
-                
+
                 if (error) {
                     console.error('❌ Auth check error:', error);
                     return false;
@@ -124,7 +135,7 @@ class GymnastikaPlatform {
                     await this.loadUserProfile(session.user);
                     return true;
                 }
-                
+
                 console.log('ℹ️ User is not authenticated');
                 return false;
             } catch (sessionError) {
