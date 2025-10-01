@@ -4072,30 +4072,12 @@ class GymnastikaPlatform {
         const stageIndex = stageMapping[progress.stage];
         if (stageIndex !== undefined) {
             const fill = document.getElementById('progressFill');
-            const arrow = document.getElementById('progressArrow');
             const stages = document.querySelectorAll('.progress-stage');
             const progressDesc = document.getElementById('progressDescription');
 
             // Update fill width
             if (fill) {
                 fill.style.width = stageToPercent[stageIndex] + '%';
-            }
-
-            // Update arrow position - dynamically calculate center of target icon
-            if (arrow && stages[stageIndex]) {
-                const targetStage = stages[stageIndex];
-                const track = targetStage.parentElement;
-
-                // Get actual positions
-                const stageRect = targetStage.getBoundingClientRect();
-                const trackRect = track.getBoundingClientRect();
-
-                // Calculate icon center relative to track left edge
-                const iconCenterX = stageRect.left + (stageRect.width / 2) - trackRect.left;
-
-                // Position arrow at icon center with translateX(-50%) to center the arrow itself
-                arrow.style.left = iconCenterX + 'px';
-                arrow.style.transform = 'translateX(-50%)';
             }
 
             // Update stage states
