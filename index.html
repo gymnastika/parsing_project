@@ -1127,6 +1127,44 @@
         </div>
     </div>
 
+    <!-- Email Send Confirmation Modal -->
+    <div id="emailConfirmationModal" class="modal-overlay">
+        <div class="completion-modal email-confirmation-modal">
+            <div class="completion-icon">📧</div>
+            <h3>Подтверждение отправки</h3>
+            <div class="email-confirmation-details">
+                <div class="confirmation-info">
+                    <div class="info-item">
+                        <strong>Получатели:</strong>
+                        <span id="confirmRecipientCount">0</span> адресов
+                    </div>
+                    <div class="info-item">
+                        <strong>Тема письма:</strong>
+                        <span id="confirmSubject">-</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Прикрепленные файлы:</strong>
+                        <span id="confirmAttachments">Нет</span>
+                    </div>
+                </div>
+                <div class="confirmation-warning">
+                    ⚠️ Письмо будет отправлено всем выбранным получателям. Это действие нельзя отменить.
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button id="confirmSendBtn" class="wizard-btn wizard-btn-primary">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                        <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z"/>
+                    </svg>
+                    Подтвердить отправку
+                </button>
+                <button id="cancelSendBtn" class="wizard-btn wizard-btn-secondary">
+                    Отмена
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Categories Management Modal -->
     <div id="categoriesModal" class="modal-overlay">
         <div class="categories-modal">
