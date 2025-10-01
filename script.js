@@ -1842,18 +1842,27 @@ class GymnastikaPlatform {
 
     // Check if contacts UI needs to be updated
     shouldUpdateContactsUI(cachedData, freshData) {
+        console.log('🔍 shouldUpdateContactsUI called:', {
+            cachedCount: cachedData?.length || 0,
+            freshCount: freshData?.length || 0
+        });
+
         // If no cached data, always update
         if (!cachedData || cachedData.length === 0) {
+            console.log('✅ shouldUpdateContactsUI: No cache → UPDATE (return true)');
             return true;
         }
 
         // If no fresh data, update if cache had data
         if (!freshData || freshData.length === 0) {
-            return cachedData.length > 0;
+            const result = cachedData.length > 0;
+            console.log(`⚠️ shouldUpdateContactsUI: No fresh data → ${result ? 'UPDATE' : 'SKIP'} (return ${result})`);
+            return result;
         }
 
         // Check if array lengths differ
         if (cachedData.length !== freshData.length) {
+            console.log(`✅ shouldUpdateContactsUI: Length differs (${cachedData.length} vs ${freshData.length}) → UPDATE (return true)`);
             return true;
         }
 
@@ -1861,14 +1870,16 @@ class GymnastikaPlatform {
         if (cachedData.length > 0 && freshData.length > 0) {
             const cachedFirst = cachedData[0];
             const freshFirst = freshData[0];
-            
-            if (cachedFirst.id !== freshFirst.id || 
+
+            if (cachedFirst.id !== freshFirst.id ||
                 cachedFirst.organization_name !== freshFirst.organization_name ||
                 cachedFirst.email !== freshFirst.email) {
+                console.log('✅ shouldUpdateContactsUI: First item differs → UPDATE (return true)');
                 return true;
             }
         }
 
+        console.log('⏭️ shouldUpdateContactsUI: Data identical → SKIP (return false)');
         return false;
     }
 
