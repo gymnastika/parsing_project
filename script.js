@@ -1324,7 +1324,17 @@ class GymnastikaPlatform {
 
                 if (tasks && tasks.length > 0) {
                     taskFound = true;
-                    results = tasks[0].final_results || [];
+                    // Parse final_results if it's a JSON string
+                    let rawResults = tasks[0].final_results || [];
+                    if (typeof rawResults === 'string') {
+                        try {
+                            rawResults = JSON.parse(rawResults);
+                        } catch (e) {
+                            console.error('❌ Failed to parse final_results:', e);
+                            rawResults = [];
+                        }
+                    }
+                    results = Array.isArray(rawResults) ? rawResults : [];
                     console.log(`🔍 Found task from parsing_tasks with ${results.length} results`);
                 }
             }
