@@ -8810,7 +8810,7 @@ div.modal-overlay.results-modal .results-modal-content {
 /* First stage (0%) - center aligned at track start */
 .progress-stage[data-stage="0"] {
     left: 0%;
-    transform: translate(-50%, -50%);
+    transform: translate(0, -50%);
 }
 
 /* Last stage (100%) - right edge aligned, translate full width left */
