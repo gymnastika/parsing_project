@@ -524,6 +524,9 @@ class GymnastikaPlatform {
             // Bind Export Contacts
             this.bindExportContacts();
 
+            // Bind Export History
+            this.bindExportHistory();
+
             // Bind Add Contact Form
             this.bindAddContactForm();
 
@@ -3204,6 +3207,120 @@ class GymnastikaPlatform {
         }
     }
 
+    // Export task history to CSV file - matches History table display
+    exportHistoryToCSV() {
+        console.log('📥 Exporting task history to CSV...');
+
+        try {
+            // Get categories from cache
+            const categories = this.getCacheData('categories_map') || [];
+
+            // Get history from cache
+            let history = this.getCacheData('task_history') || [];
+
+            if (history.length === 0) {
+                alert('Нет истории задач для экспорта. Пожалуйста, выполните парсинг сначала.');
+                return;
+            }
+
+            // Check if category filter is active
+            const filterSelect = document.getElementById('historyCategoryFilter');
+            const categoryId = filterSelect ? filterSelect.value : '';
+
+            // Apply filter if category is selected
+            if (categoryId) {
+                history = history.filter(task => task.category_id === categoryId);
+                console.log(`📋 Filtered to ${history.length} tasks for category ${categoryId}`);
+            }
+
+            if (history.length === 0) {
+                alert('Нет задач для экспорта с выбранным фильтром.');
+                return;
+            }
+
+            // CSV header - EXACT match with displayHistory() table columns
+            const headers = ['Дата', 'Время', 'Тип парсинга', 'Категория', 'Название задачи', 'Поисковый запрос', 'Найдено', 'С контактами'];
+
+            // Helper function to escape CSV values
+            const escapeCSV = (value) => {
+                if (value == null || value === '') return '';
+                const stringValue = String(value);
+                // Escape double quotes and wrap in quotes if contains comma, quote, or newline
+                if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+                    return `"${stringValue.replace(/"/g, '""')}"`;
+                }
+                return stringValue;
+            };
+
+            // Build CSV rows - EXACT match with displayHistory() row structure
+            const rows = history.map(task => {
+                // Format date and time
+                const dateObj = new Date(task.latest_date);
+                const formattedDate = dateObj.toLocaleDateString('ru-RU', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+                const formattedTime = dateObj.toLocaleTimeString('ru-RU', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+
+                // Determine task type
+                const taskTypeDisplay = task.task_type === 'ai-search' ? 'AI Поиск' : 'По URL';
+
+                // Get category name
+                const category = categories.find(c => c.id === task.category_id);
+                const categoryName = category ? category.name : (task.category_id ? 'Неизвестно' : 'Без категории');
+
+                return [
+                    escapeCSV(formattedDate),
+                    escapeCSV(formattedTime),
+                    escapeCSV(taskTypeDisplay),
+                    escapeCSV(categoryName),
+                    escapeCSV(task.task_name || 'Без названия'),
+                    escapeCSV(task.search_query || 'Не указан'),
+                    escapeCSV(task.total_results || 0),
+                    escapeCSV(task.contacts_count || 0)
+                ].join(',');
+            });
+
+            // Combine header and rows
+            const csvContent = [headers.join(','), ...rows].join('\n');
+
+            // Add UTF-8 BOM for Excel compatibility with Cyrillic
+            const BOM = '\uFEFF';
+            const csvWithBOM = BOM + csvContent;
+
+            // Create blob and download
+            const blob = new Blob([csvWithBOM], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+
+            // Generate filename with timestamp
+            const timestamp = new Date().toISOString().slice(0, 19).replace('T', '_').replace(/:/g, '-');
+            const filename = `history_${timestamp}.csv`;
+
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.style.display = 'none';
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // Clean up object URL
+            setTimeout(() => URL.revokeObjectURL(link.href), 100);
+
+            console.log(`✅ Exported ${history.length} tasks to ${filename}`);
+            alert(`✅ Экспортировано ${history.length} задач в файл ${filename}`);
+
+        } catch (error) {
+            console.error('❌ Error exporting task history:', error);
+            alert('Ошибка при экспорте истории. Проверьте консоль для деталей.');
+        }
+    }
+
     // Bind export contacts button
     bindExportContacts() {
         console.log('📥 Binding export contacts button...');
@@ -3218,6 +3335,23 @@ class GymnastikaPlatform {
             console.log('✅ Export contacts button bound successfully');
         } else {
             console.log('❌ Export contacts button not found');
+        }
+    }
+
+    // Bind export history button
+    bindExportHistory() {
+        console.log('📥 Binding export history button...');
+
+        const exportBtn = document.getElementById('exportBtn');
+
+        if (exportBtn) {
+            exportBtn.addEventListener('click', () => {
+                console.log('📥 Export history button clicked');
+                this.exportHistoryToCSV();
+            });
+            console.log('✅ Export history button bound successfully');
+        } else {
+            console.log('❌ Export history button not found');
         }
     }
 
