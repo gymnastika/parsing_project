@@ -1523,13 +1523,12 @@ class GymnastikaPlatform {
 
                 console.log(`📧 Background sync: extracted ${allContacts.length} total contacts`);
 
-                // Filter contacts that have email or phone
+                // Filter contacts that have email
                 const contactsWithInfo = allContacts.filter(contact =>
-                    (contact.email && contact.email.trim() !== '') ||
-                    (contact.phone && contact.phone.trim() !== '')
+                    (contact.email && contact.email.trim() !== '')
                 );
 
-                console.log(`📧 Background sync: ${contactsWithInfo.length} contacts with email/phone`);
+                console.log(`📧 Background sync: ${contactsWithInfo.length} contacts with email`);
 
                 if (contactsWithInfo.length > 0) {
                     // Normalize contact data
