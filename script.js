@@ -522,10 +522,13 @@ class GymnastikaPlatform {
             
             // Bind completion modal events
             this.bindCompletionModal();
-            
+
             // Force hide completion modal on startup
             this.hideCompletionModal();
-            
+
+            // Bind search input for database filtering
+            this.bindSearchInput();
+
             console.log('✅ UI initialization complete');
             
         } catch (error) {
