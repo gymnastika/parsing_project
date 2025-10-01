@@ -110,20 +110,27 @@ database/REMOVE_COUNTRY_FINAL_CORRECT.sql
 Или выполните напрямую **В ПРАВИЛЬНОЙ ПОСЛЕДОВАТЕЛЬНОСТИ**:
 
 ```sql
--- Шаг 1: Пересоздать VIEW БЕЗ country (удалить зависимость)
+-- Шаг 1: Пересоздать VIEW БЕЗ country (сохраняем WHERE с auth.uid)
 CREATE OR REPLACE VIEW user_parsing_stats AS
 SELECT
     user_id,
-    COUNT(*) as total_results,
-    COUNT(*) FILTER (WHERE email IS NOT NULL) as results_with_email,
-    COUNT(DISTINCT task_name) as unique_tasks,
-    -- COUNT(DISTINCT country) as unique_countries,  ← УДАЛИЛИ ЭТУ СТРОКУ
-    MIN(parsing_timestamp) as first_parsing,
-    MAX(parsing_timestamp) as last_parsing,
-    ROUND(
-        (COUNT(*) FILTER (WHERE email IS NOT NULL)::decimal / COUNT(*) * 100), 2
-    ) as email_success_rate
+    COUNT(*) AS total_results,
+    COUNT(
+        CASE
+            WHEN (email IS NOT NULL) THEN 1
+            ELSE NULL::integer
+        END) AS results_with_email,
+    COUNT(DISTINCT task_name) AS unique_tasks,
+    -- count(DISTINCT country) AS unique_countries,  ← УДАЛИЛИ ЭТУ СТРОКУ
+    MIN(parsing_timestamp) AS first_parsing,
+    MAX(parsing_timestamp) AS last_parsing,
+    ROUND((((COUNT(
+        CASE
+            WHEN (email IS NOT NULL) THEN 1
+            ELSE NULL::integer
+        END))::numeric / (COUNT(*))::numeric) * (100)::numeric), 2) AS email_success_rate
 FROM parsing_results
+WHERE (user_id = auth.uid())  -- ← ВАЖНО: Сохраняем WHERE clause!
 GROUP BY user_id;
 
 -- Шаг 2: Удалить индекс
