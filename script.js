@@ -538,11 +538,7 @@ class GymnastikaPlatform {
 
             // Force hide completion modal on startup
             this.hideCompletionModal();
-
-            // Bind search input for database filtering
-            this.bindSearchInput();
-
-            // Setup hybrid task monitoring (real-time + polling fallback)
+// Setup hybrid task monitoring (real-time + polling fallback)
             await this.setupTaskMonitoring();
 
             console.log('✅ UI initialization complete');
@@ -2920,113 +2916,6 @@ class GymnastikaPlatform {
             console.error(`❌ Error loading tab data for ${tabName}:`, error);
         }
     }
-
-    // Bind search input for context-aware filtering
-    bindSearchInput() {
-        const searchInput = document.getElementById('searchInput');
-        if (!searchInput) {
-            console.log('❌ Search input not found');
-            return;
-        }
-
-        console.log('🔗 Binding search input...');
-
-        // Real-time search on input
-        searchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase().trim();
-            console.log(`🔍 Search term: "${searchTerm}"`);
-
-            // Determine current active tab
-            const activeTab = document.querySelector('.database-tab.active');
-            const currentTab = activeTab?.dataset?.tab || 'task-history';
-            console.log(`📍 Current tab: ${currentTab}`);
-
-            this.performSearch(searchTerm, currentTab);
-        });
-
-        console.log('✅ Search input bound');
-    }
-
-    // Perform context-aware search based on active tab
-    performSearch(searchTerm, currentTab) {
-        console.log(`🔎 Performing search: "${searchTerm}" in tab: ${currentTab}`);
-
-        if (currentTab === 'task-history') {
-            this.searchTaskHistory(searchTerm);
-        } else if (currentTab === 'contacts') {
-            this.searchContacts(searchTerm);
-        }
-    }
-
-    // Search in task history table
-    searchTaskHistory(searchTerm) {
-        const table = document.querySelector('#historyEmpty .history-table');
-        if (!table) {
-            console.log('❌ Task history table not found');
-            return;
-        }
-
-        const rows = table.querySelectorAll('tbody tr');
-        let visibleCount = 0;
-
-        rows.forEach(row => {
-            // Get all cell values for searching
-            const dateCell = row.querySelector('.date-cell')?.textContent?.toLowerCase() || '';
-            const typeCell = row.querySelector('.type-cell')?.textContent?.toLowerCase() || '';
-            const taskNameCell = row.querySelector('.task-name-cell')?.textContent?.toLowerCase() || '';
-            const queryCell = row.querySelector('.query-cell')?.textContent?.toLowerCase() || '';
-            const countCell = row.querySelector('.count-cell')?.textContent?.toLowerCase() || '';
-            const contactsCell = row.querySelector('.contacts-cell')?.textContent?.toLowerCase() || '';
-
-            // Combine all cell values for searching
-            const rowText = `${dateCell} ${typeCell} ${taskNameCell} ${queryCell} ${countCell} ${contactsCell}`;
-
-            // Show/hide row based on search match
-            if (rowText.includes(searchTerm) || searchTerm === '') {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
-        });
-
-        console.log(`✅ Task history search: ${visibleCount}/${rows.length} rows visible`);
-    }
-
-    // Search in contacts table
-    searchContacts(searchTerm) {
-        const table = document.querySelector('#contactsEmpty .contacts-table');
-        if (!table) {
-            console.log('❌ Contacts table not found');
-            return;
-        }
-
-        const rows = table.querySelectorAll('tbody tr');
-        let visibleCount = 0;
-
-        rows.forEach(row => {
-            // Get all cell values for searching
-            const orgNameCell = row.querySelector('.org-name-cell')?.textContent?.toLowerCase() || '';
-            const emailCell = row.querySelector('.email-cell')?.textContent?.toLowerCase() || '';
-            const descriptionCell = row.querySelector('.description-cell')?.textContent?.toLowerCase() || '';
-            const websiteCell = row.querySelector('.website-cell')?.textContent?.toLowerCase() || '';
-            const dateCell = row.querySelector('.date-cell')?.textContent?.toLowerCase() || '';
-
-            // Combine all cell values for searching
-            const rowText = `${orgNameCell} ${emailCell} ${descriptionCell} ${websiteCell} ${dateCell}`;
-
-            // Show/hide row based on search match
-            if (rowText.includes(searchTerm) || searchTerm === '') {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
-        });
-
-        console.log(`✅ Contacts search: ${visibleCount}/${rows.length} rows visible`);
-    }
-
     // Bind logout button (already bound in bindAuthEvents, this is redundant)
     bindLogoutButton() {
         // Removed duplicate logout binding to prevent conflicts
