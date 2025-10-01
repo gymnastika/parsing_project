@@ -4145,10 +4145,19 @@ class GymnastikaPlatform {
             progressFill.style.width = '0%';
         }
 
-        // Reset arrow position and transform
-        if (progressArrow) {
-            progressArrow.style.left = '17px';  // Reset to stage 0 position
-            progressArrow.style.transform = 'none';
+        // Reset arrow to stage 0 position using same logic as updateModernProgress
+        if (progressArrow && progressBar) {
+            const stages = progressBar.querySelectorAll('.progress-stage');
+            if (stages[0]) {
+                const targetStage = stages[0];
+                const track = targetStage.parentElement;
+                const stageRect = targetStage.getBoundingClientRect();
+                const trackRect = track.getBoundingClientRect();
+                const iconCenterX = stageRect.left + (stageRect.width / 2) - trackRect.left;
+
+                progressArrow.style.left = iconCenterX + 'px';
+                progressArrow.style.transform = 'translateX(-50%)';
+            }
         }
 
         // Reset progress description
