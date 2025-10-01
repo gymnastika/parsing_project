@@ -97,10 +97,15 @@ const { data, error } = await this.supabase
 
 **ВАЖНО**: Есть зависимость! VIEW `user_parsing_stats` использует колонку `country`.
 
+**⚠️ ОБНОВЛЕНИЕ**: Используйте ПРАВИЛЬНЫЙ файл миграции:
+
 **Скопируйте и выполните** весь SQL из файла:
 ```
-database/REMOVE_COUNTRY_COLUMN_OPTIONAL.sql
+database/REMOVE_COUNTRY_FINAL_CORRECT.sql
 ```
+
+**Почему новый файл?**
+В реальной базе данных VIEW `user_parsing_stats` содержит дополнительное условие `WHERE (user_id = auth.uid())`, которое необходимо сохранить при пересоздании VIEW.
 
 Или выполните напрямую **В ПРАВИЛЬНОЙ ПОСЛЕДОВАТЕЛЬНОСТИ**:
 
