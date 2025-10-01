@@ -102,6 +102,27 @@ console.log(`📊 Query returned ${savedResults?.length || 0} results from parsi
 
 **Changed**:
 ```javascript
+// Get Supabase auth user ID
+const supabaseUserId = (await this.supabase.auth.getUser()).data.user?.id;
+console.log('🔑 Supabase auth user ID for contacts query:', supabaseUserId);
+
+// PRIMARY: Load from parsing_results
+const { data: contacts } = await this.supabase
+    .from('parsing_results')  // ✅ New table
+    .select('*')
+    .eq('user_id', supabaseUserId)  // ✅ Correct UUID
+    .limit(500);
+
+// Filter contacts with email
+const contactsWithInfo = contacts.filter(contact =>
+    (contact.email && contact.email.trim() !== '')
+);
+```
+
+### 4. Cross-Browser Fix 🔴 CRITICAL (`script.js:1095-1135`)
+
+**Changed**:
+```javascript
 // PRIMARY: Load from parsing_results
 const { data: contacts } = await this.supabase
     .from('parsing_results')  // ✅ New table
