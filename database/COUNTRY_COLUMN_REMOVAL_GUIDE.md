@@ -143,17 +143,33 @@ AND column_name = 'country';
 
 ## 🔄 Откат (если понадобится вернуть)
 
-Если вы удалили колонку, но захотели вернуть:
+Если вы удалили колонку, но захотели вернуть, выполните **В ОБРАТНОЙ ПОСЛЕДОВАТЕЛЬНОСТИ**:
 
 ```sql
--- Вернуть колонку
+-- Шаг 1: Вернуть колонку
 ALTER TABLE parsing_results ADD COLUMN country TEXT;
 
--- Вернуть индекс
+-- Шаг 2: Вернуть индекс
 CREATE INDEX idx_parsing_results_country ON parsing_results(country);
 
--- Добавить комментарий
+-- Шаг 3: Добавить комментарий
 COMMENT ON COLUMN parsing_results.country IS 'Страна расположения';
+
+-- Шаг 4: Вернуть country в VIEW user_parsing_stats
+CREATE OR REPLACE VIEW user_parsing_stats AS
+SELECT
+    user_id,
+    COUNT(*) as total_results,
+    COUNT(*) FILTER (WHERE email IS NOT NULL) as results_with_email,
+    COUNT(DISTINCT task_name) as unique_tasks,
+    COUNT(DISTINCT country) as unique_countries,  -- ← ВЕРНУЛИ
+    MIN(parsing_timestamp) as first_parsing,
+    MAX(parsing_timestamp) as last_parsing,
+    ROUND(
+        (COUNT(*) FILTER (WHERE email IS NOT NULL)::decimal / COUNT(*) * 100), 2
+    ) as email_success_rate
+FROM parsing_results
+GROUP BY user_id;
 ```
 
 **Важно**: Исторические данные (старые значения country) будут потеряны безвозвратно!
