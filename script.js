@@ -1082,32 +1082,34 @@ class GymnastikaPlatform {
                 }
             }
 
-            // Get all parsing results grouped by task_name for user's original design
-            const { data: results, error } = await this.supabase
-                .from('parsing_results')
+            // Get all parsing tasks from NEW persistent tasks table
+            const { data: tasks, error } = await this.supabase
+                .from('parsing_tasks')
                 .select('*')
-                .order('parsing_timestamp', { ascending: false });
+                .eq('user_id', this.currentUser?.id)
+                .order('created_at', { ascending: false });
 
-            console.log('📊 Background history sync result:', { data: results?.length, error: error });
+            console.log('📊 Background history sync result:', { data: tasks?.length, error: error });
 
             if (error) throw error;
 
             let freshHistoryData = [];
-            if (results && results.length > 0) {
-                console.log(`🔄 Background sync found ${results.length} parsing records`);
-                
-                // Group results by task_name (user's original design)
-                const taskGroups = this.groupResultsByTaskName(results);
-                console.log(`📊 Background sync grouped into ${taskGroups.length} tasks`);
-                
-                // Transform to format expected by displayHistory method
-                freshHistoryData = taskGroups.map(group => ({
-                    task_name: group.task_name,
-                    search_query: group.original_query || 'Unknown Query',
-                    total_results: group.total_results,
-                    contacts_count: group.contacts_count,
-                    latest_date: group.latest_date
+            if (tasks && tasks.length > 0) {
+                console.log(`🔄 Background sync found ${tasks.length} parsing tasks`);
+
+                // Transform parsing_tasks to history format
+                freshHistoryData = tasks.map(task => ({
+                    task_name: task.task_name,
+                    search_query: task.search_query || task.website_url || 'Unknown Query',
+                    total_results: task.final_results?.length || 0,
+                    contacts_count: task.final_results?.filter(r => r.email || r.phone)?.length || 0,
+                    latest_date: task.completed_at || task.updated_at || task.created_at,
+                    task_type: task.task_type,  // 'ai-search' or 'url-parsing'
+                    status: task.status,
+                    task_id: task.id
                 }));
+
+                console.log(`📊 Background sync transformed into ${freshHistoryData.length} history items`);
             }
 
             // Check if we need to update the UI
