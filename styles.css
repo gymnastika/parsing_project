@@ -8770,7 +8770,6 @@ div.modal-overlay.results-modal .results-modal-content {
     opacity: 0;
     transition: opacity 0.5s ease;
     position: relative;
-    padding-top: 35px;
 }
 
 .modern-progress-container.active {
