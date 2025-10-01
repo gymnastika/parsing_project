@@ -4002,6 +4002,20 @@ class GymnastikaPlatform {
             if (results && results.length > 0) {
                 this.viewResults(results);
 
+                // 6. Mark task as completed in DB
+                if (this.currentTaskId) {
+                    await fetch(`/api/parsing-tasks/${this.currentTaskId}/completed`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                        },
+                        body: JSON.stringify({
+                            results: results
+                        })
+                    });
+                }
+
                 // Invalidate cache since new parsing results have been added
                 this.invalidateCache('parsing_results');
                 this.invalidateCache('task_history');
@@ -4031,14 +4045,48 @@ class GymnastikaPlatform {
                 this.showCompletionModal();
 
                 // Reset UI after short delay to show completion state
-                setTimeout(() => this.resetParsingUI(), 2000);
+                setTimeout(() => {
+                    this.resetParsingUI();
+                    this.currentTaskId = null; // Clear task ID
+                }, 2000);
             } else {
+                // 6. Mark task as failed in DB
+                if (this.currentTaskId) {
+                    await fetch(`/api/parsing-tasks/${this.currentTaskId}/failed`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                        },
+                        body: JSON.stringify({
+                            error: 'No results found'
+                        })
+                    });
+                    this.currentTaskId = null;
+                }
+
                 this.showError('Результаты не найдены');
                 this.resetParsingUI();
             }
 
         } catch (error) {
             console.error('❌ Parsing error:', error);
+
+            // 6. Mark task as failed in DB
+            if (this.currentTaskId) {
+                await fetch(`/api/parsing-tasks/${this.currentTaskId}/failed`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                    },
+                    body: JSON.stringify({
+                        error: error.message
+                    })
+                });
+                this.currentTaskId = null;
+            }
+
             this.showError('Ошибка поиска: ' + error.message);
             this.resetParsingUI();
         }
