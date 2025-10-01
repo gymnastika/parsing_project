@@ -8783,21 +8783,21 @@ div.modal-overlay.results-modal .results-modal-content {
     position: absolute;
     top: -5px;
     left: 0%;
-    transform: translateX(-50%);
     font-size: 1.8rem;
     color: var(--primary-purple);
     transition: left 1.2s ease-in-out;
     animation: arrowBounce 1s ease-in-out infinite;
     z-index: 10;
     filter: drop-shadow(0 2px 6px rgba(124, 58, 237, 0.4));
+    /* Arrow positioned to match stage circles - no transform needed for edges */
 }
 
 @keyframes arrowBounce {
     0%, 100% {
-        transform: translateX(-50%) translateY(0);
+        transform: translateY(0);
     }
     50% {
-        transform: translateX(-50%) translateY(-6px);
+        transform: translateY(-6px);
     }
 }
 
