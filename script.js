@@ -4376,17 +4376,13 @@ class GymnastikaPlatform {
 
     // Start URL parsing process (direct web scraping without AI/Google Maps)
     async startUrlParsing(params) {
-        if (!this.pipelineOrchestrator) {
-            this.showError('Система не готова. Попробуйте позже.');
-            return;
-        }
-
         try {
-            // 1. Create task in database BEFORE starting
+            // 1. Create task in database with 'pending' status
             const taskData = {
                 taskName: params.taskName,
                 websiteUrl: params.websiteUrl,
-                type: 'url-parsing'
+                type: 'url-parsing',
+                categoryId: params.categoryId
             };
 
             const taskResponse = await fetch('/api/parsing-tasks', {
@@ -4407,121 +4403,28 @@ class GymnastikaPlatform {
 
             const createdTask = await taskResponse.json();
             this.currentTaskId = createdTask.id;
-            console.log('✅ URL parsing task created in DB:', this.currentTaskId);
+            console.log('✅ URL parsing task created with status: pending, ID:', this.currentTaskId);
+            console.log('🔄 Background Worker will pick up and execute this task automatically');
 
-            // 2. Hide submit button and show modern progress bar
+            // 2. Show visual feedback - task sent to server
             const submitBtn = document.querySelector('#urlParsingForm .submit-btn');
             const progressBar = document.getElementById('modernProgressBar');
             const progressDesc = document.getElementById('progressDescription');
 
-            if (submitBtn) {
-                submitBtn.style.display = 'none';
-                console.log('✅ URL parsing submit button hidden');
-            } else {
-                console.warn('⚠️ URL parsing submit button not found');
-            }
+            if (submitBtn) submitBtn.style.display = 'none';
+            if (progressBar) progressBar.classList.add('active');
+            if (progressDesc) progressDesc.classList.add('active');
 
-            if (progressBar) {
-                progressBar.classList.add('active');
-                console.log('✅ Progress bar activated');
-            } else {
-                console.warn('⚠️ Progress bar element not found');
-            }
-
-            if (progressDesc) {
-                progressDesc.classList.add('active');
-                console.log('✅ Progress description activated');
-            }
-
-            // 3. Set up progress callback WITH database updates
-            this.pipelineOrchestrator.onProgressUpdate = async (progress) => {
-                this.updateModernProgress(progress);
-
-                // Save progress to database
-                if (this.currentTaskId) {
-                    await this.updateTaskProgress(progress);
-                }
-            };
-
-            // 4. Mark task as running in DB
-            await fetch(`/api/parsing-tasks/${this.currentTaskId}/running`, {
-                method: 'PATCH',
-                headers: {
-                    'Authorization': `Bearer ${await this.getAuthToken()}`
-                }
+            // 3. Show initial progress state - waiting for Background Worker
+            this.updateModernProgress({
+                stage: 'initializing',
+                current: 0,
+                total: 100,
+                message: 'Задача отправлена на сервер... Ожидание Background Worker...'
             });
 
-            // 5. Execute URL parsing (direct web scraping)
-            const results = await this.pipelineOrchestrator.executeUrlParsing({
-                websiteUrl: params.websiteUrl,
-                taskName: params.taskName
-            });
-
-            if (results && results.length > 0) {
-                // Check if any results have email
-                const resultsWithEmail = results.filter(r => r.email || r.contact?.email);
-                const hasEmail = resultsWithEmail.length > 0;
-
-                // 6. Mark task as completed in DB
-                if (this.currentTaskId) {
-                    await fetch(`/api/parsing-tasks/${this.currentTaskId}/completed`, {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${await this.getAuthToken()}`
-                        },
-                        body: JSON.stringify({
-                            results: results
-                        })
-                    });
-                }
-
-                // Invalidate cache
-                this.invalidateCache('parsing_results');
-                this.invalidateCache('task_history');
-                this.invalidateCache('contacts_data');
-
-                // Refresh database section if active
-                if (this.currentSection === 'database') {
-                    await this.loadDatabaseData();
-                }
-
-                // Show result notification based on email presence
-                if (!hasEmail) {
-                    this.showError(`Email на сайте не найден. Контакт не добавлен в базу данных.`);
-                } else if (resultsWithEmail.length < results.length) {
-                    this.showSuccess(`Парсинг завершен! Найдено ${resultsWithEmail.length} из ${results.length} контактов с email.`);
-                } else {
-                    this.showCompletionModal();
-                }
-
-                // Show results modal to display what was found
-                this.showResultsModal(params.taskName, results);
-
-                // Reset UI after short delay
-                setTimeout(() => {
-                    this.resetParsingUI();
-                    this.currentTaskId = null;
-                }, 2000);
-            } else {
-                // Mark task as failed in DB
-                if (this.currentTaskId) {
-                    await fetch(`/api/parsing-tasks/${this.currentTaskId}/failed`, {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${await this.getAuthToken()}`
-                        },
-                        body: JSON.stringify({
-                            error: 'No data extracted from website'
-                        })
-                    });
-                    this.currentTaskId = null;
-                }
-
-                this.showError('Не удалось извлечь данные с сайта');
-                this.resetParsingUI();
-            }
+            // 4. Real-time subscription will handle all progress updates from Background Worker
+            // No need to execute pipeline here - Background Worker does everything!
 
         } catch (error) {
             console.error('❌ URL parsing error:', error);
