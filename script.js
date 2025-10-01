@@ -1742,7 +1742,7 @@ class GymnastikaPlatform {
 
                 const { data: tasks, error: tasksError } = await this.supabase
                     .from('parsing_tasks')
-                    .select('final_results, task_data, created_at')
+                    .select('final_results, task_data, created_at, category_id')
                     .eq('user_id', supabaseUserId)
                     .eq('status', 'completed')
                     .not('final_results', 'is', null)
