@@ -4866,10 +4866,165 @@ class GymnastikaPlatform {
             console.log('✅ Back button bound successfully');
         }
 
+        // Bind custom emails tab functionality
+        this.bindCustomEmailsTab();
+
+        // Bind email tab switching
+        this.bindEmailTabSwitching();
+
         // Load contacts for recipient selection
         this.loadEmailContacts();
 
         console.log('✅ Email step 2 activated');
+    }
+
+    // Bind email tab switching (База данных vs Собственная база)
+    bindEmailTabSwitching() {
+        const tabButtons = document.querySelectorAll('.email-tab-button');
+        const tabContents = document.querySelectorAll('.email-tab-content');
+
+        tabButtons.forEach(button => {
+            // Remove existing listeners
+            const newButton = button.cloneNode(true);
+            button.parentNode.replaceChild(newButton, button);
+
+            // Add click handler
+            newButton.addEventListener('click', () => {
+                const targetTab = newButton.getAttribute('data-tab');
+
+                // Remove active from all buttons and contents
+                document.querySelectorAll('.email-tab-button').forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+
+                // Add active to clicked button and target content
+                newButton.classList.add('active');
+                const targetContent = document.getElementById(targetTab + '-content');
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                }
+
+                console.log('📧 Switched to tab:', targetTab);
+            });
+        });
+    }
+
+    // Bind custom emails tab functionality
+    bindCustomEmailsTab() {
+        const customEmailsList = document.getElementById('customEmailsList');
+        const validateBtn = document.getElementById('validateCustomEmails');
+        const clearBtn = document.getElementById('clearCustomEmails');
+        const emailsCountSpan = document.getElementById('customEmailsCount');
+
+        // Initialize custom emails array
+        this.customEmails = [];
+
+        // Real-time email counting on input
+        if (customEmailsList) {
+            customEmailsList.addEventListener('input', () => {
+                this.updateCustomEmailsCount();
+            });
+        }
+
+        // Validate button click
+        if (validateBtn) {
+            validateBtn.addEventListener('click', () => {
+                this.validateCustomEmails();
+            });
+        }
+
+        // Clear button click
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                this.clearCustomEmails();
+            });
+        }
+
+        console.log('✅ Custom emails tab bound successfully');
+    }
+
+    // Update custom emails count
+    updateCustomEmailsCount() {
+        const customEmailsList = document.getElementById('customEmailsList');
+        const emailsCountSpan = document.getElementById('customEmailsCount');
+
+        if (!customEmailsList || !emailsCountSpan) return;
+
+        const text = customEmailsList.value;
+        const lines = text.split('\n')
+            .map(line => line.trim())
+            .filter(line => line.length > 0);
+
+        emailsCountSpan.textContent = lines.length;
+    }
+
+    // Validate custom emails
+    validateCustomEmails() {
+        console.log('📧 Validating custom emails...');
+
+        const customEmailsList = document.getElementById('customEmailsList');
+        if (!customEmailsList) return;
+
+        const text = customEmailsList.value;
+        const lines = text.split('\n')
+            .map(line => line.trim())
+            .filter(line => line.length > 0);
+
+        // Email validation regex
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        // Validate each email
+        const validEmails = [];
+        const invalidEmails = [];
+
+        lines.forEach(line => {
+            if (emailRegex.test(line)) {
+                validEmails.push(line);
+            } else {
+                invalidEmails.push(line);
+            }
+        });
+
+        // Store valid emails
+        this.customEmails = validEmails;
+
+        // Show results
+        console.log('✅ Valid emails:', validEmails.length);
+        console.log('❌ Invalid emails:', invalidEmails.length);
+
+        if (invalidEmails.length > 0) {
+            console.log('Invalid email addresses:', invalidEmails);
+            this.showWarning(`Найдено ${validEmails.length} корректных адресов и ${invalidEmails.length} некорректных. Некорректные адреса будут проигнорированы.`);
+        } else {
+            this.showSuccess(`✅ Все ${validEmails.length} email адресов прошли проверку!`);
+        }
+
+        // Update textarea with only valid emails
+        if (invalidEmails.length > 0) {
+            customEmailsList.value = validEmails.join('\n');
+        }
+
+        // Update count
+        this.updateCustomEmailsCount();
+    }
+
+    // Clear custom emails
+    clearCustomEmails() {
+        console.log('🗑️ Clearing custom emails...');
+
+        const customEmailsList = document.getElementById('customEmailsList');
+        const emailsCountSpan = document.getElementById('customEmailsCount');
+
+        if (customEmailsList) {
+            customEmailsList.value = '';
+        }
+
+        if (emailsCountSpan) {
+            emailsCountSpan.textContent = '0';
+        }
+
+        this.customEmails = [];
+
+        console.log('✅ Custom emails cleared');
     }
 
     // Go back to email step 1 (preserve all data)
