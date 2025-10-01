@@ -4223,13 +4223,28 @@ class GymnastikaPlatform {
             console.log('✅ URL parsing task created in DB:', this.currentTaskId);
 
             // 2. Hide submit button and show modern progress bar
-            const submitBtn = document.querySelector('.submit-btn');
+            const submitBtn = document.querySelector('#urlParsingForm .submit-btn');
             const progressBar = document.getElementById('modernProgressBar');
             const progressDesc = document.getElementById('progressDescription');
 
-            if (submitBtn) submitBtn.style.display = 'none';
-            if (progressBar) progressBar.classList.add('active');
-            if (progressDesc) progressDesc.classList.add('active');
+            if (submitBtn) {
+                submitBtn.style.display = 'none';
+                console.log('✅ URL parsing submit button hidden');
+            } else {
+                console.warn('⚠️ URL parsing submit button not found');
+            }
+
+            if (progressBar) {
+                progressBar.classList.add('active');
+                console.log('✅ Progress bar activated');
+            } else {
+                console.warn('⚠️ Progress bar element not found');
+            }
+
+            if (progressDesc) {
+                progressDesc.classList.add('active');
+                console.log('✅ Progress description activated');
+            }
 
             // 3. Set up progress callback WITH database updates
             this.pipelineOrchestrator.onProgressUpdate = async (progress) => {
