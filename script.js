@@ -533,8 +533,8 @@ class GymnastikaPlatform {
             // Bind search input for database filtering
             this.bindSearchInput();
 
-            // Setup real-time task subscription
-            await this.setupTaskSubscription();
+            // Setup hybrid task monitoring (real-time + polling fallback)
+            await this.setupTaskMonitoring();
 
             console.log('✅ UI initialization complete');
             
