@@ -2274,14 +2274,7 @@ class GymnastikaPlatform {
                     <input type="url" id="edit-website" value="${contact.website || ''}" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 14px; transition: border-color 0.2s;" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#d1d5db'">
                 </div>
             </div>
-            
-            <div class="form-row" style="display: flex; gap: 0.5rem;">
-                <div class="form-group" style="flex: 1;">
-                    <label for="edit-country" style="display: block; margin-bottom: 0.1rem; font-weight: 500; color: #374151; text-shadow: none; font-size: 13px;">Страна</label>
-                    <input type="text" id="edit-country" value="${contact.country || ''}" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 14px; transition: border-color 0.2s;" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#d1d5db'">
-                </div>
-            </div>
-            
+
             <div class="form-row" style="display: flex; gap: 0.5rem;">
                 <div class="form-group full-width" style="flex: 1;">
                     <label for="edit-description" style="display: block; margin-bottom: 0.1rem; font-weight: 500; color: #374151; text-shadow: none; font-size: 13px;">Описание</label>
