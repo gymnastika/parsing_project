@@ -52,12 +52,15 @@ class GymnastikaPlatform {
 
             // Start fast loading process (max 1.5 seconds)
             const loadingPromise = this.fastLoader.start();
-            
+
             // Initialize components in parallel
             await this.initializeSystemComponents();
-            
+
             // Wait for fast loading to complete
             await loadingPromise;
+
+            // Check for active parsing tasks and restore state
+            await this.checkAndRestoreActiveTask();
 
         } catch (error) {
             console.error('❌ Platform initialization error:', error);
