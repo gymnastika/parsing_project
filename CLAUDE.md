@@ -614,11 +614,38 @@ maxItems: 10 → 500      // 50x увеличение Apify лимита
 // Результат: ~1500 результатов вместо 30 (50x увеличение производительности)
 ```
 
+## 🐛 Recent Critical Fixes
+
+### **Query Duplication Fix** (October 1, 2025)
+- **Issue**: Google Maps парсинг запускал 6 поисков вместо 3 (дублирование запросов)
+- **Root Cause**: OpenAI Assistant генерировал 2 вариации на каждый язык (3 языка × 2 = 6)
+- **Solution**: Добавлена дедупликация через Set + hard limit 3 запроса
+- **Impact**: 50% экономия Apify токенов, в 2 раза быстрее
+- **Files**: `lib/server-pipeline-orchestrator.js:196-262`
+- **Docs**: `database/QUERY_DUPLICATION_FIX.md`
+
+### **Real-time Progress & Completion Fix** (October 1, 2025)
+- **Issues Fixed**:
+  1. Progress bar не обновлялся в realtime (требовался F5)
+  2. Нет финального вывода после парсинга (модальное окно, записи в БД)
+- **Solution**: Supabase Realtime подписка + обработчики completion
+- **Impact**: Real-time UX + защита от потери результатов
+- **Files**: `script.js:4922-5101`
+- **Docs**: `database/REALTIME_PROGRESS_FIX.md`
+
+### **Hybrid Monitoring System** (October 1, 2025)
+- **Purpose**: Fallback для Realtime если не настроена Publication
+- **Architecture**: Dual-path (Real-time + Polling каждые 5 сек)
+- **Files**: `script.js:4926-5076`, `server.js:1101-1121`
+- **Docs**: `database/HYBRID_MONITORING_SYSTEM.md`
+
+---
+
 ## 🏆 Key Features & Capabilities
 
 ### **Business Intelligence Pipeline**
 - **Multi-stage processing**: 6-этапный AI Search workflow + 3-этапный URL Parsing
-- **AI-powered optimization**: OpenAI Assistant оптимизирует search queries
+- **AI-powered optimization**: OpenAI Assistant оптимизирует search queries (с дедупликацией)
 - **Scalable architecture**: Plan-aware resource management (FREE/PAID)
 - **Universal Progress Bar**: Динамический прогресс-бар работает для любого количества этапов
   - AI Search: 7 stages (0% → 14% → 29% → 43% → 57% → 71% → 86% → 100%)
