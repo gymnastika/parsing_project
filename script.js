@@ -3271,6 +3271,23 @@ class GymnastikaPlatform {
         }
     }
 
+    // Bind export contacts button
+    bindExportContacts() {
+        console.log('📥 Binding export contacts button...');
+
+        const exportBtn = document.getElementById('exportContactsBtn');
+
+        if (exportBtn) {
+            exportBtn.addEventListener('click', () => {
+                console.log('📥 Export contacts button clicked');
+                this.exportContactsToCSV();
+            });
+            console.log('✅ Export contacts button bound successfully');
+        } else {
+            console.log('❌ Export contacts button not found');
+        }
+    }
+
     // Load categories from database
     async loadCategories() {
         console.log('📋 Loading categories...');
