@@ -4058,6 +4058,14 @@ class GymnastikaPlatform {
             4: 100    // complete
         };
 
+        const arrowPositions = {
+            0: '17px',              // matches stage 0 icon position (offset by icon radius)
+            1: '25%',               // matches stage 1 icon position
+            2: '50%',               // matches stage 2 icon position
+            3: '75%',               // matches stage 3 icon position
+            4: 'calc(100% - 17px)'  // matches stage 4 icon position (offset by icon radius)
+        };
+
         const stageDescriptions = {
             'initializing': 'Инициализация парсинга...',
             'query-generation': 'Генерация поисковых запросов с помощью ИИ',
@@ -4081,10 +4089,9 @@ class GymnastikaPlatform {
                 fill.style.width = stageToPercent[stageIndex] + '%';
             }
 
-            // Update arrow position - align with stage circles (no transform offset)
+            // Update arrow position - use exact positions to match stage circles
             if (arrow) {
-                const percent = stageToPercent[stageIndex];
-                arrow.style.left = percent + '%';
+                arrow.style.left = arrowPositions[stageIndex];
 
                 // Add transform only for middle stages to center arrow
                 if (stageIndex > 0 && stageIndex < 4) {
