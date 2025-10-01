@@ -5168,10 +5168,11 @@ class GymnastikaPlatform {
             recipientCount: recipients.length
         });
 
+        const sendBtn = document.getElementById('confirmSendBtn');
+        const originalText = sendBtn?.innerHTML;
+
         try {
             // Show loading state
-            const sendBtn = document.getElementById('confirmSendBtn');
-            const originalText = sendBtn?.innerHTML;
             if (sendBtn) {
                 sendBtn.disabled = true;
                 sendBtn.innerHTML = `
