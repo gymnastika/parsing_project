@@ -2073,7 +2073,6 @@ class GymnastikaPlatform {
                 <td class="website-cell">
                     ${contact.website ? `<a href="${contact.website}" target="_blank" class="website-link">${contact.website}</a>` : 'Не определен'}
                 </td>
-                <td class="country-cell">${contact.country || 'Не определена'}</td>
                 <td class="date-cell">${shortDate}</td>
             `;
             
