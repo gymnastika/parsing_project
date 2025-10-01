@@ -5057,13 +5057,15 @@ class GymnastikaPlatform {
             const taskData = task.task_data || {};
             const taskName = taskData.taskName || task.task_name || 'Неизвестная задача';
             const originalQuery = taskData.searchQuery || taskData.originalQuery || 'Не указан';
-            console.log(`📝 Saving with: task_name="${taskName}", user_id="${supabaseUserId}"`);
+            const categoryId = taskData.categoryId || task.category_id || null;
+            console.log(`📝 Saving with: task_name="${taskName}", category_id="${categoryId}", user_id="${supabaseUserId}"`);
 
             // Prepare records matching the actual parsing_results table schema
             const records = results.map(result => ({
                 user_id: supabaseUserId,
                 task_name: taskName,
                 original_query: originalQuery,
+                category_id: categoryId,  // Category ID for filtering/grouping
                 organization_name: result.organizationName || result.name || 'Неизвестно',
                 email: result.email || null,
                 description: result.description || null,
