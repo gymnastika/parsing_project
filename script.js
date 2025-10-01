@@ -4763,7 +4763,8 @@ class GymnastikaPlatform {
                 searchQuery: params.searchQuery,
                 websiteUrl: params.websiteUrl,
                 type: params.websiteUrl ? 'url-parsing' : 'ai-search',
-                categoryId: params.categoryId
+                categoryId: params.categoryId,
+                resultsPerQuery: params.resultsPerQuery || 50  // Default to 50 if not provided
             };
 
             const taskResponse = await fetch('/api/parsing-tasks', {
