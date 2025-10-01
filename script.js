@@ -2118,38 +2118,9 @@ class GymnastikaPlatform {
         }
     }
 
-    // View task results - shows modal with parsing results
-    async viewTaskResults(taskName) {
-        console.log('👁️ Viewing task results for:', taskName);
-        
-        try {
-            if (!this.supabase) {
-                console.error('❌ Supabase client not initialized');
-                return;
-            }
-
-            // Load all results for this task
-            const { data: results, error } = await this.supabase
-                .from('parsing_results')
-                .select('*')
-                .eq('task_name', taskName)
-                .order('parsing_timestamp', { ascending: false });
-
-            if (error) throw error;
-
-            if (!results || results.length === 0) {
-                alert('Результаты не найдены для данной задачи');
-                return;
-            }
-
-            console.log(`📊 Found ${results.length} results for task: ${taskName}`);
-            this.showResultsModal(taskName, results);
-            
-        } catch (error) {
-            console.error('❌ Error loading task results:', error);
-            alert('Ошибка загрузки результатов');
-        }
-    }
+    // ❌ REMOVED: Duplicate viewTaskResults() method that was overriding the correct implementation
+    // The correct viewTaskResults(taskName, taskId) is at line 1299 with proper parsing_tasks support
+    // This old method only loaded from parsing_results and caused wrong data to display
 
     // Show task menu - context menu for task actions
     showTaskMenu(taskName) {
