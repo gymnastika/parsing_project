@@ -1247,35 +1247,49 @@ class GymnastikaPlatform {
             .sort((a, b) => new Date(b.latest_date) - new Date(a.latest_date));
     }
 
-    // View results for a specific task (user's original functionality)
-    async viewTaskResults(taskName) {
+    // View results for a specific task (from parsing_tasks table)
+    async viewTaskResults(taskName, taskId = null) {
         try {
-            console.log(`👁 Viewing results for task: ${taskName}`);
-            
+            console.log(`👁 Viewing results for task: ${taskName}`, taskId ? `(ID: ${taskId})` : '');
+
             if (!this.supabase) {
                 console.error('❌ Supabase client not available');
                 return;
             }
 
-            // Get all results for this task
-            const { data: results, error } = await this.supabase
-                .from('parsing_results')
-                .select('*')
-                .eq('task_name', taskName)
-                .order('parsing_timestamp', { ascending: false });
+            // Get task from parsing_tasks table
+            let query = this.supabase
+                .from('parsing_tasks')
+                .select('*');
+
+            if (taskId) {
+                query = query.eq('id', taskId);
+            } else {
+                query = query.eq('task_name', taskName).eq('user_id', this.currentUser?.id);
+            }
+
+            const { data: tasks, error } = await query.order('created_at', { ascending: false }).limit(1);
 
             if (error) {
-                console.error('❌ Error fetching task results:', error);
+                console.error('❌ Error fetching task:', error);
                 this.showError('Ошибка загрузки результатов');
                 return;
             }
 
-            console.log(`🔍 Found ${results?.length || 0} results for task: ${taskName}`);
+            if (!tasks || tasks.length === 0) {
+                this.showError('Задача не найдена');
+                return;
+            }
+
+            const task = tasks[0];
+            const results = task.final_results || [];
+
+            console.log(`🔍 Found task with ${results.length} results`);
 
             if (results && results.length > 0) {
                 this.viewResults(results);
             } else {
-                this.showError('Результаты не найдены');
+                this.showError('Результаты не найдены или задача еще не завершена');
             }
         } catch (error) {
             console.error('❌ Error viewing task results:', error);
