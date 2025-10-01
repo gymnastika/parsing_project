@@ -1575,8 +1575,12 @@ class GymnastikaPlatform {
                 second: '2-digit'
             });
             
+            // Determine task type display name
+            const taskTypeDisplay = task.task_type === 'ai-search' ? 'AI Поиск' : 'По URL';
+
             row.innerHTML = `
                 <td class="date-cell">${formattedDate}<br>${formattedTime}</td>
+                <td class="type-cell">${taskTypeDisplay}</td>
                 <td class="task-name-cell">${task.task_name || 'Без названия'}</td>
                 <td class="query-cell">${task.search_query || 'Не указан'}</td>
                 <td class="count-cell">${task.total_results || 0}</td>
