@@ -1362,7 +1362,7 @@ class GymnastikaPlatform {
 
             // Display results or appropriate error
             if (results && results.length > 0) {
-                this.viewResults(results);
+                this.showResultsModal(taskName, results);
             } else if (taskFound) {
                 // Task exists in parsing_tasks but has no results
                 this.showError('Задача завершена без результатов или еще выполняется');
