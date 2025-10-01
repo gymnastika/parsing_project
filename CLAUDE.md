@@ -920,6 +920,14 @@ database/
 ├── CONTEXT_AWARE_SEARCH_FEATURE.md     # Context-aware поиск по базе данных
 ├── PIPELINE_CONCURRENCY_FIX.md         # Per-task orchestrator instances для concurrency
 ├── REALTIME_PROGRESS_FIX.md            # Real-time progress updates и completion flow
+├── PURE_SERVER_SIDE_ARCHITECTURE.md    # Pure server-side execution (F5-proof)
+├── DOUBLE_PIPELINE_EXECUTION_FIX.md    # Race condition fix (6 searches → 3)
+├── QUERY_DUPLICATION_FIX.md            # Query deduplication (50% cost savings)
+├── COMPLETION_METHOD_NAMES_FIX.md      # Method names fix for task completion
+├── PARSING_RESULTS_SCHEMA_FIX.md       # ✅ DATABASE SAVE FIX (October 1, 2025)
+├── EYE_ICON_FIX_SUMMARY.md             # ✅ EYE ICON FIX (October 1, 2025)
+├── CONTACTS_SECTION_FIX.md             # ✅ CONTACTS SECTION FIX (October 1, 2025)
+├── ALL_FIXES_SUMMARY.md                # ✅ COMPLETE SUMMARY (October 1, 2025)
 └── README.md                           # Инструкции по database setup
 ```
 
