@@ -704,6 +704,56 @@ HSTS_ENABLED=true
 - **Progressive loading**: Adaptive loader для UI components
 - **Resource monitoring**: Plan detection + automatic throttling
 
+## 🗄️ Database Setup
+
+### **КРИТИЧНО: Создание таблицы parsing_tasks**
+
+**Проблема**: Таблица `parsing_tasks` не существует в Supabase по умолчанию
+
+**Решение**:
+1. Откройте Supabase Dashboard → SQL Editor
+2. Выполните SQL из файла `database/create_parsing_tasks_table.sql`
+3. Проверьте создание командой:
+   ```sql
+   SELECT COUNT(*) FROM parsing_tasks;
+   ```
+
+**Что создается**:
+- ✅ Таблица `parsing_tasks` с 17 полями
+- ✅ 4 индекса для производительности (user_id, status, created_at, task_type)
+- ✅ RLS политики для безопасности (5 policies)
+- ✅ Триггер auto-update для `updated_at`
+- ✅ Service Role доступ для background worker
+
+**Структура таблицы**:
+```sql
+- id (UUID, primary key)
+- user_id (UUID, FK to auth.users)
+- task_name, task_type ('ai-search' | 'url-parsing')
+- search_query (NULL для url-parsing)
+- website_url (NULL для ai-search)
+- status ('pending' | 'running' | 'completed' | 'failed' | 'cancelled')
+- current_stage, progress (JSONB)
+- openai_thread_id, generated_queries, apify_runs
+- collected_results, final_results (JSONB)
+- error_message, retry_count
+- created_at, updated_at, completed_at
+```
+
+**Проверка RLS Policies**:
+```sql
+SELECT policyname FROM pg_policies WHERE tablename = 'parsing_tasks';
+```
+
+Должно показать:
+- Users can view own parsing tasks
+- Users can create own parsing tasks
+- Users can update own parsing tasks
+- Users can delete own parsing tasks
+- Service role full access to parsing tasks
+
+**См. полную документацию**: `database/README.md`
+
 ## 🔧 Troubleshooting Guide
 
 ### **Common Issues**
