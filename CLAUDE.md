@@ -352,22 +352,29 @@ const {
 
 ### **URL Parsing: 3-этапный процесс прямого парсинга**
 
-#### **Stage 1: Initializing**
+#### **Stage 1: Initializing (0/3 = 0%)**
 - **Модуль**: `PipelineOrchestrator.executeUrlParsing()`
 - **Процесс**: Валидация URL и подготовка к парсингу
 - **Вход**: `{ websiteUrl, taskName }`
+- **Progress**: `updateProgress('initializing', 0, 3, 'Инициализация парсинга URL...')`
+- **UI**: Progress bar 0%, описание "Инициализация парсинга..."
 
-#### **Stage 2: Direct Web Scraping**
-- **Модуль**: `ApifyClient.scrapeOrganizationDetails()`
+#### **Stage 2: Direct Web Scraping (1/3 = 33%)**
+- **Модуль**: `ApifyClient.scrapeWebsiteDetails()`
 - **Актер**: `apify/web-scraper` (прямой вызов)
 - **Процесс**: Извлечение данных напрямую с указанного URL
 - **Стратегии**: те же что и в AI Search (mailto, contact pages, meta tags)
 - **Отличие**: НЕ используется OpenAI и Google Maps
+- **Progress**: `updateProgress('web-scraping', 1, 3, 'Извлечение данных с сайта...')`
+- **UI**: Progress bar 33%, описание "Извлечение контактных данных с веб-сайтов"
 
-#### **Stage 3: Complete**
+#### **Stage 3: Complete (3/3 = 100%)**
 - **Модуль**: Форматирование результатов
 - **Выход**: Массив с извлеченными данными (email, phone, title)
 - **Формат**: Совместим с AI Search результатами
+- **Progress**: `updateProgress('complete', 3, 3, '✅ Парсинг URL завершен успешно!')`
+- **UI**: Progress bar 100%, описание "✅ Парсинг завершен успешно!"
+- **Database**: Task status → 'completed', results → final_results JSONB
 
 **Ключевое отличие:**
 ```
@@ -608,10 +615,15 @@ maxItems: 10 → 500      // 50x увеличение Apify лимита
 ## 🏆 Key Features & Capabilities
 
 ### **Business Intelligence Pipeline**
-- **Multi-stage processing**: 6-этапный workflow с валидацией на каждом этапе
+- **Multi-stage processing**: 6-этапный AI Search workflow + 3-этапный URL Parsing
 - **AI-powered optimization**: OpenAI Assistant оптимизирует search queries
 - **Scalable architecture**: Plan-aware resource management (FREE/PAID)
-- **Real-time progress**: WebSocket-style progress tracking с callbacks
+- **Universal Progress Bar**: Динамический прогресс-бар работает для любого количества этапов
+  - AI Search: 7 stages (0% → 14% → 29% → 43% → 57% → 71% → 86% → 100%)
+  - URL Parsing: 3 stages (0% → 33% → 100%)
+  - Automatic percentage calculation from `current/total`
+  - Real-time database progress updates
+  - Visual stage indicators with descriptions
 
 ### **Data Processing Capabilities**
 - **Smart deduplication**: placeId-based с data merging
@@ -864,7 +876,10 @@ claudedocs/
 
 database/
 ├── create_parsing_tasks_table.sql  # SQL миграция для persistent parsing
-└── README.md                       # Инструкции по database setup
+├── HISTORY_DISPLAY_FIX.md         # Исправление отображения истории задач
+├── URL_PARSING_FIXES.md           # Исправления URL parsing функционала
+├── URL_PARSING_PROGRESS.md        # Реализация прогресс-бара для URL parsing
+└── README.md                      # Инструкции по database setup
 ```
 
 ## 🎯 Development Patterns
