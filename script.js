@@ -1157,7 +1157,8 @@ class GymnastikaPlatform {
                         latest_date: items[0].parsing_timestamp || items[0].created_at,
                         task_type: 'ai-search',  // Legacy data was from AI Search
                         status: 'completed',
-                        task_id: null  // No task_id for legacy data
+                        task_id: null,  // No task_id for legacy data
+                        category_id: items[0].category_id || null  // Category from legacy data
                     }));
 
                     console.log(`📜 Transformed ${legacyHistory.length} legacy task groups`);
