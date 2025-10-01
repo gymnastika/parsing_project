@@ -178,6 +178,10 @@ body {
     100% { transform: rotate(360deg); }
 }
 
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
 @keyframes pulse {
     0%, 100% { opacity: 0.8; }
     50% { opacity: 0.4; }
