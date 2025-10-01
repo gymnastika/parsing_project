@@ -2554,7 +2554,7 @@ class GymnastikaPlatform {
     // Switch between tabs
     switchTab(tabName) {
         console.log(`🔄 Switching to tab: ${tabName}`);
-        
+
         // ✅ FIX: Reset progress bar ONLY if no active parsing
         // Don't reset during active parsing to preserve progress visibility
         if (!this.currentTaskId) {
@@ -2563,24 +2563,31 @@ class GymnastikaPlatform {
         } else {
             console.log('⏸️ UI reset skipped - parsing in progress (taskId:', this.currentTaskId + ')');
         }
-        
+
+        // Clear search input when switching tabs
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.value = '';
+            console.log('🔍 Search input cleared on tab switch');
+        }
+
         // Remove active class from all tab buttons
         document.querySelectorAll('.tab-button').forEach(btn => {
             btn.classList.remove('active');
         });
-        
+
         // Add active class to clicked button
         const activeButton = document.querySelector(`[data-tab="${tabName}"]`);
         if (activeButton) {
             activeButton.classList.add('active');
             console.log(`✅ Tab button activated: ${tabName}`);
         }
-        
+
         // Hide all tab contents
         document.querySelectorAll('.tab-content').forEach(content => {
             content.classList.remove('active');
         });
-        
+
         // Show target tab content
         const targetContent = document.getElementById(`${tabName}-content`);
         if (targetContent) {
@@ -2589,7 +2596,7 @@ class GymnastikaPlatform {
         } else {
             console.log(`❌ Tab content not found: ${tabName}-content`);
         }
-        
+
         // Load tab-specific data
         this.loadTabData(tabName);
     }
