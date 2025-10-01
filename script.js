@@ -12,10 +12,11 @@ class GymnastikaPlatform {
         this.telegramSettingsBound = false;
         this.navigationBound = false;
         this.adaptiveLoader = null;
+        this.taskSubscription = null; // Real-time subscription for parsing tasks
         this.settings = {
             telegramBotToken: localStorage.getItem('telegramBotToken') || ''
         };
-        
+
         // 📅 Date sorting settings for contacts
         this.dateSortDirection = 'desc'; // 'desc' = новые сверху, 'asc' = старые сверху
         this.lastContactsData = null; // Cache for re-sorting
