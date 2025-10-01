@@ -1675,6 +1675,11 @@ class GymnastikaPlatform {
                     .order('created_at', { ascending: false })
                     .limit(50);
 
+                if (tasksError) {
+                    console.error('❌ Error loading from parsing_tasks fallback:', tasksError);
+                    console.log('⚠️ Fallback failed - this is expected if all tasks are in parsing_results table');
+                }
+
                 if (!tasksError && tasks && tasks.length > 0) {
                     console.log(`📜 Fallback: found ${tasks.length} completed tasks in parsing_tasks`);
 
