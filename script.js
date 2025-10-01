@@ -5222,7 +5222,6 @@ class GymnastikaPlatform {
             this.showError(`Ошибка отправки email: ${error.message}`);
         } finally {
             // Restore button state
-            const sendBtn = document.getElementById('confirmSendBtn');
             if (sendBtn && originalText) {
                 sendBtn.disabled = false;
                 sendBtn.innerHTML = originalText;
