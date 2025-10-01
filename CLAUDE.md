@@ -927,6 +927,7 @@ database/
 ├── PARSING_RESULTS_SCHEMA_FIX.md       # ✅ DATABASE SAVE FIX (October 1, 2025)
 ├── EYE_ICON_FIX_SUMMARY.md             # ✅ EYE ICON FIX (October 1, 2025)
 ├── CONTACTS_SECTION_FIX.md             # ✅ CONTACTS SECTION FIX (October 1, 2025)
+├── CROSS_BROWSER_DATA_FIX.md           # 🔴 CROSS-BROWSER FIX (October 1, 2025)
 ├── ALL_FIXES_SUMMARY.md                # ✅ COMPLETE SUMMARY (October 1, 2025)
 └── README.md                           # Инструкции по database setup
 ```
