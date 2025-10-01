@@ -1756,17 +1756,28 @@ class GymnastikaPlatform {
 
                 if (!tasksError && tasks && tasks.length > 0) {
                     console.log(`📜 Fallback: found ${tasks.length} completed tasks in parsing_tasks`);
+                    console.log('📊 Task details:', tasks.map(t => ({
+                        task_name: t.task_data?.taskName,
+                        category_id: t.category_id,
+                        has_final_results: !!t.final_results,
+                        results_type: Array.isArray(t.final_results) ? 'array' : typeof t.final_results
+                    })));
 
                     const allContacts = [];
-                    tasks.forEach(task => {
+                    tasks.forEach((task, index) => {
                         let results = task.final_results;
+                        console.log(`🔍 Task ${index + 1}: Processing final_results, type: ${Array.isArray(results) ? 'array' : typeof results}`);
 
                         // Handle nested structure
                         if (results && results.results && Array.isArray(results.results)) {
+                            console.log(`🔄 Task ${index + 1}: Found nested .results array with ${results.results.length} items`);
                             results = results.results;
                         }
 
                         if (Array.isArray(results)) {
+                            console.log(`📋 Task ${index + 1}: Processing ${results.length} results`);
+                            let contactsInTask = 0;
+
                             results.forEach(result => {
                                 if (result.email && result.email.trim() !== '') {
                                     allContacts.push({
@@ -1779,15 +1790,24 @@ class GymnastikaPlatform {
                                         category_id: task.category_id || (task.task_data && task.task_data.categoryId) || null,
                                         parsing_timestamp: task.created_at
                                     });
+                                    contactsInTask++;
                                 }
                             });
+
+                            console.log(`✅ Task ${index + 1}: Extracted ${contactsInTask} contacts with email`);
+                        } else {
+                            console.log(`⚠️ Task ${index + 1}: final_results is not an array after processing`);
                         }
                     });
 
                     if (allContacts.length > 0) {
                         console.log(`📜 Fallback: extracted ${allContacts.length} contacts from parsing_tasks`);
                         freshContactsData = allContacts;
+                    } else {
+                        console.log(`⚠️ Fallback: No contacts with email found in any task`);
                     }
+                } else {
+                    console.log(`❌ Fallback: No completed tasks found or error occurred`);
                 }
             }
 
