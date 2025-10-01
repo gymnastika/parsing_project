@@ -348,6 +348,33 @@ const {
 - **Алгоритм**: Keyword matching + location scoring
 - **Сортировка**: По релевантности + рейтингу Google
 
+---
+
+### **URL Parsing: 3-этапный процесс прямого парсинга**
+
+#### **Stage 1: Initializing**
+- **Модуль**: `PipelineOrchestrator.executeUrlParsing()`
+- **Процесс**: Валидация URL и подготовка к парсингу
+- **Вход**: `{ websiteUrl, taskName }`
+
+#### **Stage 2: Direct Web Scraping**
+- **Модуль**: `ApifyClient.scrapeOrganizationDetails()`
+- **Актер**: `apify/web-scraper` (прямой вызов)
+- **Процесс**: Извлечение данных напрямую с указанного URL
+- **Стратегии**: те же что и в AI Search (mailto, contact pages, meta tags)
+- **Отличие**: НЕ используется OpenAI и Google Maps
+
+#### **Stage 3: Complete**
+- **Модуль**: Форматирование результатов
+- **Выход**: Массив с извлеченными данными (email, phone, title)
+- **Формат**: Совместим с AI Search результатами
+
+**Ключевое отличие:**
+```
+AI Search:    User Query → OpenAI → Google Maps → Web Scraper → Results
+URL Parsing:  Website URL → Web Scraper (direct) → Results
+```
+
 ## 🔗 Интеграции External APIs
 
 ### **OpenAI Assistant API**
