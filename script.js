@@ -5047,11 +5047,13 @@ class GymnastikaPlatform {
 
             // Get Supabase auth user ID for RLS policy
             const supabaseUserId = (await this.supabase.auth.getUser()).data.user?.id;
+            console.log('🔑 Supabase auth user ID for saving:', supabaseUserId);
 
             // Get task data from task object
             const taskData = task.task_data || {};
             const taskName = taskData.taskName || task.task_name || 'Неизвестная задача';
             const originalQuery = taskData.searchQuery || taskData.originalQuery || 'Не указан';
+            console.log(`📝 Saving with: task_name="${taskName}", user_id="${supabaseUserId}"`);
 
             // Prepare records matching the actual parsing_results table schema
             const records = results.map(result => ({
