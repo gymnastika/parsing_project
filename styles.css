@@ -8809,7 +8809,7 @@ div.modal-overlay.results-modal .results-modal-content {
 
 /* First stage (0%) - shifted left to align with track start */
 .progress-stage[data-stage="0"] {
-    left: -15px;
+    left: -17px;
     transform: translateY(-50%);
 }
 
