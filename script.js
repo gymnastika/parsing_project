@@ -2391,6 +2391,9 @@ class GymnastikaPlatform {
     switchTab(tabName) {
         console.log(`🔄 Switching to tab: ${tabName}`);
         
+        // ✅ FIX: Reset progress bar when switching tabs to prevent stale state
+        this.resetParsingUI();
+        
         // Remove active class from all tab buttons
         document.querySelectorAll('.tab-button').forEach(btn => {
             btn.classList.remove('active');
@@ -4446,17 +4449,27 @@ class GymnastikaPlatform {
 
     // Reset parsing UI after completion or error
     resetParsingUI() {
-        const submitBtn = document.querySelector('.submit-btn');
+        // ✅ FIX: Reset both AI Search and URL Parsing submit buttons
+        const aiSearchBtn = document.querySelector('#parsingForm .submit-btn');
+        const urlParsingBtn = document.querySelector('#urlParsingForm .submit-btn');
         const progressBar = document.getElementById('modernProgressBar');
         const progressDesc = document.getElementById('progressDescription');
         const progressFill = document.getElementById('progressFill');
 
-        // Show submit button
-        if (submitBtn) submitBtn.style.display = 'block';
+        // Show both submit buttons
+        if (aiSearchBtn) {
+            aiSearchBtn.style.display = 'block';
+            console.log('✅ AI Search submit button shown');
+        }
+        if (urlParsingBtn) {
+            urlParsingBtn.style.display = 'block';
+            console.log('✅ URL Parsing submit button shown');
+        }
 
         // Hide and reset progress bar
         if (progressBar) {
             progressBar.classList.remove('active');
+            console.log('✅ Progress bar hidden');
 
             // Reset all stage visual states
             const allStages = progressBar.querySelectorAll('.progress-stage');
