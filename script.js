@@ -1662,6 +1662,55 @@ class GymnastikaPlatform {
                 }
             }
 
+            // Fallback: Try loading from parsing_tasks.final_results for old data
+            if (freshContactsData.length === 0) {
+                console.log('🔄 No contacts in parsing_results, trying parsing_tasks.final_results fallback...');
+
+                const { data: tasks, error: tasksError } = await this.supabase
+                    .from('parsing_tasks')
+                    .select('final_results, task_data, created_at')
+                    .eq('user_id', supabaseUserId)
+                    .eq('status', 'completed')
+                    .not('final_results', 'is', null)
+                    .order('created_at', { ascending: false })
+                    .limit(50);
+
+                if (!tasksError && tasks && tasks.length > 0) {
+                    console.log(`📜 Fallback: found ${tasks.length} completed tasks in parsing_tasks`);
+
+                    const allContacts = [];
+                    tasks.forEach(task => {
+                        let results = task.final_results;
+
+                        // Handle nested structure
+                        if (results && results.results && Array.isArray(results.results)) {
+                            results = results.results;
+                        }
+
+                        if (Array.isArray(results)) {
+                            results.forEach(result => {
+                                if (result.email && result.email.trim() !== '') {
+                                    allContacts.push({
+                                        organization_name: result.organizationName || result.organization_name || 'Неизвестная организация',
+                                        email: result.email,
+                                        description: result.description || 'Описание отсутствует',
+                                        website: result.website || result.url || '',
+                                        country: result.country || 'Не определено',
+                                        task_name: (task.task_data && task.task_data.taskName) || 'Неизвестная задача',
+                                        parsing_timestamp: task.created_at
+                                    });
+                                }
+                            });
+                        }
+                    });
+
+                    if (allContacts.length > 0) {
+                        console.log(`📜 Fallback: extracted ${allContacts.length} contacts from parsing_tasks`);
+                        freshContactsData = allContacts;
+                    }
+                }
+            }
+
             // Check if we need to update the UI
             const needsUpdate = this.shouldUpdateContactsUI(cachedData, freshContactsData);
             
