@@ -5352,30 +5352,30 @@ class GymnastikaPlatform {
                 return;
             }
 
-            const results = finalResults.results;
+            // Get all results
+            const allResults = finalResults.results;
+
+            // Filter: keep only results with contact info (email or phone)
+            const results = allResults.filter(r => r.email || r.phone);
             const resultCount = results.length;
 
-            // DEBUG: Check finalResults structure
-            console.log('🔍 DEBUG: finalResults structure:', {
-                hasResults: !!finalResults.results,
-                resultsLength: finalResults.results?.length,
-                hasFinalCount: !!finalResults.finalCount,
-                finalCount: finalResults.finalCount,
-                hasScrapedCount: !!finalResults.scrapedCount,
-                scrapedCount: finalResults.scrapedCount,
-                allKeys: Object.keys(finalResults)
+            console.log(`📊 Results filtering:`, {
+                total: allResults.length,
+                withContacts: results.length,
+                filtered: allResults.length - results.length
             });
 
-            // DEBUG: Check for duplicate results by website
-            const websites = results.map(r => r.website || r.url);
-            const uniqueWebsites = new Set(websites);
-            console.log('🔍 DEBUG: Results array analysis:', {
-                totalResults: results.length,
-                uniqueWebsites: uniqueWebsites.size,
-                hasDuplicates: results.length !== uniqueWebsites.size
-            });
+            if (results.length === 0) {
+                console.warn('⚠️ No results with contact information');
+                this.showNotification(
+                    'Парсинг завершен',
+                    `Найдено ${allResults.length} организаций, но ни у одной нет контактных данных`,
+                    'warning'
+                );
+                return;
+            }
 
-            console.log(`📊 Saving ${resultCount} results to database...`);
+            console.log(`📊 Saving ${resultCount} results with contacts to database...`);
 
             // Save results to database
             await this.saveResultsToDatabase(task, results);
