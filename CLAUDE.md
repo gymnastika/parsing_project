@@ -758,6 +758,19 @@ SELECT policyname FROM pg_policies WHERE tablename = 'parsing_tasks';
 
 ### **Common Issues**
 
+#### **500 Error: parsing_tasks table not found**
+```javascript
+Problem: ERROR 42P01: relation "parsing_tasks" does not exist
+Solution: Выполнить SQL миграцию из database/create_parsing_tasks_table.sql
+```
+
+**Шаги решения**:
+1. Supabase Dashboard → SQL Editor
+2. Скопировать весь SQL из `database/create_parsing_tasks_table.sql`
+3. Вставить и выполнить (Run)
+4. Проверить: `SELECT COUNT(*) FROM parsing_tasks;`
+5. Перезапустить приложение
+
 #### **Pipeline Stage Failures**
 ```javascript
 // Stage 1: OpenAI Assistant не отвечает
