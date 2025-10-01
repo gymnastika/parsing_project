@@ -204,6 +204,20 @@ COMMENT ON COLUMN parsing_results.country IS 'Страна расположен�
 
 ## 🆘 Что делать при проблемах
 
+### Проблема: "cannot drop column... other objects depend on it"
+**Полная ошибка**:
+```
+ERROR: 2BP01: cannot drop column country of table parsing_results because other objects depend on it
+DETAIL: view user_parsing_stats depends on column country of table parsing_results
+```
+
+**Причина**: VIEW `user_parsing_stats` использует колонку `country`
+
+**Решение**: Используйте ОБНОВЛЕННЫЙ SQL скрипт из `database/REMOVE_COUNTRY_COLUMN_OPTIONAL.sql`, который:
+1. Сначала пересоздает VIEW без country
+2. Затем удаляет индекс
+3. Затем удаляет колонку
+
 ### Проблема: "column does not exist" после удаления
 **Причина**: Где-то в коде все еще используется country
 **Решение**: Найдите все упоминания `country` в коде и удалите
