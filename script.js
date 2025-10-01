@@ -2358,7 +2358,6 @@ class GymnastikaPlatform {
             const organizationName = document.getElementById('edit-organization-name').value.trim();
             const email = document.getElementById('edit-email').value.trim();
             const website = document.getElementById('edit-website').value.trim();
-            const country = document.getElementById('edit-country').value.trim();
             const description = document.getElementById('edit-description').value.trim();
             
             if (!organizationName) {
