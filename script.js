@@ -2689,6 +2689,7 @@ class GymnastikaPlatform {
 
             const taskName = document.getElementById('taskName').value.trim();
             const searchQuery = document.getElementById('searchQuery').value.trim();
+            const resultsPerQuery = parseInt(document.getElementById('resultsPerQuery').value);
 
             if (!taskName) {
                 this.showError('Введите название задачи');
@@ -2697,6 +2698,12 @@ class GymnastikaPlatform {
 
             if (!searchQuery) {
                 this.showError('Введите поисковый запрос');
+                return;
+            }
+
+            // Validate results per query
+            if (isNaN(resultsPerQuery) || resultsPerQuery < 10 || resultsPerQuery > 100) {
+                this.showError('Количество результатов должно быть от 10 до 100');
                 return;
             }
 
@@ -2709,7 +2716,7 @@ class GymnastikaPlatform {
                 return;
             }
 
-            await this.startParsing({ taskName, searchQuery, categoryId });
+            await this.startParsing({ taskName, searchQuery, categoryId, resultsPerQuery });
         });
     }
 
