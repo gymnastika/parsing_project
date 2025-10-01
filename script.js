@@ -481,9 +481,10 @@ class GymnastikaPlatform {
             // Show initial section
             this.showSection('parsing');
             
-            // Initialize parsing form
+            // Initialize parsing forms
             this.bindParsingForm();
-            
+            this.bindUrlParsingForm();
+
             // Bind tab buttons for parsing section
             this.bindTabButtons();
             
