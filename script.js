@@ -1126,6 +1126,21 @@ class GymnastikaPlatform {
             const supabaseUserId = (await this.supabase.auth.getUser()).data.user?.id;
             console.log('🔑 Supabase auth user ID for history:', supabaseUserId);
 
+            // Load categories for display (cache them)
+            try {
+                const { data: categoriesData, error: catError } = await this.supabase
+                    .from('categories')
+                    .select('*')
+                    .eq('user_id', supabaseUserId);
+
+                if (!catError && categoriesData) {
+                    this.setCacheData('categories_map', categoriesData);
+                    console.log(`📋 Loaded ${categoriesData.length} categories for history display`);
+                }
+            } catch (catError) {
+                console.warn('⚠️ Could not load categories:', catError.message);
+            }
+
             // Get all parsing tasks from NEW persistent tasks table
             const { data: tasks, error } = await this.supabase
                 .from('parsing_tasks')
