@@ -3330,6 +3330,226 @@ class GymnastikaPlatform {
         }
     }
 
+    // ===== MANUAL CONTACT ADDITION METHODS =====
+
+    // Bind add contact form events
+    bindAddContactForm() {
+        console.log('📝 Binding add contact form...');
+
+        const addContactBtn = document.getElementById('addContactBtn');
+        const contactForm = document.getElementById('contactForm');
+        const addContactForm = document.getElementById('addContactForm');
+        const cancelContactBtn = document.getElementById('cancelContactBtn');
+
+        if (addContactBtn) {
+            addContactBtn.addEventListener('click', () => {
+                console.log('➕ Add contact button clicked');
+                this.showAddContactForm();
+            });
+            console.log('✅ Add contact button bound');
+        }
+
+        if (cancelContactBtn) {
+            cancelContactBtn.addEventListener('click', () => {
+                console.log('❌ Cancel button clicked');
+                this.hideAddContactForm();
+            });
+            console.log('✅ Cancel button bound');
+        }
+
+        if (addContactForm) {
+            addContactForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                console.log('💾 Form submitted');
+                await this.handleAddContact(e);
+            });
+            console.log('✅ Form submit bound');
+        }
+    }
+
+    // Show add contact form
+    async showAddContactForm() {
+        console.log('📝 Showing add contact form...');
+
+        const contactForm = document.getElementById('contactForm');
+        if (!contactForm) {
+            console.error('❌ Contact form not found');
+            return;
+        }
+
+        // Load categories into select dropdown
+        await this.loadCategoriesIntoContactForm();
+
+        // Show form
+        contactForm.classList.remove('hidden');
+
+        // Scroll form into view
+        contactForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+        console.log('✅ Add contact form displayed');
+    }
+
+    // Hide add contact form
+    hideAddContactForm() {
+        console.log('🔒 Hiding add contact form...');
+
+        const contactForm = document.getElementById('contactForm');
+        const addContactForm = document.getElementById('addContactForm');
+
+        if (contactForm) {
+            contactForm.classList.add('hidden');
+        }
+
+        if (addContactForm) {
+            addContactForm.reset();
+        }
+
+        console.log('✅ Add contact form hidden');
+    }
+
+    // Load categories into contact form dropdown
+    async loadCategoriesIntoContactForm() {
+        console.log('📋 Loading categories into contact form...');
+
+        const categorySelect = document.getElementById('contactCategory');
+        if (!categorySelect) {
+            console.error('❌ Category select not found');
+            return;
+        }
+
+        try {
+            // Get Supabase auth user ID
+            const supabaseUserId = (await this.supabase.auth.getUser()).data.user?.id;
+
+            const { data: categories, error } = await this.supabase
+                .from('categories')
+                .select('*')
+                .eq('user_id', supabaseUserId)
+                .order('name', { ascending: true });
+
+            if (error) throw error;
+
+            // Clear existing options except placeholder
+            categorySelect.innerHTML = '<option value="">Выберите категорию</option>';
+
+            // Add category options
+            if (categories && categories.length > 0) {
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.textContent = category.name;
+                    categorySelect.appendChild(option);
+                });
+                console.log(`✅ Loaded ${categories.length} categories into form`);
+            } else {
+                console.log('⚠️ No categories found');
+            }
+
+        } catch (error) {
+            console.error('❌ Error loading categories into form:', error);
+            this.showError('Ошибка загрузки категорий');
+        }
+    }
+
+    // Handle add contact form submission
+    async handleAddContact(e) {
+        e.preventDefault();
+        console.log('💾 Handling contact addition...');
+
+        try {
+            // Get form values
+            const email = document.getElementById('contactEmail').value.trim();
+            const categoryId = document.getElementById('contactCategory').value;
+            const orgName = document.getElementById('orgName').value.trim();
+            const description = document.getElementById('contactDescription').value.trim();
+            const website = document.getElementById('contactWebsite').value.trim();
+
+            // Validate required fields
+            if (!email) {
+                this.showError('Email обязателен для заполнения');
+                return;
+            }
+
+            if (!categoryId) {
+                this.showError('Категория обязательна для заполнения');
+                return;
+            }
+
+            // Get Supabase auth user ID
+            const supabaseUserId = (await this.supabase.auth.getUser()).data.user?.id;
+
+            // Check for duplicate email (use deduplication logic)
+            console.log('🔍 Checking for duplicate email...');
+            const normalizedEmail = email.toLowerCase().trim();
+
+            const { data: existingContact, error: checkError } = await this.supabase
+                .from('parsing_results')
+                .select('email')
+                .eq('user_id', supabaseUserId)
+                .eq('email', normalizedEmail)
+                .limit(1);
+
+            if (checkError) throw checkError;
+
+            if (existingContact && existingContact.length > 0) {
+                this.showError(`Контакт с email "${email}" уже существует в базе данных`);
+                return;
+            }
+
+            // Prepare contact record
+            const contactRecord = {
+                user_id: supabaseUserId,
+                task_name: 'Добавлено вручную',
+                original_query: 'Ручное добавление',
+                category_id: categoryId,
+                organization_name: orgName || 'Неизвестная организация',
+                email: email,
+                description: description || 'Описание отсутствует',
+                country: 'Не определено',
+                source_url: website || 'https://manually-added.com',
+                website: website || null,
+                all_emails: [email],
+                page_title: orgName || 'Ручное добавление',
+                has_contact_info: true,
+                scraping_error: null,
+                error_type: null,
+                parsing_timestamp: new Date().toISOString()
+            };
+
+            console.log('💾 Saving contact to database...');
+
+            const { data, error } = await this.supabase
+                .from('parsing_results')
+                .insert([contactRecord]);
+
+            if (error) throw error;
+
+            console.log('✅ Contact saved successfully');
+
+            // Show success notification
+            this.showNotification(
+                'Контакт добавлен',
+                `Контакт "${orgName || email}" успешно добавлен в базу данных`,
+                'success'
+            );
+
+            // Hide form and reload contacts
+            this.hideAddContactForm();
+
+            // Invalidate contacts cache and reload
+            this.invalidateCache('contacts_data');
+            await this.loadContactsData();
+
+            console.log('✅ Contacts list refreshed');
+
+        } catch (error) {
+            console.error('❌ Error adding contact:', error);
+            this.showError('Ошибка при добавлении контакта: ' + error.message);
+        }
+    }
+
+    // ===== END MANUAL CONTACT ADDITION =====
+
     // Load categories from database
     async loadCategories() {
         console.log('📋 Loading categories...');
