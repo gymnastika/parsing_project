@@ -4949,37 +4949,39 @@ class GymnastikaPlatform {
     /**
      * Save parsing results to database
      */
-    async saveResultsToDatabase(taskId, results) {
+    async saveResultsToDatabase(task, results) {
         try {
             if (!results || results.length === 0) {
                 console.log('⚠️ No results to save');
                 return;
             }
 
-            console.log(`💾 Saving ${results.length} results for task ${taskId}...`);
+            console.log(`💾 Saving ${results.length} results for task ${task.id}...`);
 
-            // Prepare records for insertion
-            // IMPORTANT: Use Supabase auth user ID for RLS policy
+            // Get Supabase auth user ID for RLS policy
             const supabaseUserId = (await this.supabase.auth.getUser()).data.user?.id;
 
+            // Get task data from task object
+            const taskData = task.task_data || {};
+            const taskName = taskData.taskName || task.task_name || 'Неизвестная задача';
+            const originalQuery = taskData.searchQuery || taskData.originalQuery || 'Не указан';
+
+            // Prepare records matching the actual parsing_results table schema
             const records = results.map(result => ({
                 user_id: supabaseUserId,
-                task_id: taskId,
+                task_name: taskName,
+                original_query: originalQuery,
                 organization_name: result.organizationName || result.name || 'Неизвестно',
                 email: result.email || null,
-                phone: result.phone || null,
-                website: result.website || null,
-                address: result.address || null,
                 description: result.description || null,
                 country: result.country || 'Не определено',
-                rating: result.rating || null,
-                reviews_count: result.reviewsCount || null,
-                categories: result.categories || null,
-                metadata: {
-                    relevanceScore: result.relevanceScore || 0,
-                    dataSource: result.dataSource || 'unknown',
-                    scrapedAt: result.scrapedAt || new Date().toISOString()
-                }
+                source_url: result.website || result.url || result.sourceUrl || 'https://unknown.com',
+                website: result.website || null,
+                all_emails: result.all_emails || (result.email ? [result.email] : []),
+                page_title: result.pageTitle || result.title || null,
+                has_contact_info: !!(result.email || result.phone),
+                scraping_error: result.error || null,
+                error_type: result.errorType || null
             }));
 
             // Insert in batches of 100 to avoid Supabase limits
