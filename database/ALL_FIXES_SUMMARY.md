@@ -154,10 +154,6 @@ const { data: legacyResults } = await this.supabase
     .from('parsing_results')
     .select('*')
     .eq('user_id', supabaseUserId)  // Same UUID in all browsers!
-
-// Filter contacts with email
-const contactsWithInfo = contacts.filter(contact =>
-    (contact.email && contact.email.trim() !== '')
 );
 
 // Normalize from parsing_results schema
