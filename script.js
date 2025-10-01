@@ -4224,6 +4224,52 @@ class GymnastikaPlatform {
         console.log('🔄 Parsing UI reset complete');
     }
 
+    // Update task progress in database
+    async updateTaskProgress(progress) {
+        if (!this.currentTaskId) return;
+
+        try {
+            const stageMapping = {
+                'initializing': 'initializing',
+                'query-generation': 'query-generation',
+                'apify-search': 'apify-search',
+                'aggregation': 'aggregation',
+                'web-scraping': 'web-scraping',
+                'filtering': 'filtering',
+                'relevance': 'relevance',
+                'complete': 'complete'
+            };
+
+            const stageToPercent = {
+                'initializing': 0,
+                'query-generation': 25,
+                'apify-search': 50,
+                'aggregation': 50,
+                'web-scraping': 75,
+                'filtering': 75,
+                'relevance': 75,
+                'complete': 100
+            };
+
+            await fetch(`/api/parsing-tasks/${this.currentTaskId}/progress`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                },
+                body: JSON.stringify({
+                    stage: stageMapping[progress.stage] || progress.stage,
+                    current: stageToPercent[progress.stage] || progress.current || 0,
+                    total: 100,
+                    message: progress.message || ''
+                })
+            });
+        } catch (error) {
+            console.warn('⚠️ Failed to update task progress:', error.message);
+            // Don't throw - progress update failure shouldn't stop parsing
+        }
+    }
+
     // View results modal
     viewResults(results) {
         const modal = document.getElementById('resultsModal');
