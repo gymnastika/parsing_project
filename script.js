@@ -1560,7 +1560,7 @@ class GymnastikaPlatform {
                 <td class="count-cell">${task.total_results || 0}</td>
                 <td class="contacts-cell">${task.contacts_count || 0}</td>
                 <td class="actions-cell">
-                    <button class="btn-eye-original" onclick="platform.viewTaskResults('${task.task_name}')" title="Посмотреть результаты">👁</button>
+                    <button class="btn-eye-original" onclick="platform.viewTaskResults('${task.task_name}', '${task.task_id || ''}')" title="Посмотреть результаты">👁</button>
                 </td>
             `;
             body.appendChild(row);
