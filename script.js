@@ -4126,9 +4126,9 @@ class GymnastikaPlatform {
                 const notificationData = {
                     originalQuery: params.searchQuery,
                     taskName: params.taskName,
-                    queryInfo: results.queryInfo,
-                    results: results.results || results,
-                    timestamp: results.timestamp || new Date().toISOString()
+                    queryInfo: pipelineResults.queryInfo || {},
+                    results: results,
+                    timestamp: pipelineResults.timestamp || new Date().toISOString()
                 };
 
                 // Send notification asynchronously (don't block modal display)
