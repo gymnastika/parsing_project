@@ -4350,7 +4350,16 @@ class GymnastikaPlatform {
             this.currentTaskId = createdTask.id; // Store task ID for progress updates
             console.log('✅ Task created in DB:', this.currentTaskId);
 
-            // 2. Hide submit button and show modern progress bar
+            // 2. IMMEDIATELY mark task as running to prevent Background Worker from picking it up
+            await fetch(`/api/parsing-tasks/${this.currentTaskId}/running`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${await this.getAuthToken()}`
+                }
+            });
+            console.log('🔒 Task marked as RUNNING - Background Worker will skip it');
+
+            // 3. Hide submit button and show modern progress bar
             const submitBtn = document.querySelector('.submit-btn');
             const progressBar = document.getElementById('modernProgressBar');
             const progressDesc = document.getElementById('progressDescription');
@@ -4359,7 +4368,7 @@ class GymnastikaPlatform {
             if (progressBar) progressBar.classList.add('active');
             if (progressDesc) progressDesc.classList.add('active');
 
-            // 3. Set up progress callback WITH database updates
+            // 4. Set up progress callback WITH database updates
             this.pipelineOrchestrator.onProgressUpdate = async (progress) => {
                 this.updateModernProgress(progress);
 
@@ -4368,14 +4377,6 @@ class GymnastikaPlatform {
                     await this.updateTaskProgress(progress);
                 }
             };
-
-            // 4. Mark task as running in DB
-            await fetch(`/api/parsing-tasks/${this.currentTaskId}/running`, {
-                method: 'PATCH',
-                headers: {
-                    'Authorization': `Bearer ${await this.getAuthToken()}`
-                }
-            });
 
             // 5. Start pipeline with proper parameters
             const pipelineResults = await this.pipelineOrchestrator.executePipeline({
