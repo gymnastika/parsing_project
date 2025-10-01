@@ -5373,7 +5373,7 @@ class GymnastikaPlatform {
             // Show completion notification
             this.showNotification(
                 'Парсинг завершен успешно!',
-                `Найдено ${resultCount} результатов с контактными данными`,
+                'Данные успешно добавлены в базу данных',
                 'success'
             );
 
