@@ -875,11 +875,15 @@ claudedocs/
 └── tests/                   # Автоматизированные тесты
 
 database/
-├── create_parsing_tasks_table.sql  # SQL миграция для persistent parsing
-├── HISTORY_DISPLAY_FIX.md         # Исправление отображения истории задач
-├── URL_PARSING_FIXES.md           # Исправления URL parsing функционала
-├── URL_PARSING_PROGRESS.md        # Реализация прогресс-бара для URL parsing
-└── README.md                      # Инструкции по database setup
+├── create_parsing_tasks_table.sql       # SQL миграция для persistent parsing
+├── HISTORY_DISPLAY_FIX.md              # Исправление отображения истории задач
+├── URL_PARSING_FIXES.md                # Исправления URL parsing функционала
+├── URL_PARSING_PROGRESS.md             # Реализация прогресс-бара для URL parsing
+├── STUCK_TASK_RECOVERY_FIX.md          # Stuck task detection и retry логика
+├── CONTEXT_AWARE_SEARCH_FEATURE.md     # Context-aware поиск по базе данных
+├── PIPELINE_CONCURRENCY_FIX.md         # Per-task orchestrator instances для concurrency
+├── REALTIME_PROGRESS_FIX.md            # Real-time progress updates и completion flow
+└── README.md                           # Инструкции по database setup
 ```
 
 ## 🎯 Development Patterns
