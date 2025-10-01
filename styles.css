@@ -2393,6 +2393,23 @@ button.category-add-button-v2:active {
     background: #f3f4f6;
 }
 
+/* Delete Button */
+.btn-delete {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 2px 4px;
+    color: #9ca3af;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+}
+
+.btn-delete:hover {
+    color: #ef4444;
+    background: #fef2f2;
+}
+
 /* Original Menu Button */
 .btn-menu-original {
     background: #7c3aed;
