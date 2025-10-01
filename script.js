@@ -5155,8 +5155,8 @@ class GymnastikaPlatform {
             );
 
             // Refresh UI tables
-            await this.loadTaskHistory();
-            await this.loadContacts();
+            await this.loadHistoryData();
+            await this.loadContactsData();
 
             console.log('✅ Task completion handled successfully');
 
