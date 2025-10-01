@@ -3937,7 +3937,35 @@ class GymnastikaPlatform {
         }
 
         try {
-            // Hide submit button and show modern progress bar
+            // 1. Create task in database BEFORE starting
+            const taskData = {
+                taskName: params.taskName,
+                searchQuery: params.searchQuery,
+                websiteUrl: params.websiteUrl,
+                type: 'ai-search'
+            };
+
+            const taskResponse = await fetch('/api/parsing-tasks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                },
+                body: JSON.stringify({
+                    userId: this.currentUser?.id,
+                    taskData: taskData
+                })
+            });
+
+            if (!taskResponse.ok) {
+                throw new Error('Failed to create task in database');
+            }
+
+            const createdTask = await taskResponse.json();
+            this.currentTaskId = createdTask.id; // Store task ID for progress updates
+            console.log('✅ Task created in DB:', this.currentTaskId);
+
+            // 2. Hide submit button and show modern progress bar
             const submitBtn = document.querySelector('.submit-btn');
             const progressBar = document.getElementById('modernProgressBar');
             const progressDesc = document.getElementById('progressDescription');
@@ -3946,12 +3974,25 @@ class GymnastikaPlatform {
             if (progressBar) progressBar.classList.add('active');
             if (progressDesc) progressDesc.classList.add('active');
 
-            // Set up progress callback
-            this.pipelineOrchestrator.onProgressUpdate = (progress) => {
+            // 3. Set up progress callback WITH database updates
+            this.pipelineOrchestrator.onProgressUpdate = async (progress) => {
                 this.updateModernProgress(progress);
+
+                // Save progress to database
+                if (this.currentTaskId) {
+                    await this.updateTaskProgress(progress);
+                }
             };
 
-            // Start pipeline with proper parameters
+            // 4. Mark task as running in DB
+            await fetch(`/api/parsing-tasks/${this.currentTaskId}/running`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${this.supabase.auth.session()?.access_token}`
+                }
+            });
+
+            // 5. Start pipeline with proper parameters
             const results = await this.pipelineOrchestrator.executePipeline({
                 taskName: params.taskName,
                 searchQuery: params.searchQuery,
