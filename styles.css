@@ -8835,20 +8835,19 @@ div.modal-overlay.results-modal .results-modal-content {
     z-index: 5;
 }
 
-/* First stage (0%) - no horizontal transform */
+/* First stage (0%) - offset by icon radius to stay within bounds */
 .progress-stage[data-stage="0"] {
-    left: 0%;
+    left: 17px;
     transform: translateY(-50%);
 }
 
-/* Last stage (100%) - anchor to right */
+/* Last stage (100%) - offset by icon radius from right edge */
 .progress-stage[data-stage="4"] {
-    left: auto;
-    right: 0%;
+    left: calc(100% - 17px);
     transform: translateY(-50%);
 }
 
-/* Middle stages - center horizontally */
+/* Middle stages - center horizontally with percentage positioning */
 .progress-stage[data-stage="1"],
 .progress-stage[data-stage="2"],
 .progress-stage[data-stage="3"] {
