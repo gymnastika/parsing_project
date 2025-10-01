@@ -4959,8 +4959,11 @@ class GymnastikaPlatform {
             console.log(`💾 Saving ${results.length} results for task ${taskId}...`);
 
             // Prepare records for insertion
+            // IMPORTANT: Use Supabase auth user ID for RLS policy
+            const supabaseUserId = (await this.supabase.auth.getUser()).data.user?.id;
+
             const records = results.map(result => ({
-                user_id: this.currentUser.id,
+                user_id: supabaseUserId,
                 task_id: taskId,
                 organization_name: result.organizationName || result.name || 'Неизвестно',
                 email: result.email || null,
