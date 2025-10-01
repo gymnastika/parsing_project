@@ -3206,7 +3206,7 @@ class GymnastikaPlatform {
         console.log('✅ Category filters bound successfully');
     }
 
-    // Export contacts to CSV file
+    // Export contacts to CSV file - matches Contacts table display
     exportContactsToCSV() {
         console.log('📥 Exporting contacts to CSV...');
 
@@ -3237,7 +3237,10 @@ class GymnastikaPlatform {
                 return;
             }
 
-            // CSV header
+            // 📅 Sort contacts by date before export (match table display)
+            const sortedContacts = this.sortContactsByDate([...contacts], this.dateSortDirection || 'desc');
+
+            // CSV header - EXACT match with displayContacts() table columns
             const headers = ['Категория', 'Название организации', 'Email', 'Описание', 'Веб-сайт', 'Дата добавления'];
 
             // Helper function to escape CSV values
@@ -3251,13 +3254,13 @@ class GymnastikaPlatform {
                 return stringValue;
             };
 
-            // Build CSV rows
-            const rows = contacts.map(contact => {
-                // Get category name
+            // Build CSV rows - EXACT match with displayContacts() row structure
+            const rows = sortedContacts.map(contact => {
+                // Get category name (same logic as displayContacts)
                 const category = categories.find(c => c.id === contact.category_id);
                 const categoryName = category ? category.name : (contact.category_id ? 'Неизвестно' : 'Без категории');
 
-                // Format date
+                // Format date (same format as displayContacts: dd.mm.yy)
                 const dateObj = new Date(contact.parsing_timestamp || contact.created_at || new Date());
                 const formattedDate = dateObj.toLocaleDateString('ru-RU', {
                     day: '2-digit',
@@ -3301,7 +3304,8 @@ class GymnastikaPlatform {
             // Clean up object URL
             setTimeout(() => URL.revokeObjectURL(link.href), 100);
 
-            console.log(`✅ Exported ${contacts.length} contacts to ${filename}`);
+            console.log(`✅ Exported ${sortedContacts.length} contacts to ${filename}`);
+            alert(`✅ Экспортировано ${sortedContacts.length} контактов в файл ${filename}`);
 
         } catch (error) {
             console.error('❌ Error exporting contacts:', error);
