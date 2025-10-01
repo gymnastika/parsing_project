@@ -771,6 +771,16 @@ Solution: Выполнить SQL миграцию из database/create_parsing_t
 4. Проверить: `SELECT COUNT(*) FROM parsing_tasks;`
 5. Перезапустить приложение
 
+#### **URL Parsing Error: scrapeOrganizationDetails is not a function**
+```javascript
+Problem: TypeError: this.apifyClient.scrapeOrganizationDetails is not a function
+Solution: ИСПРАВЛЕНО - метод был переименован в scrapeWebsiteDetails
+```
+
+**Статус**: ✅ Исправлено в версии 2025-10-01
+- Client-side: `pipeline-orchestrator.js` использует `scrapeWebsiteDetails()`
+- Server-side: `server-pipeline-orchestrator.js` использует wrapper метод
+
 #### **Pipeline Stage Failures**
 ```javascript
 // Stage 1: OpenAI Assistant не отвечает
