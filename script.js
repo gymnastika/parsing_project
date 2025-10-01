@@ -4427,24 +4427,8 @@ class GymnastikaPlatform {
             // No need to execute pipeline here - Background Worker does everything!
 
         } catch (error) {
-            console.error('❌ URL parsing error:', error);
-
-            // Mark task as failed in DB
-            if (this.currentTaskId) {
-                await fetch(`/api/parsing-tasks/${this.currentTaskId}/failed`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${await this.getAuthToken()}`
-                    },
-                    body: JSON.stringify({
-                        error: error.message
-                    })
-                });
-                this.currentTaskId = null;
-            }
-
-            this.showError('Ошибка парсинга URL: ' + error.message);
+            console.error('❌ URL parsing task creation error:', error);
+            this.showError('Ошибка создания задачи: ' + error.message);
             this.resetParsingUI();
         }
     }
