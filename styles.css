@@ -8125,14 +8125,14 @@ div.modal-overlay.results-modal .results-modal-content {
 .contact-checkbox:checked + .checkbox-custom::after {
     content: '';
     position: absolute;
-    top: 2px;
-    left: 6px;
+    top: 50%;
+    left: 50%;
     width: 6px;
     height: 10px;
     border: 2px solid white;
     border-top: none;
     border-left: none;
-    transform: rotate(45deg);
+    transform: translate(-50%, -60%) rotate(45deg);
 }
 
 /* Checkmark for select-all checkbox (using JS-managed classes) */
