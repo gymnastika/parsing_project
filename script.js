@@ -1741,6 +1741,7 @@ class GymnastikaPlatform {
             }
 
             // Fallback: Try loading from parsing_tasks.final_results for old data
+            console.log(`🔍 Checking fallback condition: freshContactsData.length = ${freshContactsData.length}`);
             if (freshContactsData.length === 0) {
                 console.log('🔄 No contacts in parsing_results, trying parsing_tasks.final_results fallback...');
 
