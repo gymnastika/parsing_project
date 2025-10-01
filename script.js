@@ -3167,6 +3167,110 @@ class GymnastikaPlatform {
         console.log('✅ Category filters bound successfully');
     }
 
+    // Export contacts to CSV file
+    exportContactsToCSV() {
+        console.log('📥 Exporting contacts to CSV...');
+
+        try {
+            // Get categories from cache
+            const categories = this.getCacheData('categories_map') || [];
+
+            // Get contacts from cache
+            let contacts = this.getCacheData('contacts_data') || [];
+
+            if (contacts.length === 0) {
+                alert('Нет контактов для экспорта. Пожалуйста, выполните парсинг сначала.');
+                return;
+            }
+
+            // Check if category filter is active
+            const filterSelect = document.getElementById('contactsCategoryFilter');
+            const categoryId = filterSelect ? filterSelect.value : '';
+
+            // Apply filter if category is selected
+            if (categoryId) {
+                contacts = contacts.filter(contact => contact.category_id === categoryId);
+                console.log(`📋 Filtered to ${contacts.length} contacts for category ${categoryId}`);
+            }
+
+            if (contacts.length === 0) {
+                alert('Нет контактов для экспорта с выбранным фильтром.');
+                return;
+            }
+
+            // CSV header
+            const headers = ['Категория', 'Название организации', 'Email', 'Описание', 'Веб-сайт', 'Страна', 'Дата добавления'];
+
+            // Helper function to escape CSV values
+            const escapeCSV = (value) => {
+                if (value == null || value === '') return '';
+                const stringValue = String(value);
+                // Escape double quotes and wrap in quotes if contains comma, quote, or newline
+                if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+                    return `"${stringValue.replace(/"/g, '""')}"`;
+                }
+                return stringValue;
+            };
+
+            // Build CSV rows
+            const rows = contacts.map(contact => {
+                // Get category name
+                const category = categories.find(c => c.id === contact.category_id);
+                const categoryName = category ? category.name : (contact.category_id ? 'Неизвестно' : 'Без категории');
+
+                // Format date
+                const dateObj = new Date(contact.parsing_timestamp || contact.created_at || new Date());
+                const formattedDate = dateObj.toLocaleDateString('ru-RU', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: '2-digit'
+                });
+
+                return [
+                    escapeCSV(categoryName),
+                    escapeCSV(contact.organization_name || 'Неизвестная организация'),
+                    escapeCSV(contact.email || 'Не определен'),
+                    escapeCSV(contact.description || 'Описание отсутствует'),
+                    escapeCSV(contact.website || 'Не определен'),
+                    escapeCSV(contact.country || 'Не определена'),
+                    escapeCSV(formattedDate)
+                ].join(',');
+            });
+
+            // Combine header and rows
+            const csvContent = [headers.join(','), ...rows].join('\n');
+
+            // Add UTF-8 BOM for Excel compatibility with Cyrillic
+            const BOM = '\uFEFF';
+            const csvWithBOM = BOM + csvContent;
+
+            // Create blob and download
+            const blob = new Blob([csvWithBOM], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+
+            // Generate filename with timestamp
+            const timestamp = new Date().toISOString().slice(0, 19).replace('T', '_').replace(/:/g, '-');
+            const filename = `contacts_${timestamp}.csv`;
+
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.style.display = 'none';
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // Clean up object URL
+            setTimeout(() => URL.revokeObjectURL(link.href), 100);
+
+            console.log(`✅ Exported ${contacts.length} contacts to ${filename}`);
+
+        } catch (error) {
+            console.error('❌ Error exporting contacts:', error);
+            alert('Ошибка при экспорте контактов. Проверьте консоль для деталей.');
+        }
+    }
+
     // Load categories from database
     async loadCategories() {
         console.log('📋 Loading categories...');
