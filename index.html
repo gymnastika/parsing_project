@@ -336,6 +336,15 @@
                                     <textarea id="searchQuery" name="search-query" placeholder="Опишите что нужно найти" rows="3" required></textarea>
                                     <label for="searchQuery">Поисковый запрос</label>
                                 </div>
+
+                                <div class="form-group">
+                                    <input type="number" id="resultsPerQuery" name="results-per-query" min="10" max="100" value="50" required>
+                                    <label for="resultsPerQuery">Количество результатов на запрос (10-100)</label>
+                                    <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                                        ИИ создаст 3 поисковых запроса, каждый найдет указанное количество результатов
+                                    </small>
+                                </div>
+
                                 <button type="submit" class="submit-btn">
                                     Начать парсинг
                                 </button>
