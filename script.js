@@ -4058,14 +4058,6 @@ class GymnastikaPlatform {
             4: 100    // complete
         };
 
-        const arrowPositions = {
-            0: '17px',              // matches stage 0 icon position (offset by icon radius)
-            1: '25%',               // matches stage 1 icon position
-            2: '50%',               // matches stage 2 icon position
-            3: '75%',               // matches stage 3 icon position
-            4: 'calc(100% - 17px)'  // matches stage 4 icon position (offset by icon radius)
-        };
-
         const stageDescriptions = {
             'initializing': 'Инициализация парсинга...',
             'query-generation': 'Генерация поисковых запросов с помощью ИИ',
@@ -4089,16 +4081,21 @@ class GymnastikaPlatform {
                 fill.style.width = stageToPercent[stageIndex] + '%';
             }
 
-            // Update arrow position - use exact positions to match stage circles
-            if (arrow) {
-                arrow.style.left = arrowPositions[stageIndex];
+            // Update arrow position - dynamically calculate center of target icon
+            if (arrow && stages[stageIndex]) {
+                const targetStage = stages[stageIndex];
+                const track = targetStage.parentElement;
 
-                // Add transform only for middle stages to center arrow
-                if (stageIndex > 0 && stageIndex < 4) {
-                    arrow.style.transform = 'translateX(-50%)';
-                } else {
-                    arrow.style.transform = 'none';
-                }
+                // Get actual positions
+                const stageRect = targetStage.getBoundingClientRect();
+                const trackRect = track.getBoundingClientRect();
+
+                // Calculate icon center relative to track left edge
+                const iconCenterX = stageRect.left + (stageRect.width / 2) - trackRect.left;
+
+                // Position arrow at icon center with translateX(-50%) to center the arrow itself
+                arrow.style.left = iconCenterX + 'px';
+                arrow.style.transform = 'translateX(-50%)';
             }
 
             // Update stage states
