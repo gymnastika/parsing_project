@@ -1827,13 +1827,14 @@ class GymnastikaPlatform {
     displayHistory(history, container) {
         const table = document.createElement('table');
         table.className = 'history-table';
-        
-        // Create header exactly like user's screenshot
+
+        // Create header with category column
         const header = document.createElement('thead');
         header.innerHTML = `
             <tr>
                 <th>Дата</th>
                 <th>Тип парсинга</th>
+                <th>Категория</th>
                 <th>Название задачи</th>
                 <th>Поисковый запрос</th>
                 <th>Найдено</th>
