@@ -1339,12 +1339,15 @@ class GymnastikaPlatform {
                     const taskData = task.task_data || {};
                     const taskNameForQuery = taskData.taskName || task.task_name || taskName;
 
+                    // Get Supabase auth user ID for query
+                    const supabaseUserId = (await this.supabase.auth.getUser()).data.user?.id;
+
                     // Try to load from parsing_results table (new system)
                     const { data: savedResults, error: resultsError } = await this.supabase
                         .from('parsing_results')
                         .select('*')
                         .eq('task_name', taskNameForQuery)
-                        .eq('user_id', this.currentUser?.id);
+                        .eq('user_id', supabaseUserId);
 
                     if (!resultsError && savedResults && savedResults.length > 0) {
                         // Transform from parsing_results table format
