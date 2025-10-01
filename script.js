@@ -529,6 +529,9 @@ class GymnastikaPlatform {
             // Bind search input for database filtering
             this.bindSearchInput();
 
+            // Setup real-time task subscription
+            await this.setupTaskSubscription();
+
             console.log('✅ UI initialization complete');
             
         } catch (error) {
