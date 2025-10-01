@@ -1547,6 +1547,7 @@ class GymnastikaPlatform {
         header.innerHTML = `
             <tr>
                 <th>Дата</th>
+                <th>Тип парсинга</th>
                 <th>Название задачи</th>
                 <th>Поисковый запрос</th>
                 <th>Найдено</th>
