@@ -5450,7 +5450,7 @@ class GymnastikaPlatform {
         console.log('✅ Email wizard reset');
     }
 
-    // Cleanup all email attachments from storage
+    // Cleanup all email attachments from storage (Supabase/localStorage/IndexedDB/Google Drive)
     async cleanupEmailAttachments() {
         if (!this.currentEmailCampaign?.attachments || this.currentEmailCampaign.attachments.length === 0) {
             console.log('📭 No attachments to clean up');
@@ -5462,12 +5462,24 @@ class GymnastikaPlatform {
         const deletePromises = this.currentEmailCampaign.attachments.map(async (attachment) => {
             try {
                 // Skip files that weren't uploaded yet (still have tempFile)
-                if (attachment.tempFile && !attachment.filePath) {
+                if (attachment.tempFile && !attachment.filePath && !attachment.driveFileId) {
                     console.log(`⏭️ Skipping unuploaded file: ${attachment.originalName}`);
                     return;
                 }
 
-                // Determine storage location
+                // Delete Google Drive files
+                if (attachment.driveFileId && this.googleDriveClient) {
+                    try {
+                        await this.googleDriveClient.deleteFile(attachment.driveFileId);
+                        console.log(`✅ Deleted: ${attachment.originalName} from Google Drive`);
+                    } catch (driveError) {
+                        console.warn(`⚠️ Could not delete from Google Drive: ${driveError.message}`);
+                        // File might already be deleted or permissions changed, continue
+                    }
+                    return; // Google Drive files are not in Supabase/localStorage
+                }
+
+                // Delete from Supabase Storage or localStorage/IndexedDB
                 const bucket = attachment.bucket || 'attachments';
                 const filePath = attachment.filePath;
 
