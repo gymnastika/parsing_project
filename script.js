@@ -4218,12 +4218,16 @@ class GymnastikaPlatform {
                 e.stopPropagation();
                 console.log('🔧 Google Drive button clicked for file:', fileInfo.originalName);
 
-                // Check if file has driveFileId (already uploaded)
-                if (fileInfo.driveFileId) {
-                    this.showDrivePermissionsModal(fileInfo.driveFileId, index);
+                // Check if file has driveFileId - try from fileInfo first, then from element attribute
+                const driveFileId = fileInfo.driveFileId || attachmentItem.getAttribute('data-drive-file-id');
+
+                if (driveFileId) {
+                    console.log('✅ Opening permissions modal for driveFileId:', driveFileId);
+                    this.showDrivePermissionsModal(driveFileId, index);
                 } else if (fileInfo.uploadStatus === 'uploading') {
                     this.showToast('❗ Дождитесь завершения загрузки для настройки разрешений', 'warning');
                 } else {
+                    console.log('❌ No driveFileId found in fileInfo or element attribute');
                     this.showToast('❗ Файл еще не загружен на Google Drive', 'warning');
                 }
             });
