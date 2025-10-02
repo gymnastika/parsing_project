@@ -3765,6 +3765,7 @@ button.category-add-button-v2:active {
     justify-content: space-between;
     padding: 0.5rem 0;
     border-bottom: 1px solid var(--border-light);
+    gap: 1rem; /* 🔧 ADD: Space between label and value */
 }
 
 .confirmation-info .info-item:last-child {
@@ -3774,10 +3775,16 @@ button.category-add-button-v2:active {
 .confirmation-info .info-item strong {
     color: var(--text-dark);
     font-weight: 600;
+    flex-shrink: 0; /* 🔧 ADD: Prevent label from shrinking */
 }
 
 .confirmation-info .info-item span {
     color: var(--text-muted);
+    text-align: right; /* 🔧 ADD: Align text to right */
+    max-width: 60%; /* 🔧 ADD: Limit width to prevent overflow */
+    word-wrap: break-word; /* 🔧 ADD: Break long words */
+    overflow-wrap: break-word; /* 🔧 ADD: Additional browser support */
+    word-break: break-word; /* 🔧 ADD: Force break on long filenames */
 }
 
 .confirmation-warning {
