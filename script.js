@@ -5379,6 +5379,27 @@ class GymnastikaPlatform {
         }
     }
 
+    // Bind clear email state button handler
+    bindClearEmailStateButton() {
+        const clearBtn = document.getElementById('clearEmailStateBtn');
+        if (!clearBtn) {
+            console.warn('⚠️ Clear email state button not found');
+            return;
+        }
+
+        clearBtn.addEventListener('click', () => {
+            console.log('🗑️ Manual email state clear requested');
+
+            // Confirm with user
+            if (confirm('Очистить текущую email кампанию и начать сначала?')) {
+                this.resetEmailWizard();
+                this.showSuccess('✅ Email кампания очищена');
+            }
+        });
+
+        console.log('✅ Clear email state button bound');
+    }
+
     // Reset email wizard to initial state
     resetEmailWizard() {
         console.log('🔄 Resetting email wizard...');
