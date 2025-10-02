@@ -5275,7 +5275,8 @@ class GymnastikaPlatform {
                     hasTempFile: !!attachment.tempFile,
                     hasContent: !!attachment.content,
                     hasLocalPath: !!attachment.localPath,
-                    type: attachment.type
+                    type: attachment.type,
+                    fullObject: attachment  // DEBUG: Show full attachment object
                 });
 
                 if (attachment.isGoogleDriveFile && attachment.driveUrl) {
