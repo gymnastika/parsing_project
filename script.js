@@ -5288,13 +5288,13 @@ class GymnastikaPlatform {
                         driveFileId: attachment.driveFileId
                     });
                 } else if (attachment.localPath) {
-                    // File stored in IndexedDB - read from local storage
-                    console.log('💾 Reading file from IndexedDB:', attachment.originalName);
+                    // File stored in localStorage or IndexedDB - read from local storage
+                    console.log('💾 Reading file from local storage:', attachment.originalName);
                     try {
-                        const fileBlob = await this.fileManager.getFileFromIndexedDB(attachment.localPath);
+                        const fileBlob = await this.fileManager.getLocalFile(attachment.localPath);
                         if (fileBlob) {
                             const content = await this.readFileAsBase64(fileBlob);
-                            console.log('✅ IndexedDB file read complete, content length:', content?.length || 0);
+                            console.log('✅ Local file read complete, content length:', content?.length || 0);
                             preparedAttachments.push({
                                 filename: attachment.originalName,
                                 mimeType: attachment.type,
@@ -5302,10 +5302,10 @@ class GymnastikaPlatform {
                                 size: attachment.size || 0
                             });
                         } else {
-                            console.error('❌ Failed to read file from IndexedDB:', attachment.localPath);
+                            console.error('❌ Failed to read file from local storage:', attachment.localPath);
                         }
                     } catch (error) {
-                        console.error('❌ Error reading from IndexedDB:', error);
+                        console.error('❌ Error reading from local storage:', error);
                     }
                 } else if (attachment.tempFile) {
                     // Regular file - read content as base64
