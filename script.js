@@ -7805,7 +7805,15 @@ class GymnastikaPlatform {
         
         // Add modal to page
         document.body.insertAdjacentHTML('beforeend', modalHTML);
-        
+
+        // Get modal element and make it visible
+        const modal = document.getElementById('drive-permissions-modal');
+        if (modal) {
+            // Add active class to show modal (display: flex)
+            setTimeout(() => modal.classList.add('active'), 10);
+            console.log('✅ Modal added to DOM and made visible');
+        }
+
         // Handle permission type change
         const permissionRadios = document.querySelectorAll('input[name="permission"]');
         const emailInput = document.querySelector('.email-input');
