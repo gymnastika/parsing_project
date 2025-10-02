@@ -5401,11 +5401,13 @@ class GymnastikaPlatform {
     }
 
     // Reset email wizard to initial state
-    async resetEmailWizard() {
+    // keepGoogleDriveFiles: true = after email send (recipients need links), false = manual clear
+    async resetEmailWizard(keepGoogleDriveFiles = false) {
         console.log('🔄 Resetting email wizard...');
+        console.log(`📋 Keep Google Drive files: ${keepGoogleDriveFiles}`);
 
         // STEP 1: Delete all uploaded files from storage (Supabase/localStorage/IndexedDB)
-        await this.cleanupEmailAttachments();
+        await this.cleanupEmailAttachments(keepGoogleDriveFiles);
 
         // STEP 2: Clear form data
         const emailSubject = document.getElementById('emailSubject');
