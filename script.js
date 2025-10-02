@@ -5809,8 +5809,9 @@ class GymnastikaPlatform {
         const contactCheckboxes = document.querySelectorAll('.contact-checkbox');
         const selectedCount = document.getElementById('selectedContactsCount');
 
-        // Select all checkbox logic
-        if (selectAllCheckbox) {
+        // 🔒 DUPLICATE PREVENTION: Only bind select-all once
+        // Individual checkboxes need rebinding after table redraw
+        if (selectAllCheckbox && !this.selectAllBound) {
             // Update select-all checkbox styling based on state
             const updateSelectAllStyling = () => {
                 const selectAllLabel = selectAllCheckbox.closest('.checkbox-label');
