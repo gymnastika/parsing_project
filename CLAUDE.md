@@ -1139,6 +1139,7 @@ database/
 **Полная документация**:
 - `database/ALL_FIXES_SUMMARY.md` (4 первых исправления)
 - `database/NOTIFICATION_MISMATCH_FIX.md` (5-е исправление)
+- `database/EMAIL_SESSION_STATE_FIX.md` (7-е исправление)
 
 ---
 
