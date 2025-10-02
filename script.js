@@ -5300,8 +5300,22 @@ class GymnastikaPlatform {
             }
         }
 
+        // Validate and clean email addresses
+        const validEmails = recipients.filter(email => {
+            // Basic email validation regex
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const isValid = emailRegex.test(email);
+            if (!isValid) {
+                console.warn('⚠️ Invalid email detected and filtered:', email);
+            }
+            return isValid;
+        });
+
         console.log('✅ Collected recipients:', recipients.length);
-        return recipients;
+        console.log('✅ Valid recipients after filtering:', validEmails.length);
+        console.log('📧 Sample recipients:', validEmails.slice(0, 3)); // Show first 3 for debugging
+
+        return validEmails;
     }
 
     // Bind confirmation modal buttons
@@ -5460,7 +5474,9 @@ class GymnastikaPlatform {
 
             console.log('📨 Sending email via Gmail API...', {
                 recipientCount: emailData.to.length,
-                hasAttachments: emailData.attachments.length > 0
+                hasAttachments: emailData.attachments.length > 0,
+                firstThreeRecipients: emailData.to.slice(0, 3), // DEBUG: Show first 3 recipients
+                allRecipients: emailData.to // DEBUG: Show ALL recipients
             });
 
             // Send email via Gmail API
