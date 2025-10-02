@@ -5590,9 +5590,17 @@ class GymnastikaPlatform {
         // Clear existing content
         tableBody.innerHTML = '';
 
+        // Load all categories once
+        const categories = this.getCacheData('categories_map') || [];
+
         // Add each contact as table row with checkbox
         contacts.forEach((contact, index) => {
             const row = document.createElement('tr');
+
+            // Get category name (same logic as in displayContacts)
+            const category = categories.find(c => c.id === contact.category_id);
+            const categoryName = category ? category.name : (contact.category_id ? 'Неизвестно' : 'Без категории');
+
             row.innerHTML = `
                 <td class="checkbox-column">
                     <label class="contact-checkbox-label">
@@ -5600,11 +5608,11 @@ class GymnastikaPlatform {
                         <span class="checkbox-custom"></span>
                     </label>
                 </td>
-                <td>${contact.organization_name || 'N/A'}</td>
-                <td class="email-cell">${contact.email}</td>
-                <td>${contact.description ? (contact.description.length > 50 ? contact.description.substring(0, 50) + '...' : contact.description) : 'N/A'}</td>
-                <td>${contact.website ? `<a href="${contact.website}" target="_blank" class="website-link">${contact.website}</a>` : 'N/A'}</td>
-                <td>${contact.country || 'N/A'}</td>
+                <td class="category-cell">${categoryName}</td>
+                <td class="org-name-cell">${contact.organization_name || 'N/A'}</td>
+                <td class="email-cell">${contact.email || 'N/A'}</td>
+                <td class="description-cell">${contact.description ? (contact.description.length > 50 ? contact.description.substring(0, 50) + '...' : contact.description) : 'N/A'}</td>
+                <td class="website-cell">${contact.website ? `<a href="${contact.website}" target="_blank" class="website-link">${contact.website}</a>` : 'N/A'}</td>
             `;
             tableBody.appendChild(row);
         });
