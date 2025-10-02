@@ -5243,9 +5243,20 @@ class GymnastikaPlatform {
 
             // Prepare attachments - read file content for non-Google Drive files
             const preparedAttachments = [];
+            console.log('📎 Total attachments to process:', this.currentEmailCampaign.attachments?.length || 0);
+
             for (const attachment of this.currentEmailCampaign.attachments || []) {
+                console.log('📎 Processing attachment:', {
+                    name: attachment.originalName,
+                    isGoogleDriveFile: attachment.isGoogleDriveFile,
+                    hasTempFile: !!attachment.tempFile,
+                    hasContent: !!attachment.content,
+                    type: attachment.type
+                });
+
                 if (attachment.isGoogleDriveFile && attachment.driveUrl) {
                     // Google Drive file - include link
+                    console.log('☁️ Google Drive file - adding link:', attachment.originalName);
                     preparedAttachments.push({
                         filename: attachment.originalName,
                         mimeType: attachment.type,
@@ -5256,6 +5267,7 @@ class GymnastikaPlatform {
                     // Regular file - read content as base64
                     console.log('📎 Reading file content for:', attachment.originalName);
                     const content = await this.readFileAsBase64(attachment.tempFile);
+                    console.log('✅ File read complete, content length:', content?.length || 0);
                     preparedAttachments.push({
                         filename: attachment.originalName,
                         mimeType: attachment.type,
@@ -5263,13 +5275,21 @@ class GymnastikaPlatform {
                     });
                 } else if (attachment.content) {
                     // Already has content
+                    console.log('📎 Using existing content for:', attachment.originalName);
                     preparedAttachments.push({
                         filename: attachment.originalName,
                         mimeType: attachment.type,
                         content: attachment.content
                     });
+                } else {
+                    console.warn('⚠️ Attachment has no content source:', attachment.originalName);
                 }
             }
+
+            console.log('📎 Total prepared attachments:', preparedAttachments.length);
+            preparedAttachments.forEach((att, i) => {
+                console.log(`  ${i + 1}. ${att.filename} (${att.mimeType}) - hasContent: ${!!att.content}, hasDriveUrl: ${!!att.driveUrl}`);
+            });
 
             // Prepare email data
             const emailData = {
