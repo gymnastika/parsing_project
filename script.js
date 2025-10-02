@@ -5274,6 +5274,7 @@ class GymnastikaPlatform {
                     isGoogleDriveFile: attachment.isGoogleDriveFile,
                     hasTempFile: !!attachment.tempFile,
                     hasContent: !!attachment.content,
+                    hasLocalPath: !!attachment.localPath,
                     type: attachment.type
                 });
 
@@ -5286,6 +5287,26 @@ class GymnastikaPlatform {
                         driveUrl: attachment.driveUrl,
                         driveFileId: attachment.driveFileId
                     });
+                } else if (attachment.localPath) {
+                    // File stored in IndexedDB - read from local storage
+                    console.log('💾 Reading file from IndexedDB:', attachment.originalName);
+                    try {
+                        const fileBlob = await this.fileManager.getFileFromIndexedDB(attachment.localPath);
+                        if (fileBlob) {
+                            const content = await this.readFileAsBase64(fileBlob);
+                            console.log('✅ IndexedDB file read complete, content length:', content?.length || 0);
+                            preparedAttachments.push({
+                                filename: attachment.originalName,
+                                mimeType: attachment.type,
+                                content: content,
+                                size: attachment.size || 0
+                            });
+                        } else {
+                            console.error('❌ Failed to read file from IndexedDB:', attachment.localPath);
+                        }
+                    } catch (error) {
+                        console.error('❌ Error reading from IndexedDB:', error);
+                    }
                 } else if (attachment.tempFile) {
                     // Regular file - read content as base64
                     console.log('📎 Reading file content for:', attachment.originalName);
