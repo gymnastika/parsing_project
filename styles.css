@@ -6854,6 +6854,34 @@ button.category-add-button-v2:active {
     flex-shrink: 0;
 }
 
+.clear-btn-header {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    background: #fed7aa;
+    color: #ea580c;
+    border: 1px solid #fdba74;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    white-space: nowrap;
+    margin-right: 0.5rem;
+}
+
+.clear-btn-header:hover {
+    background: #fdba74;
+    border-color: #fb923c;
+}
+
+.clear-btn-header svg {
+    color: #ea580c;
+    flex-shrink: 0;
+}
+
 .form-label {
     font-size: 14px;
     font-weight: 600;
