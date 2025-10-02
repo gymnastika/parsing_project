@@ -4927,6 +4927,12 @@ class GymnastikaPlatform {
 
     // Bind custom emails tab functionality
     bindCustomEmailsTab() {
+        // Prevent duplicate event listeners
+        if (this.customEmailsTabBound) {
+            console.log('⚠️ Custom emails tab already bound, skipping');
+            return;
+        }
+
         const customEmailsList = document.getElementById('customEmailsList');
         const validateBtn = document.getElementById('validateCustomEmails');
         const clearBtn = document.getElementById('clearCustomEmails');
@@ -4956,6 +4962,7 @@ class GymnastikaPlatform {
             });
         }
 
+        this.customEmailsTabBound = true;
         console.log('✅ Custom emails tab bound successfully');
     }
 
