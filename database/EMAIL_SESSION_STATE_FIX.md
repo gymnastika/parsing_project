@@ -61,7 +61,7 @@ if (sessionState.step === 2) {
 
 ## ✅ Solution Applied
 
-### Изменения в `script.js:5383-5385`:
+### Fix #1: Изменения в `script.js:5383-5385`
 
 **БЫЛО**:
 ```javascript
@@ -87,6 +87,63 @@ localStorage.removeItem('emailCampaignSessionState'); // Legacy key
 
 // Go back to step 1 WITHOUT restoring data (skipRestore = true)
 this.backToEmailStep1(true);
+```
+
+### Fix #2: Проверка пустого объекта в `restoreEmailSessionState()` (строки 820-828)
+
+**Проблема**: `getCacheData()` возвращал пустой объект `{}` вместо `null` после очистки
+
+**БЫЛО**:
+```javascript
+const sessionState = this.getEmailSessionState();
+if (!sessionState) {
+    console.log('📭 No saved email session found');
+    return false;
+}
+```
+
+**СТАЛО**:
+```javascript
+const sessionState = this.getEmailSessionState();
+
+// Check if session state is null, empty object, or has no meaningful data
+if (!sessionState ||
+    Object.keys(sessionState).length === 0 ||
+    (!sessionState.subject && !sessionState.step)) {
+    console.log('📭 No saved email session found');
+    return false;
+}
+```
+
+### Fix #3: Полная очистка localStorage в `clearEmailSessionState()` (строки 802-814)
+
+**БЫЛО**:
+```javascript
+clearEmailSessionState() {
+    try {
+        this.invalidateCache('email_session');
+        console.log('🗑️ Email session state cleared');
+    } catch (error) {
+        console.error('❌ Error clearing email session state:', error);
+    }
+}
+```
+
+**СТАЛО**:
+```javascript
+clearEmailSessionState() {
+    try {
+        // Fully remove the cache entry from localStorage
+        this.invalidateCache('email_session');
+
+        // Also directly remove to ensure complete cleanup
+        localStorage.removeItem('cache_email_session');
+
+        console.log('🗑️ Email session state cleared completely');
+    } catch (error) {
+        console.error('❌ Error clearing email session state:', error);
+    }
+}
 ```
 
 ### Методы очистки:
