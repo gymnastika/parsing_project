@@ -5182,6 +5182,7 @@ class GymnastikaPlatform {
             const MAX_DISPLAYED_FILES = 3;
 
             const truncateFilename = (filename) => {
+                if (!filename) return 'file'; // 🔧 FIX: Handle undefined/null filenames
                 if (filename.length <= MAX_FILENAME_LENGTH) return filename;
                 const ext = filename.split('.').pop();
                 const nameWithoutExt = filename.substring(0, filename.lastIndexOf('.'));
