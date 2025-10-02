@@ -907,17 +907,31 @@ class GymnastikaPlatform {
             <div class="file-info">
                 <span class="file-icon">${statusIcon}</span>
                 <div class="file-details">
-                    <div class="file-name">${attachment.name}</div>
+                    <div class="file-name">${attachment.name || 'undefined'}</div>
                     <div class="file-meta">
-                        <span class="file-size">${this.formatFileSize(attachment.size)}</span>
+                        <span class="file-size">${this.formatFileSize(attachment.size || 0)}</span>
                         <span class="file-storage">${storageLabel}</span>
                     </div>
                 </div>
             </div>
             <div class="file-actions">
                 <span class="restore-note">Восстановлено</span>
+                <button type="button" class="remove-attachment" data-index="${index}" title="Удалить">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" transform="rotate(45 12 12)"/>
+                    </svg>
+                </button>
             </div>
         `;
+
+        // Bind remove button
+        const removeBtn = attachmentDiv.querySelector('.remove-attachment');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', () => {
+                const attachmentsList = document.getElementById('attachmentsList');
+                this.removeEmailAttachment(index, attachmentsList);
+            });
+        }
 
         return attachmentDiv;
     }
