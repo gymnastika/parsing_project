@@ -816,7 +816,11 @@ class GymnastikaPlatform {
     async restoreEmailSessionState() {
         try {
             const sessionState = this.getEmailSessionState();
-            if (!sessionState || Object.keys(sessionState).length === 0) {
+
+            // Check if session state is null, empty object, or has no meaningful data
+            if (!sessionState ||
+                Object.keys(sessionState).length === 0 ||
+                (!sessionState.subject && !sessionState.step)) {
                 console.log('📭 No saved email session found');
                 return false;
             }
