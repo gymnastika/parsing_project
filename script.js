@@ -3639,9 +3639,12 @@ class GymnastikaPlatform {
             // Invalidate ALL contacts caches (including email section cache)
             this.invalidateCache('contacts_data');      // Contacts section cache
             this.invalidateCache('parsing_results');    // Email section cache
-            await this.loadContactsData();
 
-            console.log('✅ Contacts list refreshed (all caches invalidated)');
+            // Reload contacts in both sections
+            await this.loadContactsData();              // Database section
+            await this.loadEmailContacts();             // Email section
+
+            console.log('✅ Contacts list refreshed in both Database and Email sections');
 
         } catch (error) {
             console.error('❌ Error adding contact:', error);
