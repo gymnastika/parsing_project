@@ -680,13 +680,18 @@ class GymnastikaPlatform {
     // Set data in localStorage cache with timestamp
     setCacheData(key, data) {
         try {
+            // Include user_id in cache key to prevent data leakage between users
+            const userId = this.currentUser?.id || 'guest';
+            const userKey = `cache_${userId}_${key}`;
+            
             const cacheEntry = {
                 data: data,
                 timestamp: Date.now(),
-                version: '1.0'
+                version: '1.0',
+                userId: userId  // Store userId for validation
             };
-            localStorage.setItem(`cache_${key}`, JSON.stringify(cacheEntry));
-            console.log(`💾 Cached data for key: ${key} (${data?.length || 0} items)`);
+            localStorage.setItem(userKey, JSON.stringify(cacheEntry));
+            console.log(`💾 Cached data for user ${userId}, key: ${key} (${data?.length || 0} items)`);
         } catch (error) {
             console.error('❌ Error setting cache data:', error);
         }
@@ -695,20 +700,32 @@ class GymnastikaPlatform {
     // Get data from localStorage cache if valid
     getCacheData(key, maxAge = 3600000) { // Default: 1 hour cache
         try {
-            const cacheEntry = localStorage.getItem(`cache_${key}`);
+            // Include user_id in cache key to prevent data leakage between users
+            const userId = this.currentUser?.id || 'guest';
+            const userKey = `cache_${userId}_${key}`;
+            
+            const cacheEntry = localStorage.getItem(userKey);
             if (!cacheEntry) {
-                console.log(`📦 No cache found for key: ${key}`);
+                console.log(`📦 No cache found for user ${userId}, key: ${key}`);
                 return null;
             }
 
             const parsedEntry = JSON.parse(cacheEntry);
+            
+            // Validate that cache belongs to current user (security check)
+            if (parsedEntry.userId && parsedEntry.userId !== userId) {
+                console.warn(`⚠️ Cache userId mismatch! Expected ${userId}, got ${parsedEntry.userId}`);
+                this.invalidateCache(key);
+                return null;
+            }
+            
             const isValid = this.isCacheValid(parsedEntry.timestamp, maxAge);
             
             if (isValid) {
-                console.log(`📦 Cache hit for key: ${key} (${parsedEntry.data?.length || 0} items)`);
+                console.log(`📦 Cache hit for user ${userId}, key: ${key} (${parsedEntry.data?.length || 0} items)`);
                 return parsedEntry.data;
             } else {
-                console.log(`⏰ Cache expired for key: ${key}`);
+                console.log(`⏰ Cache expired for user ${userId}, key: ${key}`);
                 this.invalidateCache(key);
                 return null;
             }
@@ -758,8 +775,11 @@ class GymnastikaPlatform {
     // Invalidate (clear) cache for specific key
     invalidateCache(key) {
         try {
-            localStorage.removeItem(`cache_${key}`);
-            console.log(`🗑️ Cache invalidated for key: ${key}`);
+            // Include user_id in cache key to invalidate correct user's cache
+            const userId = this.currentUser?.id || 'guest';
+            const userKey = `cache_${userId}_${key}`;
+            localStorage.removeItem(userKey);
+            console.log(`🗑️ Cache invalidated for user ${userId}, key: ${key}`);
         } catch (error) {
             console.error('❌ Error invalidating cache:', error);
         }
@@ -6833,21 +6853,10 @@ class GymnastikaPlatform {
                 console.log('🔄 Loading Telegram settings from Supabase');
             }
             
-            // Fallback to localStorage if no Supabase data
+            // NO FALLBACK to localStorage - prevents data leakage between users
+            // Old localStorage data should not be used across different users
             if (!telegramConnection) {
-                const token = localStorage.getItem('telegramBotToken');
-                const botName = localStorage.getItem('telegramBotName');
-                const chatId = localStorage.getItem('telegramChatId');
-                
-                if (token) {
-                    telegramConnection = {
-                        token: token,
-                        botName: botName,
-                        chatId: chatId,
-                        connectedAt: null
-                    };
-                    console.log('🔄 Loading Telegram settings from localStorage');
-                }
+                console.log('ℹ️ No Telegram connection found in Supabase');
             }
             
             // Update settings and UI if connection found
@@ -6903,15 +6912,8 @@ class GymnastikaPlatform {
         } catch (error) {
             console.error('❌ Error loading Telegram settings:', error);
             
-            // Fallback to localStorage on error
-            const token = localStorage.getItem('telegramBotToken');
-            if (token) {
-                this.settings.telegramBotToken = token;
-                const tokenInput = document.getElementById('telegramBotToken');
-                if (tokenInput) {
-                    tokenInput.value = token;
-                }
-            }
+            // NO FALLBACK to localStorage - prevents data leakage between users
+            console.log('ℹ️ Failed to load Telegram settings from Supabase');
         }
     }
 
@@ -6951,15 +6953,14 @@ class GymnastikaPlatform {
 
             const botName = data.result.first_name || data.result.username;
             
-            // Save to Supabase if user is authenticated
+            // Save to Supabase ONLY - no localStorage to prevent data leakage
             if (window.gymnastikaAuth && window.gymnastikaAuth.isAuthenticated()) {
                 await window.gymnastikaAuth.saveTelegramConnection(token, botName, chatId);
                 console.log('✅ Telegram connection saved to Supabase');
             } else {
-                // Fallback to localStorage for non-authenticated users
-                localStorage.setItem('telegramBotToken', token);
-                localStorage.setItem('telegramBotName', botName);
-                localStorage.setItem('telegramChatId', chatId);
+                console.warn('⚠️ User not authenticated - cannot save Telegram settings');
+                this.showError('Необходима авторизация для сохранения настроек Telegram');
+                return;
             }
 
             // Update settings object
