@@ -3857,16 +3857,42 @@ class GymnastikaPlatform {
         }
 
         try {
+            // 🔧 FIX: Check if category already exists before insert
+            const trimmedName = name.trim();
+            const { data: existingCategories, error: checkError } = await this.supabase
+                .from('categories')
+                .select('id, name')
+                .eq('user_id', this.currentUser.id)
+                .ilike('name', trimmedName);  // Case-insensitive check
+
+            if (checkError) {
+                console.error('❌ Error checking existing categories:', checkError);
+                throw checkError;
+            }
+
+            // If category with same name exists, show friendly error
+            if (existingCategories && existingCategories.length > 0) {
+                console.warn('⚠️ Category already exists:', trimmedName);
+                throw new Error(`Категория "${trimmedName}" уже существует`);
+            }
+
+            // Category doesn't exist - create it
             const { data, error } = await this.supabase
                 .from('categories')
                 .insert({
                     user_id: this.currentUser.id,
-                    name: name.trim()
+                    name: trimmedName
                 })
                 .select()
                 .single();
 
-            if (error) throw error;
+            if (error) {
+                // Handle duplicate constraint error as fallback
+                if (error.code === '23505') {  // PostgreSQL unique constraint violation
+                    throw new Error(`Категория "${trimmedName}" уже существует`);
+                }
+                throw error;
+            }
 
             console.log('✅ Category created:', data);
 
