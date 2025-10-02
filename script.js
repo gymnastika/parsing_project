@@ -6615,6 +6615,22 @@ class GymnastikaPlatform {
                 'success'
             );
 
+            // 📱 Send Telegram notification if configured
+            try {
+                const taskData = task.task_data || {};
+                await this.sendTelegramParsingNotification({
+                    originalQuery: taskData.searchQuery || task.search_query || 'Не указан',
+                    taskName: taskData.taskName || task.task_name || 'Без названия',
+                    queryInfo: task.openai_data || { queries: [] },
+                    results: results,
+                    totalResultsWithContact: results.filter(r => r.email).length,
+                    timestamp: task.completed_at || new Date().toISOString()
+                });
+            } catch (telegramError) {
+                console.error('⚠️ Failed to send Telegram notification:', telegramError);
+                // Don't fail the whole completion if Telegram fails
+            }
+
             // Refresh UI tables
             await this.loadHistoryData();
             await this.loadContactsData();
