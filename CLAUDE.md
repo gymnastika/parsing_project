@@ -1103,6 +1103,23 @@ database/
 - **Files**: `script.js:5395-5543` (saveResultsToDatabase)
 - **Docs**: `database/EMAIL_DEDUPLICATION_FEATURE.md`
 
+### ✅ Fix 7: Email Session State Persistence (October 2, 2025)
+**Проблема**: После отправки письма и обновления страницы пользователь оставался на этапе 2 с данными старой кампании
+- **Root Cause #1**: `clearEmailSessionState()` вызывался, но `getCacheData()` возвращал пустой объект `{}` вместо `null`
+- **Root Cause #2**: Проверка `if (!sessionState)` не работала для пустых объектов (truthy value)
+- **Solution #1**: Добавлена проверка `Object.keys(sessionState).length === 0` в `restoreEmailSessionState()`
+- **Solution #2**: Добавлена проверка наличия значимых данных `(!sessionState.subject && !sessionState.step)`
+- **Solution #3**: Полная очистка `localStorage.removeItem('cache_email_session')` в дополнение к `invalidateCache()`
+- **Impact**:
+  - ✅ После отправки письма пользователь на чистом этапе 1
+  - ✅ При F5 не восстанавливается старое состояние
+  - ✅ Новая кампания всегда начинается с нуля
+- **Files**:
+  - `script.js:820-828` (restoreEmailSessionState - empty object check)
+  - `script.js:802-814` (clearEmailSessionState - full cleanup)
+  - `script.js:5383-5385` (resetEmailWizard - clear session call)
+- **Docs**: `database/EMAIL_SESSION_STATE_FIX.md`
+
 ### 📊 Общий результат исправлений:
 - ✅ **Notification-Database match**: 7 vs 14 → 7 vs 7 (согласовано)
 - ✅ **Database save rate**: 0% → 100%
