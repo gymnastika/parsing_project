@@ -3852,7 +3852,10 @@ class GymnastikaPlatform {
             throw new Error('Название категории не может быть пустым');
         }
 
-        if (!this.currentUser) {
+        // Get Supabase user ID directly (more reliable than this.currentUser)
+        const supabaseUserId = (await this.supabase.auth.getUser()).data.user?.id;
+        
+        if (!supabaseUserId) {
             throw new Error('Пользователь не авторизован');
         }
 
@@ -3862,7 +3865,7 @@ class GymnastikaPlatform {
             const { data: existingCategories, error: checkError } = await this.supabase
                 .from('categories')
                 .select('id, name')
-                .eq('user_id', this.currentUser.id)
+                .eq('user_id', supabaseUserId)
                 .ilike('name', trimmedName);  // Case-insensitive check
 
             if (checkError) {
@@ -3880,7 +3883,7 @@ class GymnastikaPlatform {
             const { data, error } = await this.supabase
                 .from('categories')
                 .insert({
-                    user_id: this.currentUser.id,
+                    user_id: supabaseUserId,
                     name: trimmedName
                 })
                 .select()
