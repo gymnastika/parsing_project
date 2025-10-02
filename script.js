@@ -5843,6 +5843,9 @@ class GymnastikaPlatform {
                 const selectAllLabel = selectAllCheckbox.closest('.checkbox-label');
                 if (selectAllLabel) selectAllLabel.classList.remove('focused');
             });
+
+            // Mark as bound to prevent duplicate listeners
+            this.selectAllBound = true;
         }
 
         // Individual checkbox logic
