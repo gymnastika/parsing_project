@@ -5380,8 +5380,9 @@ class GymnastikaPlatform {
         const customEmailsList = document.getElementById('customEmailsList');
         if (customEmailsList) customEmailsList.value = '';
 
-        // Clear session state to prevent restoration
-        localStorage.removeItem('emailCampaignSessionState');
+        // Clear session state to prevent restoration on page refresh
+        this.clearEmailSessionState();
+        localStorage.removeItem('emailCampaignSessionState'); // Legacy key
 
         // Go back to step 1 WITHOUT restoring data (skipRestore = true)
         this.backToEmailStep1(true);
