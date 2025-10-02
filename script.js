@@ -2869,6 +2869,24 @@ class GymnastikaPlatform {
             console.log(`❌ Tab content not found: ${tabName}-content`);
         }
 
+        // 🔧 DATABASE TAB CONTROLS: Show/hide controls based on active database tab
+        if (tabName === 'task-history' || tabName === 'contacts') {
+            const taskHistoryControls = document.getElementById('taskHistoryControls');
+            const contactsControls = document.getElementById('contactsControls');
+
+            if (tabName === 'task-history') {
+                // Show history controls, hide contacts controls
+                if (taskHistoryControls) taskHistoryControls.classList.remove('hidden');
+                if (contactsControls) contactsControls.classList.add('hidden');
+                console.log('✅ Task history controls shown');
+            } else if (tabName === 'contacts') {
+                // Show contacts controls, hide history controls
+                if (taskHistoryControls) taskHistoryControls.classList.add('hidden');
+                if (contactsControls) contactsControls.classList.remove('hidden');
+                console.log('✅ Contacts controls shown (Add Contact button restored)');
+            }
+        }
+
         // Load tab-specific data
         this.loadTabData(tabName);
     }
