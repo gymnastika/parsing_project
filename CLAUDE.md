@@ -1356,3 +1356,45 @@ this.updateProgress('apify-search', 2, 5,
 3. Убедиться что система работает с полным объемом данных
 
 **КРИТИЧНО**: Эти изменения существенно увеличат время выполнения парсинга и расход токенов/ресурсов!
+
+---
+
+## 🔧 Критические исправления (October 2, 2025)
+
+### ✅ Fix 5: Email Attachment Error для файлов <25MB
+**Проблема**: При отправке email с вложением <25MB возникала ошибка: `Cannot read properties of undefined (reading 'split')` в google-oauth-hybrid.js:738
+- **Root Cause**: Файлы <25MB сохранялись как `tempFile` (File object), но контент никогда не читался как base64
+- **Solution**:
+  1. Добавлены null checks в `google-oauth-hybrid.js` (lines 737-756)
+  2. Реализован цикл подготовки вложений в `sendEmailCampaign()` (lines 5220-5256)
+  3. Создан helper метод `readFileAsBase64()` для чтения File objects (lines 7990-8004)
+- **Impact**: Email с вложениями <25MB теперь отправляются без ошибок
+- **Files**:
+  - `script.js:5220-5256` - Attachment preparation loop
+  - `script.js:7990-8004` - readFileAsBase64() helper method
+  - `lib/google-oauth-hybrid.js:737-756` - Null checks for attachment.content
+
+**Технические детали**:
+```javascript
+// Helper метод использует FileReader API
+readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file); // Возвращает data:image/png;base64,...
+    });
+}
+
+// Подготовка вложений перед отправкой
+for (const attachment of this.currentEmailCampaign.attachments || []) {
+    if (attachment.tempFile) {
+        const content = await this.readFileAsBase64(attachment.tempFile);
+        preparedAttachments.push({
+            filename: attachment.originalName,
+            mimeType: attachment.type,
+            content: content // base64 data URL
+        });
+    }
+}
+```
