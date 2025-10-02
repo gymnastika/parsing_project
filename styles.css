@@ -2355,11 +2355,29 @@ button.category-add-button-v2:active {
 .task-name-cell {
     font-weight: 500;
     color: #374151;
+    max-width: 250px; /* 🔧 FIX: Prevent long task names from overflowing */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .query-cell {
     color: #6b7280;
     max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.category-cell {
+    max-width: 150px; /* 🔧 FIX: Prevent long category names from overflowing */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.type-cell {
+    max-width: 120px; /* 🔧 FIX: Prevent long type names from overflowing */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
