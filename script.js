@@ -6515,25 +6515,32 @@ class GymnastikaPlatform {
                 if (telegramConnection.botName) {
                     this.updateTelegramConnectionStatus(true, telegramConnection.botName);
                 }
-                
+
+                // Update form visibility - hide setup form, show notification settings
+                this.updateNotificationSettingsVisibility();
+
                 console.log(`✅ Telegram settings loaded: ${telegramConnection.botName || 'Bot connected'}`);
             } else {
                 // No connection found
                 this.settings.telegramBotToken = '';
                 this.settings.telegramBotName = '';
                 this.settings.telegramChatId = '';
-                
+
                 const tokenInput = document.getElementById('telegramBotToken');
                 if (tokenInput) {
                     tokenInput.value = '';
                 }
-                
+
                 const chatIdInput = document.getElementById('telegramChatId');
                 if (chatIdInput) {
                     chatIdInput.value = '';
                 }
-                
+
                 this.updateTelegramConnectionStatus(false);
+
+                // Update form visibility - show setup form, hide notification settings
+                this.updateNotificationSettingsVisibility();
+
                 console.log('ℹ️ No Telegram connection found');
             }
             
