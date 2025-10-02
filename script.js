@@ -5217,12 +5217,42 @@ class GymnastikaPlatform {
                 throw new Error('Google account not connected. Please connect your Google account in Settings.');
             }
 
+            // Prepare attachments - read file content for non-Google Drive files
+            const preparedAttachments = [];
+            for (const attachment of this.currentEmailCampaign.attachments || []) {
+                if (attachment.isGoogleDriveFile && attachment.driveUrl) {
+                    // Google Drive file - include link
+                    preparedAttachments.push({
+                        filename: attachment.originalName,
+                        mimeType: attachment.type,
+                        driveUrl: attachment.driveUrl,
+                        driveFileId: attachment.driveFileId
+                    });
+                } else if (attachment.tempFile) {
+                    // Regular file - read content as base64
+                    console.log('📎 Reading file content for:', attachment.originalName);
+                    const content = await this.readFileAsBase64(attachment.tempFile);
+                    preparedAttachments.push({
+                        filename: attachment.originalName,
+                        mimeType: attachment.type,
+                        content: content
+                    });
+                } else if (attachment.content) {
+                    // Already has content
+                    preparedAttachments.push({
+                        filename: attachment.originalName,
+                        mimeType: attachment.type,
+                        content: attachment.content
+                    });
+                }
+            }
+
             // Prepare email data
             const emailData = {
                 to: recipients,
                 subject: this.currentEmailCampaign.subject,
                 body: this.currentEmailCampaign.body,
-                attachments: this.currentEmailCampaign.attachments || []
+                attachments: preparedAttachments
             };
 
             console.log('📨 Sending email via Gmail API...', {
