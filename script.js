@@ -2352,25 +2352,41 @@ class GymnastikaPlatform {
     // Save contact changes to Supabase
     async saveContactChanges(contactId, modalOverlay) {
         console.log('💾 Saving contact changes for ID:', contactId);
-        
+        console.log('🔍 Contact ID type:', typeof contactId, 'Value:', contactId);
+
         try {
+            // Validate contact ID
+            if (!contactId || contactId === 'undefined') {
+                console.error('❌ Invalid contact ID:', contactId);
+                alert('Ошибка: ID контакта не найден. Попробуйте обновить страницу.');
+                return;
+            }
+
             // Get form data
             const organizationName = document.getElementById('edit-organization-name').value.trim();
             const email = document.getElementById('edit-email').value.trim();
             const website = document.getElementById('edit-website').value.trim();
             const description = document.getElementById('edit-description').value.trim();
-            
+
             if (!organizationName) {
                 alert('Название организации обязательно для заполнения');
                 return;
             }
-            
+
             if (!this.supabase) {
                 console.error('❌ Supabase client not initialized');
                 alert('Ошибка подключения к базе данных');
                 return;
             }
-            
+
+            console.log('📝 Updating contact in database with data:', {
+                id: contactId,
+                organization_name: organizationName,
+                email,
+                website,
+                description
+            });
+
             // Update contact in Supabase
             const { data, error } = await this.supabase
                 .from('parsing_results')
