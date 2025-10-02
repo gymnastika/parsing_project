@@ -5451,13 +5451,16 @@ class GymnastikaPlatform {
     }
 
     // Cleanup all email attachments from storage (Supabase/localStorage/IndexedDB/Google Drive)
-    async cleanupEmailAttachments() {
+    // keepGoogleDriveFiles: true = keep Google Drive files (after email send, recipients need access)
+    //                       false = delete everything (manual clear, email not sent)
+    async cleanupEmailAttachments(keepGoogleDriveFiles = false) {
         if (!this.currentEmailCampaign?.attachments || this.currentEmailCampaign.attachments.length === 0) {
             console.log('📭 No attachments to clean up');
             return;
         }
 
         console.log(`🗑️ Cleaning up ${this.currentEmailCampaign.attachments.length} email attachments...`);
+        console.log(`📋 Keep Google Drive files: ${keepGoogleDriveFiles}`);
 
         const deletePromises = this.currentEmailCampaign.attachments.map(async (attachment) => {
             try {
@@ -5467,14 +5470,20 @@ class GymnastikaPlatform {
                     return;
                 }
 
-                // Delete Google Drive files
-                if (attachment.driveFileId && this.googleDriveClient) {
-                    try {
-                        await this.googleDriveClient.deleteFile(attachment.driveFileId);
-                        console.log(`✅ Deleted: ${attachment.originalName} from Google Drive`);
-                    } catch (driveError) {
-                        console.warn(`⚠️ Could not delete from Google Drive: ${driveError.message}`);
-                        // File might already be deleted or permissions changed, continue
+                // Handle Google Drive files
+                if (attachment.driveFileId) {
+                    if (keepGoogleDriveFiles) {
+                        console.log(`☁️ Keeping Google Drive file (recipients need access): ${attachment.originalName}`);
+                        return; // Don't delete - recipients need the link to work
+                    } else if (this.googleDriveClient) {
+                        // Delete only when manually clearing (email not sent)
+                        try {
+                            await this.googleDriveClient.deleteFile(attachment.driveFileId);
+                            console.log(`✅ Deleted: ${attachment.originalName} from Google Drive`);
+                        } catch (driveError) {
+                            console.warn(`⚠️ Could not delete from Google Drive: ${driveError.message}`);
+                            // File might already be deleted or permissions changed, continue
+                        }
                     }
                     return; // Google Drive files are not in Supabase/localStorage
                 }
