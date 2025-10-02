@@ -5271,7 +5271,8 @@ class GymnastikaPlatform {
                     preparedAttachments.push({
                         filename: attachment.originalName,
                         mimeType: attachment.type,
-                        content: content
+                        content: content,
+                        size: attachment.tempFile.size  // CRITICAL: Include file size
                     });
                 } else if (attachment.content) {
                     // Already has content
@@ -5279,7 +5280,8 @@ class GymnastikaPlatform {
                     preparedAttachments.push({
                         filename: attachment.originalName,
                         mimeType: attachment.type,
-                        content: attachment.content
+                        content: attachment.content,
+                        size: attachment.size || 0  // Include size if available
                     });
                 } else {
                     console.warn('⚠️ Attachment has no content source:', attachment.originalName);
