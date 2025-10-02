@@ -7986,7 +7986,23 @@ class GymnastikaPlatform {
             this.showToast(`Ошибка обновления разрешений: ${error.message}`, 'error');
         }
     }
-    
+
+    // Read file as base64 data URL
+    readFileAsBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                console.log('✅ File read successfully:', file.name);
+                resolve(reader.result);
+            };
+            reader.onerror = (error) => {
+                console.error('❌ Error reading file:', file.name, error);
+                reject(error);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
     // Update file display after upload error
     updateFileDisplayAfterError(fileIndex, error) {
         const attachmentItem = document.querySelector(`[data-file-index="${fileIndex}"]`);
