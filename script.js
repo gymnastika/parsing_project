@@ -5612,7 +5612,7 @@ class GymnastikaPlatform {
             // If no cache, load from database
             if (!contacts || contacts.length === 0) {
                 console.log('📧 No cached contacts, loading from database...');
-                
+
                 // Wait for Supabase client
                 if (!this.supabase) {
                     let attempts = 0;
@@ -5623,9 +5623,14 @@ class GymnastikaPlatform {
                 }
 
                 if (this.supabase) {
+                    // 🔒 SECURITY: Filter by user_id to show only current user's contacts
+                    const supabaseUserId = (await this.supabase.auth.getUser()).data.user?.id;
+                    console.log('🔑 Loading email contacts for user:', supabaseUserId);
+
                     const { data, error } = await this.supabase
                         .from('parsing_results')
                         .select('*')
+                        .eq('user_id', supabaseUserId)  // 🔒 SECURITY FIX: Filter by user
                         .order('created_at', { ascending: false })
                         .limit(1000);
 
@@ -5633,6 +5638,7 @@ class GymnastikaPlatform {
                         contacts = data;
                         // Update cache
                         this.setCacheData('parsing_results', contacts);
+                        console.log(`✅ Loaded ${data.length} contacts from database for email section`);
                     }
                 }
             }
