@@ -5359,6 +5359,12 @@ class GymnastikaPlatform {
             attachmentsList.classList.remove('has-files');
         }
 
+        // Hide attachments container
+        const emailForm = document.querySelector('.email-compose-form');
+        if (emailForm) {
+            emailForm.classList.remove('has-files');
+        }
+
         // Reset campaign data
         this.currentEmailCampaign = {
             subject: '',
