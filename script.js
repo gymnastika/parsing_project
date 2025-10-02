@@ -816,7 +816,7 @@ class GymnastikaPlatform {
     async restoreEmailSessionState() {
         try {
             const sessionState = this.getEmailSessionState();
-            if (!sessionState) {
+            if (!sessionState || Object.keys(sessionState).length === 0) {
                 console.log('📭 No saved email session found');
                 return false;
             }
