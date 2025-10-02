@@ -6618,14 +6618,14 @@ class GymnastikaPlatform {
                 organization_name: result.organizationName || result.name || 'Неизвестно',
                 email: result.email || null,
                 description: result.description || null,
-                country: result.country || 'Не определено',
+                // country field removed - no longer in table schema
                 source_url: result.website || result.url || result.sourceUrl || 'https://unknown.com',
                 website: result.website || null,
                 all_emails: result.all_emails || (result.email ? [result.email] : []),
                 page_title: result.pageTitle || result.title || null,
                 has_contact_info: !!(result.email || result.phone),
-                scraping_error: result.error || null,
-                error_type: result.errorType || null
+                scraping_error: result.error || null
+                // error_type field removed - no longer in table schema
             }));
 
             // 🔍 DEDUPLICATION: Check for existing emails in database
