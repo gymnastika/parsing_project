@@ -3425,6 +3425,12 @@ class GymnastikaPlatform {
 
     // Bind add contact form events
     bindAddContactForm() {
+        // 🔒 DUPLICATE PREVENTION: Only bind once to avoid double submission
+        if (this.addContactFormBound) {
+            console.log('⏭️ Add contact form already bound - skipping');
+            return;
+        }
+
         console.log('📝 Binding add contact form...');
 
         const addContactBtn = document.getElementById('addContactBtn');
@@ -3456,6 +3462,9 @@ class GymnastikaPlatform {
             });
             console.log('✅ Form submit bound');
         }
+
+        // Mark as bound to prevent duplicate bindings
+        this.addContactFormBound = true;
     }
 
     // Show add contact form
