@@ -8065,6 +8065,9 @@ div.modal-overlay.results-modal .results-modal-content {
     font-family: 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
     font-weight: 500;
     color: var(--primary-purple) !important;
+    word-break: break-word;
+    max-width: 250px;
+    overflow-wrap: break-word;
 }
 
 .website-link {
