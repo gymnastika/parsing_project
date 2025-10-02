@@ -801,8 +801,13 @@ class GymnastikaPlatform {
     // Clear email wizard session state (after successful send or manual clear)
     clearEmailSessionState() {
         try {
+            // Fully remove the cache entry from localStorage
             this.invalidateCache('email_session');
-            console.log('🗑️ Email session state cleared');
+
+            // Also directly remove to ensure complete cleanup
+            localStorage.removeItem('cache_email_session');
+
+            console.log('🗑️ Email session state cleared completely');
         } catch (error) {
             console.error('❌ Error clearing email session state:', error);
         }
