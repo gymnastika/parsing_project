@@ -5379,6 +5379,15 @@ class GymnastikaPlatform {
         if (progressStep1) progressStep1.classList.add('active');
         if (progressStep2) progressStep2.classList.remove('active');
 
+        // Reset "Next to Step 2" button state (in case it's stuck in loading)
+        const nextBtn = document.getElementById('nextToStep2');
+        if (nextBtn) {
+            nextBtn.disabled = false;
+            nextBtn.innerHTML = 'Продолжить';
+            nextBtn.style.opacity = '1';
+            nextBtn.title = '';
+        }
+
         // Restore form data from currentEmailCampaign
         if (this.currentEmailCampaign) {
             const emailSubject = document.getElementById('emailSubject');
