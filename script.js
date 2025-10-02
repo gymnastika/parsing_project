@@ -1727,6 +1727,7 @@ class GymnastikaPlatform {
                 if (contactsWithInfo.length > 0) {
                     // Normalize contact data from parsing_results schema
                     freshContactsData = contactsWithInfo.map(contact => ({
+                        id: contact.id,  // CRITICAL: Include ID for editing
                         organization_name: contact.organization_name || 'Неизвестная организация',
                         email: contact.email || '',
                         description: contact.description || 'Описание отсутствует',
