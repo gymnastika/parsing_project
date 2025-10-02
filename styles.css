@@ -8070,6 +8070,7 @@ div.modal-overlay.results-modal .results-modal-content {
     font-weight: 500;
     color: var(--text-gray);
     gap: 0.5rem;
+    position: relative;
 }
 
 /* Custom checkbox appearance for individual contact checkboxes */
