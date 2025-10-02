@@ -2402,7 +2402,13 @@ class GymnastikaPlatform {
             
         } catch (error) {
             console.error('❌ Error saving contact changes:', error);
-            alert('Ошибка при сохранении изменений');
+            console.error('❌ Error details:', {
+                message: error.message,
+                code: error.code,
+                details: error.details,
+                hint: error.hint
+            });
+            alert(`Ошибка при сохранении изменений: ${error.message}`);
         }
     }
 
