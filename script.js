@@ -5360,14 +5360,17 @@ class GymnastikaPlatform {
         const customEmailsList = document.getElementById('customEmailsList');
         if (customEmailsList) customEmailsList.value = '';
 
-        // Go back to step 1
-        this.backToEmailStep1();
+        // Clear session state to prevent restoration
+        localStorage.removeItem('emailCampaignSessionState');
+
+        // Go back to step 1 WITHOUT restoring data (skipRestore = true)
+        this.backToEmailStep1(true);
 
         console.log('✅ Email wizard reset');
     }
 
-    // Go back to email step 1 (preserve all data)
-    backToEmailStep1() {
+    // Go back to email step 1 (preserve all data unless skipRestore is true)
+    backToEmailStep1(skipRestore = false) {
         console.log('🔙 Returning to email step 1...');
         
         const step1 = document.getElementById('emailStep1');
