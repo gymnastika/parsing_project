@@ -8140,14 +8140,14 @@ div.modal-overlay.results-modal .results-modal-content {
 .checkbox-label.checked::after {
     content: '';
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 6px;
+    left: 8px;
     width: 6px;
     height: 10px;
     border: 2px solid white;
     border-top: none;
     border-left: none;
-    transform: translate(-50%, -50%) rotate(45deg);
+    transform: rotate(45deg);
 }
 
 /* Indeterminate state for select all checkbox (using JS-managed classes) */
