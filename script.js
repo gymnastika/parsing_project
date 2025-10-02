@@ -1203,8 +1203,13 @@ class GymnastikaPlatform {
                 console.log(`📊 Background sync transformed into ${freshHistoryData.length} history items`);
             }
 
-            // ✅ FIX: Load legacy data from parsing_results table for backward compatibility
+            // ✅ FIX: Load legacy data from parsing_results ONLY for tasks NOT in parsing_tasks
+            // This prevents duplication when same task exists in both tables
             try {
+                // Get task names that already exist in parsing_tasks
+                const existingTaskNames = new Set(freshHistoryData.map(t => t.task_name));
+                console.log(`📋 ${existingTaskNames.size} tasks already in parsing_tasks, will exclude from legacy load`);
+                
                 const { data: legacyResults, error: legacyError } = await this.supabase
                     .from('parsing_results')
                     .select('*')
@@ -1214,9 +1219,15 @@ class GymnastikaPlatform {
                 if (!legacyError && legacyResults && legacyResults.length > 0) {
                     console.log(`📜 Found ${legacyResults.length} legacy results from parsing_results table`);
 
-                    // Group legacy results by task_name
+                    // Group legacy results by task_name, EXCLUDING tasks already in parsing_tasks
                     const legacyGroups = legacyResults.reduce((acc, item) => {
                         const key = item.task_name || 'Без названия';
+                        
+                        // Skip if this task already exists in parsing_tasks (prevent duplication)
+                        if (existingTaskNames.has(key)) {
+                            return acc;
+                        }
+                        
                         if (!acc[key]) {
                             acc[key] = [];
                         }
