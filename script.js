@@ -5288,11 +5288,11 @@ class GymnastikaPlatform {
                         driveUrl: attachment.driveUrl,
                         driveFileId: attachment.driveFileId
                     });
-                } else if (attachment.localPath) {
+                } else if (attachment.filePath && attachment.bucket === 'local-fallback') {
                     // File stored in localStorage or IndexedDB - read from local storage
                     console.log('💾 Reading file from local storage:', attachment.originalName);
                     try {
-                        const fileBlob = await this.fileManager.getLocalFile(attachment.localPath);
+                        const fileBlob = await this.fileManager.getLocalFile(attachment.filePath);
                         if (fileBlob) {
                             const content = await this.readFileAsBase64(fileBlob);
                             console.log('✅ Local file read complete, content length:', content?.length || 0);
@@ -5303,7 +5303,7 @@ class GymnastikaPlatform {
                                 size: attachment.size || 0
                             });
                         } else {
-                            console.error('❌ Failed to read file from local storage:', attachment.localPath);
+                            console.error('❌ Failed to read file from local storage:', attachment.filePath);
                         }
                     } catch (error) {
                         console.error('❌ Error reading from local storage:', error);
