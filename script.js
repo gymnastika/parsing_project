@@ -5849,9 +5849,11 @@ class GymnastikaPlatform {
             checkbox.addEventListener('change', () => {
                 this.updateSelectedEmailContacts();
 
-                // Update select all checkbox state
+                // 🔧 FIX: Get CURRENT checkboxes, not cached reference
+                // This ensures correct count after filtering
+                const currentCheckboxes = document.querySelectorAll('.contact-checkbox');
                 const checkedCount = document.querySelectorAll('.contact-checkbox:checked').length;
-                const totalCount = contactCheckboxes.length;
+                const totalCount = currentCheckboxes.length;
 
                 if (selectAllCheckbox) {
                     selectAllCheckbox.checked = checkedCount === totalCount;
