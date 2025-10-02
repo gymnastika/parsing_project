@@ -5151,7 +5151,27 @@ class GymnastikaPlatform {
         document.getElementById('confirmSubject').textContent = subject;
 
         if (attachments.length > 0) {
-            const attachmentText = attachments.map(a => a.filename).join(', ');
+            // 🔧 FIX: Truncate long filenames and limit displayed files
+            const MAX_FILENAME_LENGTH = 30;
+            const MAX_DISPLAYED_FILES = 3;
+
+            const truncateFilename = (filename) => {
+                if (filename.length <= MAX_FILENAME_LENGTH) return filename;
+                const ext = filename.split('.').pop();
+                const nameWithoutExt = filename.substring(0, filename.lastIndexOf('.'));
+                const truncated = nameWithoutExt.substring(0, MAX_FILENAME_LENGTH - ext.length - 4) + '...';
+                return `${truncated}.${ext}`;
+            };
+
+            const displayedFiles = attachments.slice(0, MAX_DISPLAYED_FILES)
+                .map(a => truncateFilename(a.filename))
+                .join(', ');
+
+            const remainingCount = attachments.length - MAX_DISPLAYED_FILES;
+            const attachmentText = remainingCount > 0
+                ? `${displayedFiles} + еще ${remainingCount}`
+                : displayedFiles;
+
             document.getElementById('confirmAttachments').textContent = `${attachments.length} файлов: ${attachmentText}`;
         } else {
             document.getElementById('confirmAttachments').textContent = 'Нет';
