@@ -5392,7 +5392,8 @@ class GymnastikaPlatform {
 
             // Confirm with user
             if (confirm('Очистить текущую email кампанию и начать сначала?')) {
-                await this.resetEmailWizard();
+                // Delete ALL files including Google Drive (email not sent, no recipients)
+                await this.resetEmailWizard(false);
                 this.showSuccess('✅ Email кампания очищена');
             }
         });
