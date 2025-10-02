@@ -850,8 +850,8 @@ class GymnastikaPlatform {
                 console.log('🎯 Restoring to step 2...');
                 this.showEmailStep2();
 
-                // Show restoration notification
-                this.showSuccess('Сессия восстановлена! Продолжите настройку рассылки.');
+                // Restoration notification removed per user request
+                // this.showSuccess('Сессия восстановлена! Продолжите настройку рассылки.');
             }
 
             return true;
