@@ -3636,11 +3636,12 @@ class GymnastikaPlatform {
             // Hide form and reload contacts
             this.hideAddContactForm();
 
-            // Invalidate contacts cache and reload
-            this.invalidateCache('contacts_data');
+            // Invalidate ALL contacts caches (including email section cache)
+            this.invalidateCache('contacts_data');      // Contacts section cache
+            this.invalidateCache('parsing_results');    // Email section cache
             await this.loadContactsData();
 
-            console.log('✅ Contacts list refreshed');
+            console.log('✅ Contacts list refreshed (all caches invalidated)');
 
         } catch (error) {
             console.error('❌ Error adding contact:', error);
