@@ -66,6 +66,9 @@ class GymnastikaPlatform {
             // Check for active parsing tasks and restore state
             await this.checkAndRestoreActiveTask();
 
+            // Bind email state clear button
+            this.bindClearEmailStateButton();
+
         } catch (error) {
             console.error('❌ Platform initialization error:', error);
             this.showError('Ошибка инициализации платформы');
