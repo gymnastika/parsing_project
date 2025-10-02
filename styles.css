@@ -3746,6 +3746,8 @@ button.category-add-button-v2:active {
 /* Email Confirmation Modal Styles */
 .email-confirmation-modal {
     max-width: 500px;
+    max-height: 90vh; /* 🔧 FIX: Prevent modal from growing too tall */
+    overflow-y: auto; /* 🔧 FIX: Add scroll if content exceeds max-height */
 }
 
 .email-confirmation-details {
