@@ -4466,7 +4466,7 @@ button.category-add-button-v2:active {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
+    padding: 10px 16px; /* 🔧 UNIFIED: Same padding as export-btn, categories-btn */
     background: var(--primary-purple);
     color: white;
     border: none;
