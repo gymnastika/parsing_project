@@ -6553,7 +6553,7 @@ button.category-add-button-v2:active {
 }
 
 .custom-emails-form .form-group label {
-    display: block;
+    display: none;  /* Hidden per user request - label text appears inside textarea */
     color: var(--text-dark);
     font-weight: 400;  /* Changed from 500 to normal weight */
     font-size: 0.95rem;
