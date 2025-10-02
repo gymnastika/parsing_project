@@ -5401,10 +5401,13 @@ class GymnastikaPlatform {
     }
 
     // Reset email wizard to initial state
-    resetEmailWizard() {
+    async resetEmailWizard() {
         console.log('🔄 Resetting email wizard...');
 
-        // Clear form data
+        // STEP 1: Delete all uploaded files from storage (Supabase/localStorage/IndexedDB)
+        await this.cleanupEmailAttachments();
+
+        // STEP 2: Clear form data
         const emailSubject = document.getElementById('emailSubject');
         const emailBody = document.getElementById('emailBody');
         const attachmentsList = document.getElementById('attachmentsList');
@@ -5422,7 +5425,7 @@ class GymnastikaPlatform {
             emailForm.classList.remove('has-files');
         }
 
-        // Reset campaign data
+        // STEP 3: Reset campaign data
         this.currentEmailCampaign = {
             subject: '',
             body: '',
@@ -5445,6 +5448,52 @@ class GymnastikaPlatform {
         this.backToEmailStep1(true);
 
         console.log('✅ Email wizard reset');
+    }
+
+    // Cleanup all email attachments from storage
+    async cleanupEmailAttachments() {
+        if (!this.currentEmailCampaign?.attachments || this.currentEmailCampaign.attachments.length === 0) {
+            console.log('📭 No attachments to clean up');
+            return;
+        }
+
+        console.log(`🗑️ Cleaning up ${this.currentEmailCampaign.attachments.length} email attachments...`);
+
+        const deletePromises = this.currentEmailCampaign.attachments.map(async (attachment) => {
+            try {
+                // Skip files that weren't uploaded yet (still have tempFile)
+                if (attachment.tempFile && !attachment.filePath) {
+                    console.log(`⏭️ Skipping unuploaded file: ${attachment.originalName}`);
+                    return;
+                }
+
+                // Determine storage location
+                const bucket = attachment.bucket || 'attachments';
+                const filePath = attachment.filePath;
+
+                if (!filePath) {
+                    console.log(`⚠️ No filePath for attachment: ${attachment.originalName}`);
+                    return;
+                }
+
+                // Delete from appropriate storage
+                if (this.fileManager) {
+                    await this.fileManager.deleteFile(bucket, filePath);
+                    console.log(`✅ Deleted: ${attachment.originalName} from ${bucket}`);
+                } else {
+                    console.warn('⚠️ FileManager not available for cleanup');
+                }
+
+            } catch (error) {
+                console.error(`❌ Failed to delete ${attachment.originalName}:`, error.message);
+                // Continue with other files even if one fails
+            }
+        });
+
+        // Wait for all deletions to complete
+        await Promise.allSettled(deletePromises);
+
+        console.log('✅ Attachments cleanup complete');
     }
 
     // Go back to email step 1 (preserve all data unless skipRestore is true)
