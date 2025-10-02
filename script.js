@@ -1577,12 +1577,13 @@ class GymnastikaPlatform {
     }
 
     // Delete task from history and database
+    // 🔒 IMPORTANT: Only deletes task metadata, NOT the associated contacts
     async deleteTask(taskName, taskId = null) {
         try {
             console.log(`🗑️ Deleting task: ${taskName}`, taskId ? `(ID: ${taskId})` : '(legacy)');
 
-            // Confirmation dialog
-            const confirmed = confirm(`Вы уверены, что хотите удалить задачу "${taskName}"?\n\nЭто действие нельзя отменить.`);
+            // Confirmation dialog - make it clear contacts will NOT be deleted
+            const confirmed = confirm(`Вы уверены, что хотите удалить задачу "${taskName}"?\n\n⚠️ Примечание: Контакты из этой задачи ОСТАНУТСЯ в базе данных.\nЭто действие нельзя отменить.`);
             if (!confirmed) {
                 console.log('❌ Deletion cancelled by user');
                 return;
@@ -1595,11 +1596,12 @@ class GymnastikaPlatform {
             }
 
             let deletedFromTasks = false;
-            let deletedFromResults = false;
 
-            // Case 1: TaskId provided - delete from parsing_tasks
+            // Delete ONLY from parsing_tasks (task metadata)
+            // 🔒 CONTACTS PRESERVATION: We do NOT delete from parsing_results
+            // to preserve contacts even after task deletion
             if (taskId) {
-                console.log(`🗑️ Deleting from parsing_tasks table (ID: ${taskId})...`);
+                console.log(`🗑️ Deleting task metadata from parsing_tasks table (ID: ${taskId})...`);
 
                 const { error: taskError } = await this.supabase
                     .from('parsing_tasks')
@@ -1613,39 +1615,25 @@ class GymnastikaPlatform {
                 }
 
                 deletedFromTasks = true;
-                console.log('✅ Successfully deleted from parsing_tasks');
-            }
-
-            // Case 2: Also try to delete from parsing_results (legacy)
-            // This handles both legacy tasks (no taskId) and cleanup of old data
-            console.log(`🗑️ Deleting from parsing_results table (task_name: ${taskName})...`);
-
-            const { error: resultsError } = await this.supabase
-                .from('parsing_results')
-                .delete()
-                .eq('task_name', taskName)
-                .eq('user_id', this.currentUser?.id);
-
-            if (resultsError) {
-                console.warn('⚠️ Error deleting from parsing_results:', resultsError);
-                // Don't throw - this table might not have data
+                console.log('✅ Successfully deleted task metadata from parsing_tasks');
+                console.log('📞 Contacts from this task remain in parsing_results table');
             } else {
-                deletedFromResults = true;
-                console.log('✅ Successfully deleted from parsing_results');
+                // Legacy task without ID - cannot delete safely
+                console.warn('⚠️ Legacy task without ID - skipping deletion');
+                this.showError('Невозможно удалить задачу без ID');
+                return;
             }
 
             // Invalidate cache to refresh UI
             this.invalidateCache('task_history');
-            this.invalidateCache('parsing_results');
-            this.invalidateCache('contacts_data');
-            console.log('🔄 Cache invalidated after deletion');
+            console.log('🔄 Cache invalidated after task deletion');
 
             // Refresh history display
             await this.loadHistoryData();
 
             // Show success message
-            if (deletedFromTasks || deletedFromResults) {
-                this.showSuccess(`Задача "${taskName}" успешно удалена`);
+            if (deletedFromTasks) {
+                this.showSuccess(`Задача "${taskName}" успешно удалена. Контакты сохранены в базе данных.`);
             } else {
                 this.showError('Задача не найдена в базе данных');
             }
