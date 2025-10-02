@@ -5830,7 +5830,9 @@ class GymnastikaPlatform {
 
             selectAllCheckbox.addEventListener('change', (e) => {
                 const isChecked = e.target.checked;
-                contactCheckboxes.forEach(checkbox => {
+                // 🔧 FIX: Use CURRENT checkboxes, not cached reference from line 5809
+                const currentCheckboxes = document.querySelectorAll('.contact-checkbox');
+                currentCheckboxes.forEach(checkbox => {
                     checkbox.checked = isChecked;
                 });
                 this.updateSelectedEmailContacts();
