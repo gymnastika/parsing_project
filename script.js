@@ -5364,8 +5364,8 @@ class GymnastikaPlatform {
             // Show success message
             this.showSuccess(`✅ Письмо успешно отправлено ${result.recipientCount} получателям!`);
 
-            // Reset form and cleanup attachments
-            await this.resetEmailWizard();
+            // Reset form and cleanup attachments (keep Google Drive files - recipients need access)
+            await this.resetEmailWizard(true);
 
         } catch (error) {
             console.error('❌ Error sending email campaign:', error);
