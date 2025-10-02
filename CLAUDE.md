@@ -1128,7 +1128,8 @@ database/
 - ✅ **Cross-browser data**: 0% → 100% 🔴
 - ✅ **Data persistence**: Failed → Complete
 - ✅ **Contact filtering**: Все результаты → Только с email/phone
-- ✅ **Comprehensive documentation**: 6 новых MD файлов
+- ✅ **Email session state**: Restores old campaign → Clean step 1 after send
+- ✅ **Comprehensive documentation**: 7 новых MD файлов
 
 ### ⚠️ Важно для тестирования:
 - **Старые задачи** (до 1 октября): могут показывать 0 результатов (данные не были сохранены из-за бага)
