@@ -5387,12 +5387,12 @@ class GymnastikaPlatform {
             return;
         }
 
-        clearBtn.addEventListener('click', () => {
+        clearBtn.addEventListener('click', async () => {
             console.log('🗑️ Manual email state clear requested');
 
             // Confirm with user
             if (confirm('Очистить текущую email кампанию и начать сначала?')) {
-                this.resetEmailWizard();
+                await this.resetEmailWizard();
                 this.showSuccess('✅ Email кампания очищена');
             }
         });
