@@ -5393,8 +5393,8 @@ class GymnastikaPlatform {
             nextBtn.title = '';
         }
 
-        // Restore form data from currentEmailCampaign
-        if (this.currentEmailCampaign) {
+        // Restore form data from currentEmailCampaign (only if not skipping restore)
+        if (!skipRestore && this.currentEmailCampaign) {
             const emailSubject = document.getElementById('emailSubject');
             const emailBody = document.getElementById('emailBody');
 
@@ -5412,6 +5412,8 @@ class GymnastikaPlatform {
                 body: this.currentEmailCampaign.body?.substring(0, 50) + '...',
                 attachments: this.currentEmailCampaign.attachments?.length || 0
             });
+        } else if (skipRestore) {
+            console.log('⏭️ Skipping form data restoration (clean reset)');
         }
 
         // Re-validate form to enable/disable Next button
