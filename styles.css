@@ -8140,7 +8140,7 @@ div.modal-overlay.results-modal .results-modal-content {
 .checkbox-label.checked::after {
     content: '';
     position: absolute;
-    top: 3px;
+    top: 5px;
     left: 7px;
     width: 6px;
     height: 10px;
