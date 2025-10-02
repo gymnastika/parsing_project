@@ -3673,10 +3673,17 @@ class GymnastikaPlatform {
                 </div>
             `;
 
+            // Get Supabase user ID directly (more reliable than this.currentUser)
+            const supabaseUserId = (await this.supabase.auth.getUser()).data.user?.id;
+            
+            if (!supabaseUserId) {
+                throw new Error('Пользователь не авторизован');
+            }
+
             const { data: categories, error } = await this.supabase
                 .from('categories')
                 .select('*')
-                .eq('user_id', this.currentUser.id)
+                .eq('user_id', supabaseUserId)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
