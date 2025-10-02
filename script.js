@@ -7656,7 +7656,9 @@ class GymnastikaPlatform {
         if (fileInfo) {
             fileInfo.needsPermissionSetup = true;
             fileInfo.permissionStatus = 'pending';
-            console.log('🔐 Marked Google Drive file as needing permissions:', fileInfo.originalName);
+            fileInfo.driveFileId = uploadResult.fileId; // Store driveFileId in fileInfo
+            fileInfo.driveUrl = uploadResult.driveUrl; // Store driveUrl in fileInfo
+            console.log('🔐 Marked Google Drive file as needing permissions:', fileInfo.originalName, 'driveFileId:', uploadResult.fileId);
 
             // Trigger validation since this file now needs permissions
             this.validateEmailForm();
