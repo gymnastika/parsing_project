@@ -2093,8 +2093,10 @@ class GymnastikaPlatform {
         // Load all categories once
         const categories = this.getCacheData('categories_map') || [];
 
-        sortedContacts.forEach(contact => {
+        sortedContacts.forEach((contact, index) => {
             const row = document.createElement('tr');
+            row.className = 'contact-row';
+            row.dataset.contactId = contact.id || index;
 
             // Format date like in screenshot (10.09.25)
             const dateObj = new Date(contact.parsing_timestamp || contact.created_at || new Date());
@@ -2108,27 +2110,44 @@ class GymnastikaPlatform {
             const category = categories.find(c => c.id === contact.category_id);
             const categoryName = category ? category.name : (contact.category_id ? 'Неизвестно' : 'Без категории');
 
+            // Check if contact has multiple emails
+            const allEmails = contact.all_emails || [];
+            const hasMultipleEmails = allEmails.length > 1;
+            const primaryEmail = contact.email || (allEmails.length > 0 ? allEmails[0] : null);
+
             row.innerHTML = `
                 <td class="category-cell">${categoryName}</td>
                 <td class="org-name-cell">${contact.organization_name || 'Неизвестная организация'}</td>
                 <td class="email-cell">
-                    ${contact.email ? `<a href="mailto:${contact.email}" class="email-link">${contact.email}</a>` : 'Не определен'}
+                    ${primaryEmail ? `<a href="mailto:${primaryEmail}" class="email-link" onclick="event.stopPropagation()">${primaryEmail}</a>` : 'Не определен'}
+                    ${hasMultipleEmails ? `<span class="expand-emails-btn" title="Показать все email (${allEmails.length})">▼ +${allEmails.length - 1}</span>` : ''}
                 </td>
                 <td class="description-cell">${contact.description || 'Описание отсутствует'}</td>
                 <td class="website-cell">
-                    ${contact.website ? `<a href="${contact.website}" target="_blank" class="website-link">${contact.website}</a>` : 'Не определен'}
+                    ${contact.website ? `<a href="${contact.website}" target="_blank" class="website-link" onclick="event.stopPropagation()">${contact.website}</a>` : 'Не определен'}
                 </td>
                 <td class="date-cell">${shortDate}</td>
             `;
-            
-            // Add click handler for contact row
+
+            // Add click handler for expand emails button
+            if (hasMultipleEmails) {
+                const expandBtn = row.querySelector('.expand-emails-btn');
+                if (expandBtn) {
+                    expandBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.toggleEmailsExpansion(row, contact, allEmails);
+                    });
+                }
+            }
+
+            // Add click handler for contact row (right-click menu)
             row.style.cursor = 'pointer';
             row.addEventListener('click', (e) => {
-                // Don't trigger for link clicks
-                if (e.target.tagName === 'A') return;
+                // Don't trigger for link clicks or expand button
+                if (e.target.tagName === 'A' || e.target.classList.contains('expand-emails-btn')) return;
                 this.showContactMenu(contact, e);
             });
-            
+
             body.appendChild(row);
         });
         table.appendChild(body);
