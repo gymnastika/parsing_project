@@ -2609,7 +2609,7 @@ class GymnastikaPlatform {
         const table = document.createElement('table');
         table.className = 'results-modal-table';
         
-        // Table header
+        // Table header (matching Contacts section)
         const thead = document.createElement('thead');
         thead.innerHTML = `
             <tr>
@@ -2617,7 +2617,6 @@ class GymnastikaPlatform {
                 <th>Email</th>
                 <th>Описание</th>
                 <th>Веб-сайт</th>
-                <th>Страна</th>
                 <th>Дата добавления</th>
             </tr>
         `;
