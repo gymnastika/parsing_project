@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Политика конфиденциальности - GYMNASTIKA Parsing Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #7c3aed;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .last-updated {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #333;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        .contact {
+            background: #f8f8f8;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 30px;
+        }
+
+        a {
+            color: #7c3aed;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Политика конфиденциальности</h1>
+        <p class="last-updated">Последнее обновление: 3 октября 2025 г.</p>
+
+        <h2>1. Общие положения</h2>
+        <p>Данная Политика конфиденциальности описывает, как GYMNASTIKA Parsing Platform ("мы", "нас" или "наш") собирает, использует и защищает вашу личную информацию при использовании нашего веб-приложения.</p>
+
+        <h2>2. Собираемая информация</h2>
+        <p>Мы собираем следующие типы информации:</p>
+        <ul>
+            <li><strong>Учетная информация:</strong> Email адрес, имя пользователя при регистрации</li>
+            <li><strong>Google Account данные:</strong> Email, имя, профиль (при подключении Google OAuth)</li>
+            <li><strong>Данные парсинга:</strong> Контакты организаций, которые вы собираете через платформу</li>
+            <li><strong>Технические данные:</strong> IP адрес, браузер, операционная система для обеспечения безопасности</li>
+        </ul>
+
+        <h2>3. Использование информации</h2>
+        <p>Мы используем собранную информацию для:</p>
+        <ul>
+            <li>Предоставления функциональности платформы (парсинг, хранение данных, email рассылки)</li>
+            <li>Интеграции с Google Services (Gmail API, Google Drive API) для отправки писем и хранения файлов</li>
+            <li>Улучшения качества сервиса и пользовательского опыта</li>
+            <li>Обеспечения безопасности и предотвращения мошенничества</li>
+        </ul>
+
+        <h2>4. Google API Services</h2>
+        <p>Наше приложение использует следующие Google API:</p>
+        <ul>
+            <li><strong>Gmail API:</strong> Для отправки email рассылок от вашего имени (только с вашего разрешения)</li>
+            <li><strong>Google Drive API:</strong> Для загрузки и хранения больших файлов-вложений (только файлы, которые вы загружаете)</li>
+            <li><strong>Google User Info:</strong> Для получения вашего email и имени при авторизации</li>
+        </ul>
+        <p><strong>Использование данных Google:</strong></p>
+        <ul>
+            <li>Мы НЕ храним ваши пароли от Google Account</li>
+            <li>Мы используем только те разрешения (scopes), которые необходимы для функционала</li>
+            <li>Вы можете отозвать доступ в любой момент через настройки Google Account</li>
+            <li>Мы НЕ передаем данные третьим лицам</li>
+            <li>Все токены доступа хранятся в зашифрованном виде в защищенной базе данных</li>
+        </ul>
+
+        <h2>5. Хранение и защита данных</h2>
+        <p>Мы принимаем разумные меры для защиты вашей информации:</p>
+        <ul>
+            <li>Все данные хранятся в защищенной базе данных Supabase с шифрованием</li>
+            <li>Используется HTTPS для всех соединений</li>
+            <li>OAuth 2.0 токены хранятся в зашифрованном виде</li>
+            <li>Доступ к данным предоставляется только вам (Row Level Security)</li>
+        </ul>
+
+        <h2>6. Передача данных третьим лицам</h2>
+        <p>Мы НЕ продаем, не обмениваем и не передаем вашу личную информацию третьим лицам, за исключением:</p>
+        <ul>
+            <li>Сервисов, необходимых для работы платформы (Supabase для базы данных, Railway для хостинга)</li>
+            <li>Случаев, когда это требуется по закону</li>
+        </ul>
+
+        <h2>7. Ваши права</h2>
+        <p>Вы имеете право:</p>
+        <ul>
+            <li>Получить доступ к своим данным</li>
+            <li>Исправить неточные данные</li>
+            <li>Удалить свою учетную запись и все связанные данные</li>
+            <li>Экспортировать свои данные в формате CSV</li>
+            <li>Отозвать доступ к Google Services в любой момент</li>
+        </ul>
+
+        <h2>8. Cookies и локальное хранилище</h2>
+        <p>Мы используем localStorage браузера для:</p>
+        <ul>
+            <li>Сохранения сессии пользователя</li>
+            <li>Кэширования настроек для улучшения производительности</li>
+            <li>Хранения OAuth токенов (в зашифрованном виде)</li>
+        </ul>
+
+        <h2>9. Изменения в Политике</h2>
+        <p>Мы можем обновлять данную Политику конфиденциальности. О значительных изменениях будем уведомлять через платформу.</p>
+
+        <h2>10. Контактная информация</h2>
+        <div class="contact">
+            <p>Если у вас есть вопросы по Политике конфиденциальности, свяжитесь с нами:</p>
+            <p><strong>Email:</strong> <a href="mailto:support@gymnastika.ae">support@gymnastika.ae</a></p>
+            <p><strong>Приложение:</strong> GYMNASTIKA Parsing Platform</p>
+        </div>
+
+        <hr style="margin: 40px 0; border: none; border-top: 1px solid #e0e0e0;">
+
+        <h1>Privacy Policy</h1>
+        <p class="last-updated">Last updated: October 3, 2025</p>
+
+        <h2>1. Introduction</h2>
+        <p>This Privacy Policy describes how GYMNASTIKA Parsing Platform ("we", "us" or "our") collects, uses and protects your personal information when using our web application.</p>
+
+        <h2>2. Information We Collect</h2>
+        <ul>
+            <li><strong>Account Information:</strong> Email address, username during registration</li>
+            <li><strong>Google Account Data:</strong> Email, name, profile (when connecting Google OAuth)</li>
+            <li><strong>Parsing Data:</strong> Organization contacts that you collect through the platform</li>
+            <li><strong>Technical Data:</strong> IP address, browser, operating system for security purposes</li>
+        </ul>
+
+        <h2>3. How We Use Information</h2>
+        <ul>
+            <li>Providing platform functionality (parsing, data storage, email campaigns)</li>
+            <li>Google Services integration (Gmail API, Google Drive API)</li>
+            <li>Improving service quality and user experience</li>
+            <li>Ensuring security and fraud prevention</li>
+        </ul>
+
+        <h2>4. Google API Services Usage</h2>
+        <p>Our application uses the following Google APIs:</p>
+        <ul>
+            <li><strong>Gmail API:</strong> To send email campaigns on your behalf (with your permission only)</li>
+            <li><strong>Google Drive API:</strong> To upload and store large file attachments (only files you upload)</li>
+            <li><strong>Google User Info:</strong> To get your email and name during authorization</li>
+        </ul>
+        <p><strong>Google Data Usage:</strong></p>
+        <ul>
+            <li>We DO NOT store your Google Account passwords</li>
+            <li>We only use scopes necessary for functionality</li>
+            <li>You can revoke access anytime through Google Account settings</li>
+            <li>We DO NOT share data with third parties</li>
+            <li>All access tokens are stored encrypted in a secure database</li>
+        </ul>
+
+        <h2>5. Contact Us</h2>
+        <div class="contact">
+            <p>If you have questions about this Privacy Policy, contact us:</p>
+            <p><strong>Email:</strong> <a href="mailto:support@gymnastika.ae">support@gymnastika.ae</a></p>
+        </div>
+    </div>
+</body>
+</html>
