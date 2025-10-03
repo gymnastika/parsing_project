@@ -2216,6 +2216,144 @@ class GymnastikaPlatform {
         }, 10);
     }
 
+    // Toggle emails expansion (show/hide all emails for contact)
+    toggleEmailsExpansion(row, contact, allEmails) {
+        const contactId = row.dataset.contactId;
+        const existingExpansion = document.querySelector(`.emails-expansion-row[data-parent-id="${contactId}"]`);
+
+        if (existingExpansion) {
+            // Collapse: remove expansion row
+            existingExpansion.remove();
+            const expandBtn = row.querySelector('.expand-emails-btn');
+            if (expandBtn) expandBtn.textContent = `▼ +${allEmails.length - 1}`;
+            row.classList.remove('expanded');
+        } else {
+            // Expand: create expansion row
+            const expansionRow = document.createElement('tr');
+            expansionRow.className = 'emails-expansion-row';
+            expansionRow.dataset.parentId = contactId;
+
+            const td = document.createElement('td');
+            td.colSpan = 6; // Span all columns
+            td.className = 'emails-expansion-cell';
+
+            // Create emails list with checkboxes
+            const emailsContainer = document.createElement('div');
+            emailsContainer.className = 'emails-expansion-container';
+
+            const header = document.createElement('div');
+            header.className = 'emails-expansion-header';
+            header.innerHTML = `
+                <strong>Все email адреса организации "${contact.organization_name || 'Неизвестно'}":</strong>
+                <button class="select-all-emails-btn" data-contact-id="${contactId}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                    </svg>
+                    Выбрать все для рассылки
+                </button>
+            `;
+
+            const emailsList = document.createElement('div');
+            emailsList.className = 'emails-list';
+
+            allEmails.forEach((email, index) => {
+                const emailItem = document.createElement('label');
+                emailItem.className = 'email-checkbox-item';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'email-checkbox';
+                checkbox.dataset.contactId = contactId;
+                checkbox.dataset.email = email;
+                checkbox.value = email;
+
+                // Check if email is already selected for campaign
+                if (this.selectedCampaignEmails && this.selectedCampaignEmails.has(email)) {
+                    checkbox.checked = true;
+                }
+
+                checkbox.addEventListener('change', (e) => {
+                    this.handleEmailSelectionChange(e.target, contact);
+                });
+
+                const emailLink = document.createElement('a');
+                emailLink.href = `mailto:${email}`;
+                emailLink.className = 'email-link';
+                emailLink.textContent = email;
+                emailLink.onclick = (e) => e.stopPropagation();
+
+                const badge = document.createElement('span');
+                badge.className = 'email-badge';
+                badge.textContent = index === 0 ? 'Основной' : `Email ${index + 1}`;
+
+                emailItem.appendChild(checkbox);
+                emailItem.appendChild(emailLink);
+                emailItem.appendChild(badge);
+                emailsList.appendChild(emailItem);
+            });
+
+            emailsContainer.appendChild(header);
+            emailsContainer.appendChild(emailsList);
+            td.appendChild(emailsContainer);
+            expansionRow.appendChild(td);
+
+            // Insert expansion row after current row
+            row.after(expansionRow);
+
+            // Update expand button
+            const expandBtn = row.querySelector('.expand-emails-btn');
+            if (expandBtn) expandBtn.textContent = `▲ ${allEmails.length} email`;
+            row.classList.add('expanded');
+
+            // Bind "Select All" button
+            const selectAllBtn = header.querySelector('.select-all-emails-btn');
+            if (selectAllBtn) {
+                selectAllBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.selectAllEmailsForContact(contactId, allEmails, contact);
+                });
+            }
+        }
+    }
+
+    // Handle individual email checkbox change
+    handleEmailSelectionChange(checkbox, contact) {
+        if (!this.selectedCampaignEmails) {
+            this.selectedCampaignEmails = new Set();
+        }
+
+        if (checkbox.checked) {
+            this.selectedCampaignEmails.add(checkbox.value);
+            console.log(`✅ Selected email for campaign: ${checkbox.value} (${contact.organization_name})`);
+        } else {
+            this.selectedCampaignEmails.delete(checkbox.value);
+            console.log(`❌ Deselected email: ${checkbox.value}`);
+        }
+
+        console.log(`📧 Total selected emails: ${this.selectedCampaignEmails.size}`);
+    }
+
+    // Select all emails for a specific contact
+    selectAllEmailsForContact(contactId, allEmails, contact) {
+        if (!this.selectedCampaignEmails) {
+            this.selectedCampaignEmails = new Set();
+        }
+
+        // Add all emails to selection
+        allEmails.forEach(email => {
+            this.selectedCampaignEmails.add(email);
+        });
+
+        // Update all checkboxes for this contact
+        const checkboxes = document.querySelectorAll(`.email-checkbox[data-contact-id="${contactId}"]`);
+        checkboxes.forEach(cb => cb.checked = true);
+
+        console.log(`✅ Selected all ${allEmails.length} emails for "${contact.organization_name}"`);
+        console.log(`📧 Total selected emails: ${this.selectedCampaignEmails.size}`);
+
+        this.showSuccess(`Выбрано ${allEmails.length} email для рассылки`);
+    }
+
     // Hide contact menu
     hideContactMenu() {
         const menu = document.querySelector('.contact-context-menu');
