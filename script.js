@@ -3772,8 +3772,10 @@ class GymnastikaPlatform {
             return;
         }
 
-        if (!this.currentUser) {
-            console.log('❌ No current user for loading categories');
+        // Use Supabase auth to get current user ID
+        const supabaseUserId = (await this.supabase.auth.getUser()).data.user?.id;
+        if (!supabaseUserId) {
+            console.error('❌ User not authenticated, cannot load categories into selects');
             return;
         }
 
@@ -3781,7 +3783,7 @@ class GymnastikaPlatform {
             const { data: categories, error } = await this.supabase
                 .from('categories')
                 .select('*')
-                .eq('user_id', this.currentUser.id)
+                .eq('user_id', supabaseUserId)
                 .order('name', { ascending: true });
 
             if (error) throw error;
