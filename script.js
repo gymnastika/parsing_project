@@ -2625,21 +2625,43 @@ class GymnastikaPlatform {
         const tbody = document.createElement('tbody');
         results.forEach(result => {
             const row = document.createElement('tr');
-            
-            const formattedDate = new Date(result.parsing_timestamp).toLocaleDateString('ru-RU', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-            
+
+            // Format date properly or show fallback
+            let formattedDate = 'Не указана';
+            if (result.parsing_timestamp || result.created_at) {
+                try {
+                    const dateValue = result.parsing_timestamp || result.created_at;
+                    const parsedDate = new Date(dateValue);
+                    if (!isNaN(parsedDate.getTime())) {
+                        formattedDate = parsedDate.toLocaleDateString('ru-RU', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: '2-digit'
+                        });
+                    }
+                } catch (e) {
+                    console.warn('Failed to parse date:', result.parsing_timestamp);
+                }
+            }
+
+            // Shorten website URL for display
+            let websiteDisplay = 'Не указан';
+            if (result.website) {
+                try {
+                    const url = new URL(result.website);
+                    websiteDisplay = `<a href="${result.website}" target="_blank" title="${result.website}">${url.hostname}</a>`;
+                } catch (e) {
+                    // If URL parsing fails, just show first 30 chars
+                    const shortUrl = result.website.length > 30 ? result.website.substring(0, 30) + '...' : result.website;
+                    websiteDisplay = `<a href="${result.website}" target="_blank" title="${result.website}">${shortUrl}</a>`;
+                }
+            }
+
             row.innerHTML = `
                 <td>${result.organization_name || 'Не указано'}</td>
                 <td>${result.email || 'Не указан'}</td>
                 <td title="${result.description || ''}">${result.description ? (result.description.length > 50 ? result.description.substring(0, 50) + '...' : result.description) : 'Не указано'}</td>
-                <td>${result.website ? `<a href="${result.website}" target="_blank">${result.website}</a>` : 'Не указан'}</td>
-                <td>${result.country || 'Не указана'}</td>
+                <td>${websiteDisplay}</td>
                 <td>${formattedDate}</td>
             `;
             tbody.appendChild(row);
