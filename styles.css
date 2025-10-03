@@ -7687,6 +7687,141 @@ div.modal-overlay.edit-contact-modal label {
     padding: 0 !important;
 }
 
+/* =============================================
+   EXPANDABLE EMAILS UI
+   ============================================= */
+
+/* Expand emails button */
+.expand-emails-btn {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 8px;
+    background: var(--primary-purple);
+    color: white;
+    font-size: 0.75rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.expand-emails-btn:hover {
+    background: var(--primary-purple-dark);
+    transform: scale(1.05);
+}
+
+/* Expanded row styles */
+.contact-row.expanded {
+    background: #f0eeff !important;
+}
+
+.emails-expansion-row {
+    background: #fafbff;
+}
+
+.emails-expansion-cell {
+    padding: 16px 24px !important;
+    border-bottom: 2px solid #e0e7ff;
+}
+
+.emails-expansion-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.emails-expansion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.emails-expansion-header strong {
+    color: var(--text-dark);
+    font-size: 0.95rem;
+}
+
+.select-all-emails-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--primary-purple);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.select-all-emails-btn:hover {
+    background: var(--primary-purple-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(124, 58, 237, 0.3);
+}
+
+.select-all-emails-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Emails list */
+.emails-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 0;
+}
+
+.email-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: white;
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.email-checkbox-item:hover {
+    background: #f8f9ff;
+    border-color: var(--primary-purple);
+    transform: translateX(4px);
+}
+
+.email-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--primary-purple);
+}
+
+.email-checkbox-item .email-link {
+    flex: 1;
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.email-checkbox-item .email-link:hover {
+    text-decoration: underline;
+}
+
+.email-badge {
+    padding: 2px 8px;
+    background: #e0e7ff;
+    color: var(--primary-purple);
+    font-size: 0.75rem;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
 /* Ensure contacts container has proper spacing */
 #contacts-content {
     margin-top: 0 !important; /* Tab content itself shouldn't have margin */
