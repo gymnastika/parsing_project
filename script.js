@@ -5463,17 +5463,30 @@ class GymnastikaPlatform {
                     const emails = lines
                         .map(line => line.trim())
                         .filter(line => line && emailRegex.test(line));
-                    
+
                     console.log('📧 Parsed custom emails from textarea:', emails.length);
                     recipients.push(...emails);
                 }
             }
         } else {
             // Use selected contacts from database
-            console.log('📧 Using selected contacts from database:', this.selectedEmailContacts?.length || 0);
-            if (this.selectedEmailContacts && this.selectedEmailContacts.length > 0) {
+            console.log('📧 Using selected contacts from database...');
+
+            // PRIORITY 1: Use manually selected emails from expandable rows
+            if (this.selectedCampaignEmails && this.selectedCampaignEmails.size > 0) {
+                const selectedEmails = Array.from(this.selectedCampaignEmails);
+                console.log(`✅ Using ${selectedEmails.length} manually selected emails from expandable rows`);
+                recipients.push(...selectedEmails);
+            }
+            // PRIORITY 2: Fallback to old selectedEmailContacts system
+            else if (this.selectedEmailContacts && this.selectedEmailContacts.length > 0) {
+                console.log(`📧 Using ${this.selectedEmailContacts.length} contacts from old selection system`);
                 this.selectedEmailContacts.forEach(contact => {
-                    if (contact.email) {
+                    // Use all_emails if available, otherwise fallback to single email
+                    if (contact.all_emails && contact.all_emails.length > 0) {
+                        console.log(`📧 Contact "${contact.organization_name}" has ${contact.all_emails.length} emails - adding all`);
+                        recipients.push(...contact.all_emails);
+                    } else if (contact.email) {
                         recipients.push(contact.email);
                     }
                 });
