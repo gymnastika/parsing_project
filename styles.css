@@ -7777,6 +7777,36 @@ div.modal-overlay.edit-contact-modal label {
     padding: 8px 0;
 }
 
+/* Read-only email view (Contacts section) */
+.email-view-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: white;
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.email-view-item:hover {
+    background: #f8f9ff;
+    border-color: var(--primary-purple);
+    transform: translateX(4px);
+}
+
+.email-view-item .email-link {
+    flex: 1;
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.email-view-item .email-link:hover {
+    text-decoration: underline;
+}
+
+/* Email selection with checkboxes (Email Campaign section) */
 .email-checkbox-item {
     display: flex;
     align-items: center;
