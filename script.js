@@ -2091,7 +2091,20 @@ class GymnastikaPlatform {
 
         // 🔍 DEBUG: Check how many contacts have multiple emails
         let multipleEmailsCount = 0;
+        let hasAllEmailsField = 0;
+        console.log('🔍 DEBUG: Checking first 5 contacts for all_emails field:');
+        sortedContacts.slice(0, 5).forEach((contact, idx) => {
+            console.log(`  [${idx}] ${contact.organization_name || 'Unknown'}:`);
+            console.log(`      all_emails:`, contact.all_emails);
+            console.log(`      all_emails type:`, typeof contact.all_emails);
+            console.log(`      email:`, contact.email);
+        });
+
         sortedContacts.forEach(contact => {
+            if (contact.all_emails !== null && contact.all_emails !== undefined) {
+                hasAllEmailsField++;
+            }
+
             let allEmails = contact.all_emails || [];
             if (typeof allEmails === 'string') {
                 try {
@@ -2105,6 +2118,7 @@ class GymnastikaPlatform {
                 console.log(`🔍 Contact with multiple emails: ${contact.organization_name} - ${allEmails.length} emails:`, allEmails);
             }
         });
+        console.log(`📊 Contacts with all_emails field: ${hasAllEmailsField} / ${sortedContacts.length}`);
         console.log(`📊 Total contacts with multiple emails: ${multipleEmailsCount} / ${sortedContacts.length}`);
 
         // Create body
