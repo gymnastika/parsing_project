@@ -410,10 +410,13 @@ Old tasks (before fixes):
 - [x] Fix 1: Database save schema mapping
 - [x] Fix 2: Eye icon user_id and fallback
 - [x] Fix 3: Contacts section data source
+- [x] Fix 4: Cross-browser data visibility
+- [x] Fix 5: Multiple emails display (all_emails field)
 - [x] Documentation created for all fixes
 - [x] Code changes committed and pushed
-- [ ] **User testing**: Run NEW parsing task
-- [ ] **Verification**: Check all three features work
+- [ ] **User testing**: Hard refresh browser (Cmd+Shift+R)
+- [ ] **Verification**: Check expand buttons (▼ +N) appear for multiple emails
+- [ ] **Test expand**: Click button to see all emails
 - [ ] **Cleanup**: Clear browser cache if needed
 - [ ] **Monitoring**: Watch for any new errors
 
