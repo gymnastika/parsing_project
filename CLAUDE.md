@@ -1480,4 +1480,76 @@ if (\!userId || \!taskData) {
 
 ---
 
+### ✅ Fix 7: Multiple Emails Display - JSON String Parsing (October 7, 2025)
+**Проблема**: В разделе "Контакты" отображался только 1 email, даже когда в `all_emails` было несколько email адресов
+
+**Данные из парсинга**:
+```json
+{
+  "email": "info@lvlupgyms.com",
+  "allEmails": ["info@lvlupgyms.com", "info@lvlupgyms.comlocation"]
+}
+```
+
+**Данные из базы** (`parsing_results` table):
+```json
+{
+  "email": "info@ggdxb.com",
+  "all_emails": "[\"field.@media\", \"info@ggdxb.com\"]"  // ❌ СТРОКА, не массив
+}
+```
+
+- **Root Cause**: Supabase возвращает JSONB колонку как JSON **string**, а не как JavaScript array
+  - Код `displayContacts()` ожидал массив: `const allEmails = contact.all_emails || [];`
+  - Получал строку: `"[\"email1\", \"email2\"]"`
+  - Проверка `allEmails.length > 1` работала как `.length` строки, а не массива
+  - Результат: `hasMultipleEmails = false` → expandable UI не показывался
+
+- **Solution**:
+  1. Добавлена проверка типа `all_emails` перед использованием
+  2. Если это строка → парсим через `JSON.parse()`
+  3. Если парсинг не удался → fallback на пустой массив `[]`
+  4. try/catch для безопасности от невалидного JSON
+
+- **Impact**:
+  - ✅ Множественные email теперь корректно отображаются
+  - ✅ Expandable UI кнопка появляется когда email > 1
+  - ✅ Клик по кнопке раскрывает все email адреса
+  - ✅ Работает для старых и новых записей в БД
+
+- **Files Modified**:
+  - `script.js:2113-2125` - Метод `displayContacts()` с JSON парсингом
+
+**Технические детали**:
+```javascript
+// БЫЛО (не работало со строками):
+const allEmails = contact.all_emails || [];
+const hasMultipleEmails = allEmails.length > 1;
+
+// СТАЛО (работает и со строками, и с массивами):
+let allEmails = contact.all_emails || [];
+if (typeof allEmails === 'string') {
+    try {
+        allEmails = JSON.parse(allEmails);  // Парсим JSON string → array
+    } catch (e) {
+        console.warn('Failed to parse all_emails:', allEmails, e);
+        allEmails = [];  // Fallback на пустой массив
+    }
+}
+const hasMultipleEmails = allEmails.length > 1;  // ✅ Теперь работает правильно
+```
+
+**Пример работы**:
+```javascript
+// Input from Supabase:
+contact.all_emails = "[\"info@gym.com\", \"admin@gym.com\"]"  // string
+
+// After parsing:
+allEmails = ["info@gym.com", "admin@gym.com"]  // array
+hasMultipleEmails = true  // ✅
+// UI показывает: "info@gym.com ▼ +1"
+```
+
+---
+
 **Создано с помощью Claude Code** | **GitHub**: https://github.com/gymnastika/parsing_project
