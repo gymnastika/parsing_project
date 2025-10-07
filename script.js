@@ -6362,16 +6362,23 @@ class GymnastikaPlatform {
             if (progressBar) progressBar.classList.add('active');
             if (progressDesc) progressDesc.classList.add('active');
 
-            // 3. Show initial progress state - waiting for Background Worker
+            // 3. Show initial progress state
             this.updateModernProgress({
                 stage: 'initializing',
                 current: 0,
-                total: 100,
-                message: 'Задача отправлена на сервер... Ожидание Background Worker...'
+                total: 3,
+                message: 'Инициализация парсинга URL...'
             });
 
-            // 4. Real-time subscription will handle all progress updates from Background Worker
-            // No need to execute pipeline here - Background Worker does everything!
+            // 4. Execute URL parsing pipeline (task is marked as 'running' so Background Worker won't pick it up)
+            const pipelineParams = {
+                taskId: this.currentTaskId,
+                websiteUrl: params.websiteUrl,
+                taskName: params.taskName,
+                categoryId: params.categoryId
+            };
+
+            await this.orchestrator.executeUrlParsing(pipelineParams);
 
         } catch (error) {
             console.error('❌ URL parsing task creation error:', error);
