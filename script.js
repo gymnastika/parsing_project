@@ -6008,25 +6008,59 @@ class GymnastikaPlatform {
         // Add each contact as table row with checkbox
         contacts.forEach((contact, index) => {
             const row = document.createElement('tr');
+            const contactId = contact.id || `contact-${index}`;
 
             // Get category name (same logic as in displayContacts)
             const category = categories.find(c => c.id === contact.category_id);
             const categoryName = category ? category.name : (contact.category_id ? 'Неизвестно' : 'Без категории');
 
+            // Check if contact has multiple emails
+            const allEmails = contact.all_emails || [];
+            const hasMultipleEmails = allEmails.length > 1;
+            const primaryEmail = contact.email || (allEmails.length > 0 ? allEmails[0] : 'N/A');
+
+            // Build email cell content with expand button if multiple emails
+            let emailCellContent = '';
+            if (hasMultipleEmails) {
+                emailCellContent = `
+                    <div class="email-cell-with-expand">
+                        <span>${primaryEmail}</span>
+                        <button class="expand-campaign-emails-btn" data-contact-id="${contactId}">
+                            ▼ +${allEmails.length - 1}
+                        </button>
+                    </div>
+                `;
+            } else {
+                emailCellContent = primaryEmail;
+            }
+
             row.innerHTML = `
                 <td class="checkbox-column">
                     <label class="contact-checkbox-label">
-                        <input type="checkbox" class="contact-checkbox" data-contact-id="${contact.id || index}" data-email="${contact.email}">
+                        <input type="checkbox" class="contact-checkbox" data-contact-id="${contactId}" data-email="${primaryEmail}">
                         <span class="checkbox-custom"></span>
                     </label>
                 </td>
                 <td class="category-cell">${categoryName}</td>
                 <td class="org-name-cell">${contact.organization_name || 'N/A'}</td>
-                <td class="email-cell">${contact.email || 'N/A'}</td>
+                <td class="email-cell">${emailCellContent}</td>
                 <td class="description-cell">${contact.description ? (contact.description.length > 50 ? contact.description.substring(0, 50) + '...' : contact.description) : 'N/A'}</td>
                 <td class="website-cell">${contact.website ? `<a href="${contact.website}" target="_blank" class="website-link">${contact.website}</a>` : 'N/A'}</td>
             `;
+
+            row.dataset.contactId = contactId;
             tableBody.appendChild(row);
+
+            // Bind expand button if multiple emails
+            if (hasMultipleEmails) {
+                const expandBtn = row.querySelector('.expand-campaign-emails-btn');
+                if (expandBtn) {
+                    expandBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.toggleCampaignEmailsExpansion(row, contact, allEmails);
+                    });
+                }
+            }
         });
 
         // Bind checkbox events
