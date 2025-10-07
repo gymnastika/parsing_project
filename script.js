@@ -6293,7 +6293,7 @@ class GymnastikaPlatform {
                 categoryId: params.categoryId
             };
 
-            await this.orchestrator.executeAISearch(pipelineParams);
+            await this.pipelineOrchestrator.executeAISearch(pipelineParams);
 
         } catch (error) {
             console.error('❌ Task creation error:', error);
