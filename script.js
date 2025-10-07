@@ -2050,6 +2050,8 @@ class GymnastikaPlatform {
 
     // Display contacts - With category column
     displayContacts(contacts, container) {
+        console.log('🎨 displayContacts() called with', contacts.length, 'contacts');
+
         const table = document.createElement('table');
         table.className = 'contacts-table';
 
