@@ -1775,6 +1775,7 @@ class GymnastikaPlatform {
                         id: contact.id,  // CRITICAL: Include ID for editing
                         organization_name: contact.organization_name || 'Неизвестная организация',
                         email: contact.email || '',
+                        all_emails: contact.all_emails || [],  // ✅ CRITICAL: Include all_emails for multiple email display
                         description: contact.description || 'Описание отсутствует',
                         website: contact.website || contact.source_url || '',
                         country: contact.country || 'Не определено',
