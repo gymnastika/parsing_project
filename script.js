@@ -6937,8 +6937,35 @@ class GymnastikaPlatform {
             const categoryId = taskData.categoryId || task.category_id || null;
             console.log(`📝 Saving with: task_name="${taskName}", category_id="${categoryId}", user_id="${supabaseUserId}"`);
 
-            // 🔍 DEBUG: Log first 3 results to see allEmails data
-            console.log('🔍 DEBUG: First 3 raw results from parser:');
+            // 🧹 CLEANUP: Clean and deduplicate allEmails arrays
+            const cleanAllEmails = (emails) => {
+                if (!Array.isArray(emails) || emails.length === 0) return [];
+
+                // Email validation regex - strict version
+                const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+                // Filter, clean, validate, and deduplicate
+                const cleaned = [...new Set(
+                    emails
+                        .filter(e => e && typeof e === 'string')  // Only strings
+                        .map(e => e.trim().toLowerCase())          // Normalize
+                        .filter(e => emailRegex.test(e))          // Validate format
+                        .filter(e => e.length < 100)               // Reasonable length
+                        .filter(e => !e.includes(' '))             // No spaces
+                )];
+
+                return cleaned;
+            };
+
+            // Clean allEmails for all results
+            results.forEach(result => {
+                if (result.allEmails) {
+                    result.allEmails = cleanAllEmails(result.allEmails);
+                }
+            });
+
+            // 🔍 DEBUG: Log first 3 results to see allEmails data AFTER cleanup
+            console.log('🔍 DEBUG: First 3 raw results from parser (AFTER cleanup):');
             results.slice(0, 3).forEach((result, idx) => {
                 console.log(`  [${idx}] ${result.organizationName || result.name}:`);
                 console.log(`      email: ${result.email}`);
