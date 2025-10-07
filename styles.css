@@ -7852,6 +7852,93 @@ div.modal-overlay.edit-contact-modal label {
     font-weight: 500;
 }
 
+/* Email Campaign expansion styles */
+.campaign-emails-expansion-row {
+    background: #f8f9ff;
+}
+
+.campaign-emails-expansion-cell {
+    padding: 16px 20px;
+    background: white;
+    border: 2px solid var(--primary-purple);
+    border-radius: 8px;
+}
+
+.campaign-emails-expansion-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.campaign-emails-expansion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.campaign-emails-expansion-header strong {
+    color: var(--text-dark);
+    font-size: 0.95rem;
+}
+
+.select-all-campaign-emails-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--primary-purple);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.select-all-campaign-emails-btn:hover {
+    background: #7c3aed;
+    transform: translateY(-1px);
+}
+
+.campaign-emails-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.campaign-email-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--primary-purple);
+}
+
+/* Expand button for campaign emails */
+.expand-campaign-emails-btn {
+    padding: 2px 8px;
+    background: var(--primary-purple);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-left: 8px;
+}
+
+.expand-campaign-emails-btn:hover {
+    background: #7c3aed;
+    transform: scale(1.05);
+}
+
+.email-cell-with-expand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 /* Ensure contacts container has proper spacing */
 #contacts-content {
     margin-top: 0 !important; /* Tab content itself shouldn't have margin */
