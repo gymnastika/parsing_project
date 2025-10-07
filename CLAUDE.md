@@ -1417,3 +1417,67 @@ for (const attachment of this.currentEmailCampaign.attachments || []) {
     }
 }
 ```
+
+### ✅ Fix 6: 400 Bad Request - Missing userId in Task Creation (October 7, 2025)
+**Проблема**: При попытке запустить парсинг возникала ошибка 400 Bad Request
+```
+Failed to load resource: the server responded with a status of 400 ()
+❌ Task creation error: Error: Failed to create task in database
+❌ Missing required fields: { userId: false, taskData: true }
+```
+
+- **Root Cause**: Код отправлял `userId: this.currentUser?.id`, но `this.currentUser` был `undefined` или `null`
+  - При `userId: undefined`, JSON.stringify() не включает это поле в тело запроса
+  - Сервер получал только `taskData` без `userId` → отклонял запрос с 400 ошибкой
+
+- **Solution**:
+  1. Получение `userId` напрямую из Supabase session в момент создания запроса
+  2. Добавлена валидация аутентификации с понятным сообщением об ошибке
+  3. Исправлены оба метода: `startParsing()` и `startUrlParsing()`
+
+- **Impact**:
+  - ✅ `userId` теперь ВСЕГДА получается из актуальной Supabase сессии
+  - ✅ Добавлена проверка аутентификации перед отправкой запроса
+  - ✅ Запрос всегда содержит валидный `userId` → сервер принимает его
+  - ✅ Парсинг успешно запускается без ошибок 400
+
+- **Files Modified**:
+  - `script.js:6209-6241` - Метод `startParsing()` с валидацией userId
+  - `script.js:6280-6310` - Метод `startUrlParsing()` с валидацией userId
+
+**Технические детали**:
+```javascript
+// БЫЛО (неправильно - userId может быть undefined):
+body: JSON.stringify({
+    userId: this.currentUser?.id,  // ❌ undefined если не залогинен
+    taskData: taskData
+})
+
+// СТАЛО (правильно - всегда валидный userId):
+// Получаем актуальную сессию из Supabase
+const { data: { session }, error: sessionError } = await this.supabase.auth.getSession();
+
+if (sessionError || \!session?.user) {
+    throw new Error("Пользователь не авторизован. Пожалуйста, войдите в систему.");
+}
+
+const userId = session.user.id;  // ✅ Всегда валидный UUID
+console.log("✅ Authenticated user ID:", userId);
+
+body: JSON.stringify({
+    userId: userId,  // ✅ Гарантированно присутствует
+    taskData: taskData
+})
+```
+
+**Server-side Validation** (`server.js:1049-1052`):
+```javascript
+if (\!userId || \!taskData) {
+    console.error("❌ Missing required fields:", { userId: \!\!userId, taskData: \!\!taskData });
+    return res.status(400).json({ error: "userId and taskData are required" });
+}
+```
+
+---
+
+**Создано с помощью Claude Code** | **GitHub**: https://github.com/gymnastika/parsing_project
