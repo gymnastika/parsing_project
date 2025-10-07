@@ -6408,25 +6408,37 @@ class GymnastikaPlatform {
 
     // Update selected email contacts array and counter
     updateSelectedEmailContacts() {
-        const selectedCheckboxes = document.querySelectorAll('.contact-checkbox:checked');
+        // Get ALL selected checkboxes: primary contacts + expanded campaign emails
+        const primaryCheckboxes = document.querySelectorAll('.contact-checkbox:checked');
+        const campaignCheckboxes = document.querySelectorAll('.campaign-email-checkbox:checked');
         const selectedCount = document.getElementById('selectedContactsCount');
-        
-        // Update selected contacts array
+
+        // Update selected contacts array (combine primary + campaign emails)
         this.selectedEmailContacts = [];
-        selectedCheckboxes.forEach(checkbox => {
+
+        // Add primary contact emails
+        primaryCheckboxes.forEach(checkbox => {
             this.selectedEmailContacts.push({
                 id: checkbox.dataset.contactId,
                 email: checkbox.dataset.email
             });
         });
 
-        // Update counter display
+        // Add expanded campaign emails
+        campaignCheckboxes.forEach(checkbox => {
+            this.selectedEmailContacts.push({
+                id: checkbox.dataset.contactId,
+                email: checkbox.dataset.email
+            });
+        });
+
+        // Update counter display (total = primary + campaign)
         const count = this.selectedEmailContacts.length;
         if (selectedCount) {
             selectedCount.textContent = `${count} выбрано`;
         }
 
-        console.log(`📧 Selected ${count} contacts for email campaign`);
+        console.log(`📧 Selected ${count} emails for campaign (${primaryCheckboxes.length} primary + ${campaignCheckboxes.length} expanded)`);
     }
 
     // Start parsing process
