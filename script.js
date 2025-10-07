@@ -2456,7 +2456,7 @@ class GymnastikaPlatform {
         console.log(`📧 Total selected emails: ${this.selectedCampaignEmails.size}`);
 
         // Update selected contacts count
-        this.updateSelectedContactsCount();
+        this.updateSelectedEmailContacts();
     }
 
     // Select all emails for campaign
@@ -2478,7 +2478,7 @@ class GymnastikaPlatform {
         console.log(`📧 Total selected emails: ${this.selectedCampaignEmails.size}`);
 
         // Update selected contacts count
-        this.updateSelectedContactsCount();
+        this.updateSelectedEmailContacts();
     }
 
     // Handle individual email checkbox change
