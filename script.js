@@ -6256,17 +6256,7 @@ class GymnastikaPlatform {
             const createdTask = await taskResponse.json();
             this.currentTaskId = createdTask.id;
             console.log('✅ Task created with status: pending, ID:', this.currentTaskId);
-
-            // CRITICAL: Mark task as 'running' IMMEDIATELY to prevent Background Worker from picking it up
-            // This prevents DOUBLE EXECUTION (frontend + worker both executing same task)
-            await fetch(`/api/parsing-tasks/${this.currentTaskId}/running`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${session.access_token}`
-                }
-            });
-            console.log('🔒 Task marked as running - Background Worker will skip this task');
+            console.log('🔄 Background Worker will pick up and execute this task automatically');
 
             // 2. Show visual feedback - task sent to server
             const submitBtn = document.querySelector('.submit-btn');
@@ -6277,23 +6267,16 @@ class GymnastikaPlatform {
             if (progressBar) progressBar.classList.add('active');
             if (progressDesc) progressDesc.classList.add('active');
 
-            // 3. Show initial progress state
+            // 3. Show initial progress state - waiting for Background Worker
             this.updateModernProgress({
                 stage: 'initializing',
                 current: 0,
-                total: 7,
-                message: 'Инициализация парсинга...'
+                total: 100,
+                message: 'Задача отправлена на сервер... Ожидание Background Worker...'
             });
 
-            // 4. Execute pipeline (task is marked as 'running' so Background Worker won't pick it up)
-            const pipelineParams = {
-                taskId: this.currentTaskId,
-                searchQuery: params.searchQuery,
-                resultsPerQuery: params.resultsPerQuery || 50,
-                categoryId: params.categoryId
-            };
-
-            await this.pipelineOrchestrator.executeAISearch(pipelineParams);
+            // 4. Real-time subscription will handle all progress updates from Background Worker
+            // No need to execute pipeline here - Background Worker does everything!
 
         } catch (error) {
             console.error('❌ Task creation error:', error);
