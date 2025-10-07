@@ -2286,7 +2286,7 @@ class GymnastikaPlatform {
             td.colSpan = 6; // Span all columns
             td.className = 'emails-expansion-cell';
 
-            // Create emails list with checkboxes
+            // Create emails list (read-only view for Contacts section)
             const emailsContainer = document.createElement('div');
             emailsContainer.className = 'emails-expansion-container';
 
@@ -2294,36 +2294,14 @@ class GymnastikaPlatform {
             header.className = 'emails-expansion-header';
             header.innerHTML = `
                 <strong>Все email адреса организации "${contact.organization_name || 'Неизвестно'}":</strong>
-                <button class="select-all-emails-btn" data-contact-id="${contactId}">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                    </svg>
-                    Выбрать все для рассылки
-                </button>
             `;
 
             const emailsList = document.createElement('div');
             emailsList.className = 'emails-list';
 
             allEmails.forEach((email, index) => {
-                const emailItem = document.createElement('label');
-                emailItem.className = 'email-checkbox-item';
-
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.className = 'email-checkbox';
-                checkbox.dataset.contactId = contactId;
-                checkbox.dataset.email = email;
-                checkbox.value = email;
-
-                // Check if email is already selected for campaign
-                if (this.selectedCampaignEmails && this.selectedCampaignEmails.has(email)) {
-                    checkbox.checked = true;
-                }
-
-                checkbox.addEventListener('change', (e) => {
-                    this.handleEmailSelectionChange(e.target, contact);
-                });
+                const emailItem = document.createElement('div');
+                emailItem.className = 'email-view-item';
 
                 const emailLink = document.createElement('a');
                 emailLink.href = `mailto:${email}`;
@@ -2335,7 +2313,6 @@ class GymnastikaPlatform {
                 badge.className = 'email-badge';
                 badge.textContent = index === 0 ? 'Основной' : `Email ${index + 1}`;
 
-                emailItem.appendChild(checkbox);
                 emailItem.appendChild(emailLink);
                 emailItem.appendChild(badge);
                 emailsList.appendChild(emailItem);
@@ -2353,15 +2330,6 @@ class GymnastikaPlatform {
             const expandBtn = row.querySelector('.expand-emails-btn');
             if (expandBtn) expandBtn.textContent = `▲ ${allEmails.length} email`;
             row.classList.add('expanded');
-
-            // Bind "Select All" button
-            const selectAllBtn = header.querySelector('.select-all-emails-btn');
-            if (selectAllBtn) {
-                selectAllBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    this.selectAllEmailsForContact(contactId, allEmails, contact);
-                });
-            }
         }
     }
 
