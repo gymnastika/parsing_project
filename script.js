@@ -6279,6 +6279,16 @@ class GymnastikaPlatform {
     // Start URL parsing process (direct web scraping without AI/Google Maps)
     async startUrlParsing(params) {
         try {
+            // Get current authenticated user from Supabase
+            const { data: { session }, error: sessionError } = await this.supabase.auth.getSession();
+
+            if (sessionError || !session?.user) {
+                throw new Error('Пользователь не авторизован. Пожалуйста, войдите в систему.');
+            }
+
+            const userId = session.user.id;
+            console.log('✅ Authenticated user ID for URL parsing:', userId);
+
             // 1. Create task in database with 'pending' status
             const taskData = {
                 taskName: params.taskName,
@@ -6291,10 +6301,10 @@ class GymnastikaPlatform {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${await this.getAuthToken()}`
+                    'Authorization': `Bearer ${session.access_token}`
                 },
                 body: JSON.stringify({
-                    userId: this.currentUser?.id,
+                    userId: userId,
                     taskData: taskData
                 })
             });
