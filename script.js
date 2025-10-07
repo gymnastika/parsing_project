@@ -2425,7 +2425,7 @@ class GymnastikaPlatform {
 
             // Update expand button
             const expandBtn = row.querySelector('.expand-campaign-emails-btn');
-            if (expandBtn) expandBtn.textContent = `▲ ${allEmails.length} email`;
+            if (expandBtn) expandBtn.textContent = `▲ ${allEmails.length}`;
             row.classList.add('expanded');
 
             // Bind "Select All" button
