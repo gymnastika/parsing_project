@@ -6958,11 +6958,24 @@ class GymnastikaPlatform {
             };
 
             // Clean allEmails for all results
+            let totalCleaned = 0;
+            let totalRemoved = 0;
             results.forEach(result => {
                 if (result.allEmails) {
+                    const originalLength = result.allEmails.length;
                     result.allEmails = cleanAllEmails(result.allEmails);
+                    const cleanedLength = result.allEmails.length;
+
+                    if (originalLength !== cleanedLength) {
+                        totalCleaned++;
+                        totalRemoved += (originalLength - cleanedLength);
+                    }
                 }
             });
+
+            if (totalCleaned > 0) {
+                console.log(`🧹 Cleaned ${totalCleaned} allEmails arrays, removed ${totalRemoved} invalid/duplicate emails`);
+            }
 
             // 🔍 DEBUG: Log first 3 results to see allEmails data AFTER cleanup
             console.log('🔍 DEBUG: First 3 raw results from parser (AFTER cleanup):');
