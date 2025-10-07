@@ -6256,7 +6256,17 @@ class GymnastikaPlatform {
             const createdTask = await taskResponse.json();
             this.currentTaskId = createdTask.id;
             console.log('✅ Task created with status: pending, ID:', this.currentTaskId);
-            console.log('🔄 Background Worker will pick up and execute this task automatically');
+
+            // CRITICAL: Mark task as 'running' IMMEDIATELY to prevent Background Worker from picking it up
+            // This prevents DOUBLE EXECUTION (frontend + worker both executing same task)
+            await fetch(`/api/parsing-tasks/${this.currentTaskId}/running`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
+                }
+            });
+            console.log('🔒 Task marked as running - Background Worker will skip this task');
 
             // 2. Show visual feedback - task sent to server
             const submitBtn = document.querySelector('.submit-btn');
