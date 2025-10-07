@@ -2083,10 +2083,28 @@ class GymnastikaPlatform {
         
         // 📅 Sort contacts by date before displaying
         const sortedContacts = this.sortContactsByDate([...contacts], this.dateSortDirection);
-        
+
         // Store sorted contacts for re-sorting
         this.lastContactsData = sortedContacts;
-        
+
+        // 🔍 DEBUG: Check how many contacts have multiple emails
+        let multipleEmailsCount = 0;
+        sortedContacts.forEach(contact => {
+            let allEmails = contact.all_emails || [];
+            if (typeof allEmails === 'string') {
+                try {
+                    allEmails = JSON.parse(allEmails);
+                } catch (e) {
+                    allEmails = [];
+                }
+            }
+            if (allEmails.length > 1) {
+                multipleEmailsCount++;
+                console.log(`🔍 Contact with multiple emails: ${contact.organization_name} - ${allEmails.length} emails:`, allEmails);
+            }
+        });
+        console.log(`📊 Total contacts with multiple emails: ${multipleEmailsCount} / ${sortedContacts.length}`);
+
         // Create body
         const body = document.createElement('tbody');
 
