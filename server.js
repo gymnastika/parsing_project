@@ -1042,6 +1042,9 @@ app.post('/api/tasks/:taskId/cancel', async (req, res) => {
 // Create new parsing task
 app.post('/api/parsing-tasks', async (req, res) => {
     try {
+        console.log('📥 RAW req.body:', req.body);
+        console.log('📥 req.body type:', typeof req.body);
+        console.log('📥 req.body keys:', Object.keys(req.body));
         console.log('📥 Received parsing task request:', JSON.stringify(req.body, null, 2));
 
         const { userId, taskData } = req.body;
