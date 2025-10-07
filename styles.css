@@ -9322,3 +9322,24 @@ div.modal-overlay.results-modal .results-modal-content {
         margin-top: 1.5rem;
     }
 }
+
+/* ============================================= */
+/* Auth Footer - Privacy Policy & Terms Links   */
+/* ============================================= */
+.auth-footer {
+    position: relative;
+    z-index: 10 !important;
+}
+
+.auth-footer a {
+    position: relative;
+    z-index: 11 !important;
+    display: inline-block;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+.auth-footer a:hover {
+    color: #ffffff !important;
+    text-decoration: underline;
+}
