@@ -1,6 +1,6 @@
 # Complete Fixes Summary - October 1, 2025
 
-**Date**: October 1, 2025
+**Date**: October 1-2, 2025
 **Status**: ✅ **ALL ISSUES FIXED**
 
 ---
@@ -30,6 +30,12 @@
 - **Root Cause**: Saved with Supabase UUID, loaded with `this.currentUser?.id` (browser-specific)
 - **Fix**: All queries now use Supabase auth UUID consistently
 - **Documentation**: `database/CROSS_BROWSER_DATA_FIX.md`
+
+### Issue 5: Multiple Emails Not Displaying ✅
+- **Problem**: Organizations with 2+ emails show only 1 email, no expand button (▼ +N)
+- **Root Cause**: `all_emails` field not included in loadContactsData() mapping (line 1778)
+- **Fix**: Added `all_emails: contact.all_emails || []` to contact object mapping
+- **Documentation**: `database/MULTIPLE_EMAILS_DISPLAY_FIX.md`
 
 ---
 
