@@ -6378,7 +6378,7 @@ class GymnastikaPlatform {
                 categoryId: params.categoryId
             };
 
-            await this.orchestrator.executeUrlParsing(pipelineParams);
+            await this.pipelineOrchestrator.executeUrlParsing(pipelineParams);
 
         } catch (error) {
             console.error('❌ URL parsing task creation error:', error);
