@@ -7102,7 +7102,12 @@ class GymnastikaPlatform {
             for (let i = 0; i < uniqueRecords.length; i += insertBatchSize) {
                 const batch = uniqueRecords.slice(i, i + insertBatchSize);
 
-                const { data, error } = await this.supabase
+                // 🔍 DEBUG: Check all_emails field before insert
+                console.log(`🔍 DEBUG batch ${i / insertBatchSize + 1}: First record all_emails:`, batch[0]?.all_emails);
+
+                // Supabase expects JSONB fields as native JavaScript arrays (not stringified)
+                // The supabase-js client will automatically convert arrays to JSONB
+                const { data, error} = await this.supabase
                     .from('parsing_results')
                     .insert(batch);
 
