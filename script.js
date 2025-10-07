@@ -6904,6 +6904,16 @@ class GymnastikaPlatform {
             const categoryId = taskData.categoryId || task.category_id || null;
             console.log(`📝 Saving with: task_name="${taskName}", category_id="${categoryId}", user_id="${supabaseUserId}"`);
 
+            // 🔍 DEBUG: Log first 3 results to see allEmails data
+            console.log('🔍 DEBUG: First 3 raw results from parser:');
+            results.slice(0, 3).forEach((result, idx) => {
+                console.log(`  [${idx}] ${result.organizationName || result.name}:`);
+                console.log(`      email: ${result.email}`);
+                console.log(`      allEmails: ${JSON.stringify(result.allEmails)}`);
+                console.log(`      allEmails type: ${typeof result.allEmails}`);
+                console.log(`      allEmails length: ${result.allEmails?.length || 0}`);
+            });
+
             // Prepare records matching the actual parsing_results table schema
             const records = results.map(result => ({
                 user_id: supabaseUserId,
@@ -6922,6 +6932,15 @@ class GymnastikaPlatform {
                 scraping_error: result.error || null
                 // error_type field removed - no longer in table schema
             }));
+
+            // 🔍 DEBUG: Log first 3 prepared records to see all_emails mapping
+            console.log('🔍 DEBUG: First 3 prepared records for database:');
+            records.slice(0, 3).forEach((record, idx) => {
+                console.log(`  [${idx}] ${record.organization_name}:`);
+                console.log(`      all_emails: ${JSON.stringify(record.all_emails)}`);
+                console.log(`      all_emails type: ${typeof record.all_emails}`);
+                console.log(`      all_emails length: ${record.all_emails?.length || 0}`);
+            });
 
             // 🔍 DEDUPLICATION: Check for existing emails in database
             console.log('🔍 Checking for duplicate emails in existing database...');
