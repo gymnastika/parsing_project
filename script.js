@@ -2111,7 +2111,16 @@ class GymnastikaPlatform {
             const categoryName = category ? category.name : (contact.category_id ? 'Неизвестно' : 'Без категории');
 
             // Check if contact has multiple emails
-            const allEmails = contact.all_emails || [];
+            // Fix: Parse all_emails if it's a JSON string
+            let allEmails = contact.all_emails || [];
+            if (typeof allEmails === 'string') {
+                try {
+                    allEmails = JSON.parse(allEmails);
+                } catch (e) {
+                    console.warn('Failed to parse all_emails:', allEmails, e);
+                    allEmails = [];
+                }
+            }
             const hasMultipleEmails = allEmails.length > 1;
             const primaryEmail = contact.email || (allEmails.length > 0 ? allEmails[0] : null);
 
