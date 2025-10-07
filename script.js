@@ -6326,13 +6326,38 @@ class GymnastikaPlatform {
 
             selectAllCheckbox.addEventListener('change', (e) => {
                 const isChecked = e.target.checked;
-                // 🔧 FIX: Use CURRENT checkboxes, not cached reference from line 5809
-                const currentCheckboxes = document.querySelectorAll('.contact-checkbox');
-                currentCheckboxes.forEach(checkbox => {
+
+                // Select ALL checkboxes: primary contacts + expanded campaign emails
+                const primaryCheckboxes = document.querySelectorAll('.contact-checkbox');
+                const campaignCheckboxes = document.querySelectorAll('.campaign-email-checkbox');
+
+                // Set primary contact checkboxes
+                primaryCheckboxes.forEach(checkbox => {
                     checkbox.checked = isChecked;
                 });
+
+                // Set expanded campaign email checkboxes
+                campaignCheckboxes.forEach(checkbox => {
+                    checkbox.checked = isChecked;
+
+                    // Update selectedCampaignEmails Set
+                    if (isChecked) {
+                        if (!this.selectedCampaignEmails) {
+                            this.selectedCampaignEmails = new Set();
+                        }
+                        this.selectedCampaignEmails.add(checkbox.value);
+                    } else {
+                        if (this.selectedCampaignEmails) {
+                            this.selectedCampaignEmails.delete(checkbox.value);
+                        }
+                    }
+                });
+
                 this.updateSelectedEmailContacts();
                 updateSelectAllStyling();
+
+                console.log(`✅ Select All: ${isChecked ? 'CHECKED' : 'UNCHECKED'} all emails (primary + expanded)`);
+                console.log(`📧 Primary checkboxes: ${primaryCheckboxes.length}, Campaign checkboxes: ${campaignCheckboxes.length}`);
             });
 
             selectAllCheckbox.addEventListener('focus', () => {
