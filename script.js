@@ -2092,13 +2092,18 @@ class GymnastikaPlatform {
         // 🔍 DEBUG: Check how many contacts have multiple emails
         let multipleEmailsCount = 0;
         let hasAllEmailsField = 0;
-        console.log('🔍 DEBUG: Checking first 5 contacts for all_emails field:');
-        sortedContacts.slice(0, 5).forEach((contact, idx) => {
-            console.log(`  [${idx}] ${contact.organization_name || 'Unknown'}:`);
-            console.log(`      all_emails:`, contact.all_emails);
-            console.log(`      all_emails type:`, typeof contact.all_emails);
-            console.log(`      email:`, contact.email);
-        });
+
+        // Sample first 5 contacts
+        const sample = sortedContacts.slice(0, 5).map((contact, idx) => ({
+            index: idx,
+            name: contact.organization_name || 'Unknown',
+            email: contact.email,
+            all_emails: contact.all_emails,
+            all_emails_type: typeof contact.all_emails,
+            all_emails_length: Array.isArray(contact.all_emails) ? contact.all_emails.length : 'N/A'
+        }));
+
+        console.log('🔍 DEBUG: First 5 contacts sample:', sample);
 
         sortedContacts.forEach(contact => {
             if (contact.all_emails !== null && contact.all_emails !== undefined) {
