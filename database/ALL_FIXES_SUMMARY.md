@@ -337,7 +337,9 @@ Old tasks (before fixes):
 1. ✅ `database/PARSING_RESULTS_SCHEMA_FIX.md` - Main database save fix
 2. ✅ `database/EYE_ICON_FIX_SUMMARY.md` - Eye icon view results fix
 3. ✅ `database/CONTACTS_SECTION_FIX.md` - Contacts loading fix
-4. ✅ `database/ALL_FIXES_SUMMARY.md` - This complete summary
+4. ✅ `database/CROSS_BROWSER_DATA_FIX.md` - Cross-browser data visibility fix
+5. ✅ `database/MULTIPLE_EMAILS_DISPLAY_FIX.md` - Multiple emails expand button fix
+6. ✅ `database/ALL_FIXES_SUMMARY.md` - This complete summary
 
 ### Existing Documentation (Updated Context)
 - `database/PURE_SERVER_SIDE_ARCHITECTURE.md` - Background Worker architecture
